@@ -1,0 +1,36 @@
+{
+  "name": "gulp-npm-publish",
+  "version": "1.0.1",
+  "description": "Publish your NPM modules safely and gracefully using Gulp.",
+  "main": "./index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/inikulin/gulp-npm-publish.git"
+  },
+  "keywords": [
+    "gulp",
+    "npm",
+    "publish",
+    "package",
+    "module"
+  ],
+  "author": "Ivan Nikulin <ifaaan@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/inikulin/gulp-npm-publish/issues"
+  },
+  "homepage": "https://github.com/inikulin/gulp-npm-publish#readme",
+  "files": [
+    "index.js"
+  ],
+  "dependencies": {
+    "gulp-util": "^3.0.7",
+    "pinkie-promise": "^1.0.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.4"
+  }
+}
