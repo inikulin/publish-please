@@ -1,10 +1,11 @@
 # gulp-npm-publish
 [![Build Status](https://api.travis-ci.org/inikulin/gulp-npm-publish.svg)](https://travis-ci.org/inikulin/gulp-npm-publish)
+
 TODO
 
  - [x] Prompt
- - [ ] Latest commit
- - [x] Tag check (compare with package.json version)
+ - [ ] Latest commit info
+ - [x] Git tag check (compare with package.json version)
  - [ ] Staged changes check
  - [ ] npm publish --tag
  - [x] Branch check

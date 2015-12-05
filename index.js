@@ -1,4 +1,5 @@
 var exec           = require('child_process').exec;
+var fs             = require('fs');
 var elegantSpinner = require('elegant-spinner');
 var logUpdate      = require('log-update');
 var inquirer       = require('inquirer');
@@ -65,9 +66,9 @@ function git (command, cwd) {
 function validateGitTag (pkgVersion) {
     var stopSpinner = createSpinner('Validating git tag');
 
-    return git('describe --tags')
+    return git('describe --exact-match --tags HEAD')
         .catch(function () {
-            throw new PluginError("Latest commit doesn't have git tag.");
+            throwError("Latest commit doesn't have git tag.");
         })
         .then(function (tag) {
             if (tag !== pkgVersion && tag !== 'v' + pkgVersion) {
@@ -95,7 +96,23 @@ function validateBranch (expected) {
         });
 }
 
+function readPkgVersion () {
+    try {
+        var version = JSON.parse(fs.readFileSync('package.json').toString()).version;
+    }
+    catch (err) {
+        throwError("Can't parse package.json: file doesn't exist or it's not a valid JSON file");
+    }
+
+    if (!version)
+        throwError('Version is not specified in package.json');
+
+    return version;
+}
+
 module.exports = function (opts) {
+    var pkgVersion = null;
+
     opts = defaults(opts, {
         confirm:        true,
         validateGitTag: true,
@@ -104,10 +121,16 @@ module.exports = function (opts) {
 
     return Promise.resolve()
         .then(function () {
+            pkgVersion = readPkgVersion();
+        })
+        .then(function () {
             if (opts.validateBranch)
                 return validateBranch(opts.validateBranch);
+        })
+        .then(function () {
+            if (opts.validateGitTag)
+                return validateGitTag(pkgVersion);
         });
-
 };
 
 // Exports for the testing purposes
