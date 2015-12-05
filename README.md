@@ -3,7 +3,7 @@ TODO
 
  - [x] Prompt
  - [ ] Latest commit
- - [ ] Tag check (compare with package.json version)
+ - [x] Tag check (compare with package.json version)
  - [ ] Staged changes check
  - [ ] npm publish --tag
  - [ ] Branch check
