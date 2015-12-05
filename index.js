@@ -3,11 +3,16 @@ var elegantSpinner = require('elegant-spinner');
 var logUpdate      = require('log-update');
 var inquirer       = require('inquirer');
 var chalk          = require('chalk');
+var defaults       = require('defaults');
 var PluginError    = require('gulp-util').PluginError;
 var Promise        = require('pinkie-promise');
 var OS             = require('os-family');
+var noop           = require('noop-fn');
 
 function createSpinner (text) {
+    if (module.exports.testMode)
+        return noop;
+
     var frame = elegantSpinner();
 
     var animation = setInterval(function () {
@@ -16,11 +21,19 @@ function createSpinner (text) {
 
     animation.unref();
 
-    return function () {
+    return function (ok) {
+        var status = ok ?
+                     chalk.green(OS.win ? '√' : '✓') :
+                     chalk.red(OS.win ? '×' : '✖');
+
         clearInterval(animation);
-        logUpdate(text + ' ' + chalk.green(OS.win ? '√' : '✓'));
+        logUpdate(text + ' ' + status);
         console.log();
     };
+}
+
+function throwError (msg) {
+    throw new PluginError('gulp-npm-publish', msg);
 }
 
 function confirmPublishing () {
@@ -38,9 +51,9 @@ function confirmPublishing () {
     });
 }
 
-function git (command) {
+function git (command, cwd) {
     return new Promise(function (resolve, reject) {
-        exec('git ' + command, function (err, stdout) {
+        exec('git ' + command, { cwd: cwd || process.cwd }, function (err, stdout) {
             if (err)
                 reject(err);
             else
@@ -58,25 +71,46 @@ function validateGitTag (pkgVersion) {
         })
         .then(function (tag) {
             if (tag !== pkgVersion && tag !== 'v' + pkgVersion) {
-                throw new PluginError('Expected git tag to be ' + chalk.gray(pkgVersion) +
-                                      ' or ' + chalk.gray('v' + pkgVersion) + ', ' +
-                                      'but it was ' + chalk.gray(tag) + '.');
+                stopSpinner(false);
+
+                throwError('Expected git tag to be `' + pkgVersion + '` or ' +
+                           '`v' + pkgVersion + '`, but it was `' + tag + '`.');
             }
 
-            stopSpinner();
+            stopSpinner(true);
         })
 }
 
 function validateBranch (expected) {
     var stopSpinner = createSpinner('Validating branch');
 
-    return git("git branch | sed -n '/\\* /s///p'")
+    return git("branch | sed -n '/\\* /s///p'")
         .then(function (branch) {
             if (branch !== expected) {
-                throw new PluginError('Expected branch to be ' + chalk.gray(expected) +
-                                      'but it was ' + chalk.gray(branch) + '.');
+                stopSpinner(false);
+                throwError('Expected branch to be `' + expected + '`, but it was `' + branch + '`.');
             }
 
-            stopSpinner();
+            stopSpinner(true);
         });
 }
+
+module.exports = function (opts) {
+    opts = defaults(opts, {
+        confirm:        true,
+        validateGitTag: true,
+        validateBranch: 'master'
+    });
+
+    return Promise.resolve()
+        .then(function () {
+            if (opts.validateBranch)
+                return validateBranch(opts.validateBranch);
+        });
+
+};
+
+// Exports for the testing purposes
+module.exports.git      = git;
+module.exports.testMode = false;
+

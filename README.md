@@ -1,4 +1,5 @@
 # gulp-npm-publish
+[![Build Status](https://api.travis-ci.org/inikulin/gulp-npm-publish.svg)](https://travis-ci.org/inikulin/gulp-npm-publish)
 TODO
 
  - [x] Prompt
