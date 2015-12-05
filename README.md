@@ -1,12 +1,12 @@
 # gulp-npm-publish
 TODO
 
- - Prompt
- - Latest commit
- - Tag check
- - Staged changes check
- - npm publish --tag
- - Branch check
+ - [x] Prompt
+ - [ ] Latest commit
+ - [ ] Tag check (compare with package.json version)
+ - [ ] Staged changes check
+ - [ ] npm publish --tag
+ - [ ] Branch check
 
 ## Install
 ```

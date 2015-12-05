@@ -1,7 +1,7 @@
 {
   "name": "gulp-npm-publish",
   "version": "1.0.1",
-  "description": "Publish your NPM modules safely and gracefully using Gulp.",
+  "description": "Publish your npm modules safely and gracefully using Gulp.",
   "main": "./index.js",
   "scripts": {
     "test": "mocha"
@@ -28,6 +28,7 @@
   ],
   "dependencies": {
     "gulp-util": "^3.0.7",
+    "inquirer": "^0.11.0",
     "pinkie-promise": "^1.0.0"
   },
   "devDependencies": {
