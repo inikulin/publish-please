@@ -1,5 +1,5 @@
 # Publish, please!
-[![Build Status](https://api.travis-ci.org/inikulin/gulp-npm-publish.svg)](https://travis-ci.org/inikulin/gulp-npm-publish)
+[![Build Status](https://api.travis-ci.org/inikulin/publish-please.svg)](https://travis-ci.org/inikulin/publish-please)
 
 TODO
 
@@ -10,10 +10,6 @@ TODO
  - [ ] npm publish --tag
  - [x] Branch check
 
-## Install
-```
-npm install --save-dev gulp-npm-publish
-```
 
 ## Usage
 TODO
