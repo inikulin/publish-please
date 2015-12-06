@@ -24,6 +24,7 @@ it('Should validate package.json existence', function () {
             return publish({
                 confirm:          false,
                 checkUncommitted: false,
+                checkUntracked:   false,
                 validateGitTag:   false,
                 validateBranch:   false
             });
@@ -44,6 +45,7 @@ describe('Branch validation', function () {
                 return publish({
                     confirm:          false,
                     checkUncommitted: false,
+                    checkUntracked:   false,
                     validateGitTag:   false
                 });
             })
@@ -62,6 +64,7 @@ describe('Branch validation', function () {
                 return publish({
                     confirm:          false,
                     checkUncommitted: false,
+                    checkUntracked:   false,
                     validateGitTag:   false,
                     validateBranch:   'no-tag'
                 });
@@ -81,6 +84,7 @@ describe('Branch validation', function () {
                 return publish({
                     confirm:          false,
                     checkUncommitted: false,
+                    checkUntracked:   false,
                     validateGitTag:   false,
                     validateBranch:   'master'
                 });
@@ -100,6 +104,7 @@ describe('Branch validation', function () {
                 return publish({
                     confirm:          false,
                     checkUncommitted: false,
+                    checkUntracked:   false,
                     validateGitTag:   false,
                     validateBranch:   'no-tag'
                 });
@@ -112,6 +117,7 @@ describe('Branch validation', function () {
                 return publish({
                     confirm:          false,
                     checkUncommitted: false,
+                    checkUntracked:   false,
                     validateGitTag:   false,
                     validateBranch:   false
                 });
@@ -126,6 +132,7 @@ describe('Git tag validation', function () {
                 return publish({
                     confirm:          false,
                     checkUncommitted: false,
+                    checkUntracked:   false,
                     validateGitTag:   true,
                     validateBranch:   false
                 });
@@ -145,6 +152,7 @@ describe('Git tag validation', function () {
                 return publish({
                     confirm:          false,
                     checkUncommitted: false,
+                    checkUntracked:   false,
                     validateGitTag:   true,
                     validateBranch:   false
                 });
@@ -164,6 +172,7 @@ describe('Git tag validation', function () {
                 return publish({
                     confirm:          false,
                     checkUncommitted: false,
+                    checkUntracked:   false,
                     validateGitTag:   true,
                     validateBranch:   false
                 });
@@ -176,6 +185,7 @@ describe('Git tag validation', function () {
                 return publish({
                     confirm:          false,
                     checkUncommitted: false,
+                    checkUntracked:   false,
                     validateGitTag:   false,
                     validateBranch:   false
                 });
@@ -196,6 +206,7 @@ describe('Uncommitted changes check', function () {
                 return publish({
                     confirm:          false,
                     checkUncommitted: true,
+                    checkUntracked:   false,
                     validateGitTag:   false,
                     validateBranch:   false
                 });
@@ -217,6 +228,63 @@ describe('Uncommitted changes check', function () {
                 return publish({
                     confirm:          false,
                     checkUncommitted: false,
+                    checkUntracked:   false,
+                    validateGitTag:   false,
+                    validateBranch:   false
+                });
+            });
+    });
+
+    it('Should pass validation', function () {
+        return cmd('git checkout master')
+            .then(function () {
+                return publish({
+                    confirm:          false,
+                    checkUncommitted: true,
+                    checkUntracked:   false,
+                    validateGitTag:   false,
+                    validateBranch:   false
+                });
+            });
+    });
+});
+
+describe('Untracked files check', function () {
+    afterEach(function () {
+        return del('test-file');
+    });
+
+    it('Should expect no untracked files in the working tree', function () {
+        return cmd('git checkout master')
+            .then(function () {
+                writeFile('test-file', 'Yo!');
+
+                return publish({
+                    confirm:          false,
+                    checkUncommitted: false,
+                    checkUntracked:   true,
+                    validateGitTag:   false,
+                    validateBranch:   false
+                });
+            })
+            .then(function () {
+                throw new Error('Promise rejection expected');
+            })
+            .catch(function (err) {
+                assert(err instanceof PluginError);
+                assert.strictEqual(err.message, "  * There are untracked files in the working tree.");
+            });
+    });
+
+    it('Should pass validation if option is disabled', function () {
+        return cmd('git checkout master')
+            .then(function () {
+                writeFile('test-file', 'Yo!');
+
+                return publish({
+                    confirm:          false,
+                    checkUncommitted: false,
+                    checkUntracked:   false,
                     validateGitTag:   false,
                     validateBranch:   false
                 });
@@ -229,9 +297,11 @@ describe('Uncommitted changes check', function () {
                 return publish({
                     confirm:          false,
                     checkUncommitted: false,
+                    checkUntracked:   true,
                     validateGitTag:   false,
                     validateBranch:   false
                 });
             });
     });
 });
+
