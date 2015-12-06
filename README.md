@@ -4,12 +4,15 @@
 TODO
 
  - [x] Prompt
- - [ ] Latest commit info
+ - [x] Latest commit info
  - [x] Git tag check (compare with package.json version)
- - [ ] Staged changes check
+ - [x] Staged changes check
  - [ ] npm publish --tag
  - [x] Branch check
-
+ - [x] .publishrc file
+ - [ ] prepublishScript
+ - [ ] test .publishrc
+ - [ ] check emoji on windows
 
 ## Usage
 TODO
