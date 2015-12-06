@@ -3,6 +3,7 @@ var PluginError = require('gulp-util').PluginError;
 var del         = require('del');
 var publish     = require('../lib');
 var writeFile   = require('fs').writeFileSync;
+var readFile    = require('fs').readFileSync;
 var cmd         = require('../lib').cmd;
 
 before(function () {
@@ -305,3 +306,38 @@ describe('Untracked files check', function () {
     });
 });
 
+describe('Prepublish script', function () {
+    afterEach(function () {
+        return cmd('git reset --hard HEAD');
+    });
+
+    it('Should fail if prepublish script fail', function () {
+        return cmd('git checkout master')
+            .then(function () {
+                return publish({
+                    confirm:          false,
+                    prepublishScript: 'git'
+                });
+            })
+            .then(function () {
+                throw new Error('Promise rejection expected');
+            })
+            .catch(function (err) {
+                assert(err instanceof PluginError);
+                assert.strictEqual(err.message, 'Prepublish script `git` exited with code 1.');
+            });
+    });
+
+    it('Should run prepublish script', function () {
+        return cmd('git checkout master')
+            .then(function () {
+                return publish({
+                    confirm:          false,
+                    prepublishScript: 'git mv README.md test-file'
+                });
+            })
+            .then(function () {
+                assert(readFile('test-file'));
+            });
+    });
+});

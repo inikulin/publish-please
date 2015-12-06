@@ -10,7 +10,7 @@ TODO
  - [ ] npm publish --tag
  - [x] Branch check
  - [x] .publishrc file
- - [ ] prepublishScript
+ - [x] prepublishScript
  - [ ] test .publishrc
  - [x] check emoji on windows
 

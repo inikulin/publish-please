@@ -1,5 +1,5 @@
 {
-  "name": "gulp-npm-publish",
+  "name": "publish-please",
   "version": "1.0.1",
   "description": "Publish your npm modules safely and gracefully.",
   "main": "./lib/index.js",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/inikulin/gulp-npm-publish.git"
+    "url": "git+https://github.com/inikulin/publish-please.git"
   },
   "keywords": [
     "gulp",
@@ -23,9 +23,9 @@
   "author": "Ivan Nikulin <ifaaan@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/inikulin/gulp-npm-publish/issues"
+    "url": "https://github.com/inikulin/publish-please/issues"
   },
-  "homepage": "https://github.com/inikulin/gulp-npm-publish#readme",
+  "homepage": "https://github.com/inikulin/publish-please#readme",
   "files": [
     "lib",
     "bin"
