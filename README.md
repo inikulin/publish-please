@@ -12,7 +12,7 @@ TODO
  - [x] .publishrc file
  - [ ] prepublishScript
  - [ ] test .publishrc
- - [ ] check emoji on windows
+ - [x] check emoji on windows
 
 ## Usage
 TODO
