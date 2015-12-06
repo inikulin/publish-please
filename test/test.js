@@ -31,7 +31,7 @@ it('Should validate package.json existence', function () {
         })
         .catch(function (err) {
             assert(err instanceof PluginError);
-            assert.strictEqual(err.message, "Can't parse package.json: file doesn't exist or it's not a valid JSON file");
+            assert.strictEqual(err.message, "Can't parse package.json: file doesn't exist or it's not a valid JSON file.");
         });
 });
 
@@ -49,7 +49,7 @@ describe('Branch validation', function () {
             })
             .catch(function (err) {
                 assert(err instanceof PluginError);
-                assert.strictEqual(err.message, 'Expected branch to be `master`, but it was `no-tag`.');
+                assert.strictEqual(err.message, '  * Expected branch to be `master`, but it was `no-tag`.');
             });
     });
 
@@ -67,7 +67,7 @@ describe('Branch validation', function () {
             })
             .catch(function (err) {
                 assert(err instanceof PluginError);
-                assert.strictEqual(err.message, 'Expected branch to be `no-tag`, but it was `master`.');
+                assert.strictEqual(err.message, '  * Expected branch to be `no-tag`, but it was `master`.');
             });
     });
 
@@ -85,7 +85,7 @@ describe('Branch validation', function () {
             })
             .catch(function (err) {
                 assert(err instanceof PluginError);
-                assert.strictEqual(err.message, 'Expected branch to be `master`, but it was `(detached from a4b76ae)`.');
+                assert.strictEqual(err.message, '  * Expected branch to be `master`, but it was `(detached from a4b76ae)`.');
             });
     });
 
@@ -127,7 +127,7 @@ describe('Git tag validation', function () {
             })
             .catch(function (err) {
                 assert(err instanceof PluginError);
-                assert.strictEqual(err.message, 'Expected git tag to be `1.0.0` or `v1.0.0`, but it was `v0.0.42`.');
+                assert.strictEqual(err.message, '  * Expected git tag to be `1.0.0` or `v1.0.0`, but it was `v0.0.42`.');
             });
     });
 
@@ -145,7 +145,7 @@ describe('Git tag validation', function () {
             })
             .catch(function (err) {
                 assert(err instanceof PluginError);
-                assert.strictEqual(err.message, "Latest commit doesn't have git tag.");
+                assert.strictEqual(err.message, "  * Latest commit doesn't have git tag.");
             });
     });
 
