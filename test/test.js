@@ -184,7 +184,6 @@ describe('Git tag validation', function () {
 });
 
 describe('Uncommitted changes check', function () {
-
     afterEach(function () {
         return cmd('git reset --hard HEAD');
     });
