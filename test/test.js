@@ -1,10 +1,11 @@
 var assert      = require('assert');
 var PluginError = require('gulp-util').PluginError;
 var del         = require('del');
-var publish     = require('../lib');
 var writeFile   = require('fs').writeFileSync;
 var readFile    = require('fs').readFileSync;
+var publish     = require('../lib');
 var cmd         = require('../lib').cmd;
+var getOptions  = require('../lib').getOptions;
 
 before(function () {
     publish.testMode = true;
@@ -19,24 +20,65 @@ after(function (done) {
     del('publish-please-test-repo', done);
 });
 
-it('Should validate package.json existence', function () {
-    return cmd('git checkout no-package-json')
-        .then(function () {
-            return publish({
-                confirm:          false,
-                checkUncommitted: false,
-                checkUntracked:   false,
-                validateGitTag:   false,
-                validateBranch:   false
+describe('package.json', function () {
+    it('Should validate package.json existence', function () {
+        return cmd('git checkout no-package-json')
+            .then(function () {
+                return publish({
+                    confirm:          false,
+                    checkUncommitted: false,
+                    checkUntracked:   false,
+                    validateGitTag:   false,
+                    validateBranch:   false
+                });
+            })
+            .then(function () {
+                throw new Error('Promise rejection expected');
+            })
+            .catch(function (err) {
+                assert(err instanceof PluginError);
+                assert.strictEqual(err.message, "Can't parse package.json: file doesn't exist or it's not a valid JSON file.");
             });
-        })
-        .then(function () {
-            throw new Error('Promise rejection expected');
-        })
-        .catch(function (err) {
-            assert(err instanceof PluginError);
-            assert.strictEqual(err.message, "Can't parse package.json: file doesn't exist or it's not a valid JSON file.");
+    });
+});
+
+
+describe('.publishrc', function () {
+    afterEach(function () {
+        return del('.publishrc');
+    });
+
+    it('Should use options from .publishrc file', function () {
+        writeFile('.publishrc', JSON.stringify({
+            confirm:          false,
+            prepublishScript: 'npm test',
+            checkUncommitted: true,
+            checkUntracked:   true
+        }));
+
+        var opts = getOptions({
+            checkUncommitted: false,
+            checkUntracked:   false
         });
+
+        assert(!opts.confirm);
+        assert.strictEqual(opts.prepublishScript, 'npm test');
+        assert(!opts.checkUncommitted);
+        assert(!opts.checkUntracked);
+        assert.strictEqual(opts.validateBranch, 'master');
+    });
+
+    it('Should expect .publishrc to be a valid JSON file', function () {
+        writeFile('.publishrc', 'yoyo123');
+
+        try {
+            getOptions();
+        }
+        catch (err) {
+            assert(err instanceof PluginError);
+            assert.strictEqual(err.message, '.publishrc is not a valid JSON file.');
+        }
+    });
 });
 
 describe('Branch validation', function () {

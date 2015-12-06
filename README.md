@@ -11,7 +11,7 @@ TODO
  - [x] Branch check
  - [x] .publishrc file
  - [x] prepublishScript
- - [ ] test .publishrc
+ - [x] test .publishrc
  - [x] check emoji on windows
 
 ## Usage
