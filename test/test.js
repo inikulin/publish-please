@@ -383,3 +383,30 @@ describe('Prepublish script', function () {
             });
     });
 });
+
+describe('Publish tag', function () {
+    it('Should publish with the given tag', function () {
+        return cmd('git checkout master')
+            .then(function () {
+                return publish({
+                    confirm: false,
+                    tag:     'alpha'
+                });
+            })
+            .then(function (npmCmd) {
+                assert.strictEqual(npmCmd, 'npm publish --tag alpha');
+            });
+    });
+
+    it('Should publish with the `latest` tag by default', function () {
+        return cmd('git checkout master')
+            .then(function () {
+                return publish({
+                    confirm: false
+                });
+            })
+            .then(function (npmCmd) {
+                assert.strictEqual(npmCmd, 'npm publish --tag latest');
+            });
+    });
+});
