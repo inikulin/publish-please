@@ -1,26 +1,26 @@
 var assert      = require('assert');
 var PluginError = require('gulp-util').PluginError;
 var del         = require('del');
-var npmPublish  = require('../');
-var git         = require('../').git;
+var publish     = require('../lib');
+var git         = require('../lib').git;
 
 before(function () {
-    npmPublish.testMode = true;
+    publish.testMode = true;
 
-    return git('clone https://github.com/inikulin/gnp-test-repo.git').then(function () {
-        process.chdir('gnp-test-repo');
+    return git('clone https://github.com/inikulin/publish-please-test-repo.git').then(function () {
+        process.chdir('publish-please-test-repo');
     });
 });
 
 after(function (done) {
     process.chdir('../');
-    del('gnp-test-repo', done);
+    del('publish-please-test-repo', done);
 });
 
 it('Should validate package.json existence', function () {
     return git('checkout no-package-json')
         .then(function () {
-            return npmPublish({
+            return publish({
                 confirm:        false,
                 validateGitTag: false,
                 validateBranch: false
@@ -39,7 +39,7 @@ describe('Branch validation', function () {
     it('Should expect `master` branch by default', function () {
         return git('checkout no-tag')
             .then(function () {
-                return npmPublish({
+                return publish({
                     confirm:        false,
                     validateGitTag: false
                 });
@@ -56,7 +56,7 @@ describe('Branch validation', function () {
     it('Should validate branch passed via parameter', function () {
         return git('checkout master')
             .then(function () {
-                return npmPublish({
+                return publish({
                     confirm:        false,
                     validateGitTag: false,
                     validateBranch: 'no-tag'
@@ -74,7 +74,7 @@ describe('Branch validation', function () {
     it('Should expect the latest commit in the branch', function () {
         return git('checkout a4b76ae5d285800eadcf16e60c75edc33071d929')
             .then(function () {
-                return npmPublish({
+                return publish({
                     confirm:        false,
                     validateGitTag: false,
                     validateBranch: 'master'
@@ -92,7 +92,7 @@ describe('Branch validation', function () {
     it('Should pass validation', function () {
         return git('checkout no-tag')
             .then(function () {
-                return npmPublish({
+                return publish({
                     confirm:        false,
                     validateGitTag: false,
                     validateBranch: 'no-tag'
@@ -103,7 +103,7 @@ describe('Branch validation', function () {
     it('Should not validate if option is disabled', function () {
         return git('checkout no-tag')
             .then(function () {
-                return npmPublish({
+                return publish({
                     confirm:        false,
                     validateGitTag: false,
                     validateBranch: false
@@ -116,7 +116,7 @@ describe('Git tag validation', function () {
     it('Should expect git tag to match version', function () {
         return git('checkout tag-doesnt-match-version')
             .then(function () {
-                return npmPublish({
+                return publish({
                     confirm:        false,
                     validateGitTag: true,
                     validateBranch: false
@@ -134,7 +134,7 @@ describe('Git tag validation', function () {
     it('Should expect git tag to exist', function () {
         return git('checkout no-tag')
             .then(function () {
-                return npmPublish({
+                return publish({
                     confirm:        false,
                     validateGitTag: true,
                     validateBranch: false
@@ -152,7 +152,7 @@ describe('Git tag validation', function () {
     it('Should pass validation', function () {
         return git('checkout master')
             .then(function () {
-                return npmPublish({
+                return publish({
                     confirm:        false,
                     validateGitTag: true,
                     validateBranch: false
@@ -163,7 +163,7 @@ describe('Git tag validation', function () {
     it('Should not validate if option is disabled', function () {
         return git('checkout tag-doesnt-match-version')
             .then(function () {
-                return npmPublish({
+                return publish({
                     confirm:        false,
                     validateGitTag: false,
                     validateBranch: false

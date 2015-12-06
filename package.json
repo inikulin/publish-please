@@ -1,8 +1,11 @@
 {
   "name": "gulp-npm-publish",
   "version": "1.0.1",
-  "description": "Publish your npm modules safely and gracefully using Gulp.",
-  "main": "./index.js",
+  "description": "Publish your npm modules safely and gracefully.",
+  "main": "./lib/index.js",
+  "bin": {
+    "publish-please": "./bin/cli.js"
+  },
   "scripts": {
     "test": "mocha"
   },
@@ -24,7 +27,8 @@
   },
   "homepage": "https://github.com/inikulin/gulp-npm-publish#readme",
   "files": [
-    "index.js"
+    "lib",
+    "bin"
   ],
   "dependencies": {
     "chalk": "^1.1.1",

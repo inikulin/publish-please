@@ -1,4 +1,4 @@
-# gulp-npm-publish
+# Publish, please!
 [![Build Status](https://api.travis-ci.org/inikulin/gulp-npm-publish.svg)](https://travis-ci.org/inikulin/gulp-npm-publish)
 
 TODO
