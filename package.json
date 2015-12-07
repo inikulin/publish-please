@@ -40,7 +40,8 @@
     "node-emoji": "^1.0.4",
     "noop-fn": "^1.0.0",
     "os-family": "^1.0.0",
-    "pinkie-promise": "^1.0.0"
+    "pinkie-promise": "^1.0.0",
+    "spawn-cmd": "0.0.2"
   },
   "devDependencies": {
     "del": "^1.2.1",
