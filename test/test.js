@@ -366,7 +366,7 @@ describe('Prepublish script', function () {
             })
             .catch(function (err) {
                 assert(err instanceof PluginError);
-                assert.strictEqual(err.message, 'Prepublish script `git` exited with code 1.');
+                assert.strictEqual(err.message, 'Command `git` exited with code 1.');
             });
     });
 
