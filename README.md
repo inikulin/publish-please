@@ -78,6 +78,9 @@ You can specify publish options in the JSON form via `.publishrc` file in your p
 ```
 
 ## Sensitive information audit
+** Important note:** tool provides some very basic sensitive data check. Do not rely on it fully. Always perform manual checks for the
+sensitive data in your packages.
+
 Performed for the following items:
 
 - Private SSH key
