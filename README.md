@@ -22,12 +22,12 @@
  - Can be used as CLI tool or [Gulp](https://github.com/gulpjs/gulp) plugin.
 
 ## Install
-As CLI tool:
+### As CLI tool:
 ```
 npm install -g publish-please
 ```
 
-As Gulp plugin:
+### As Gulp plugin:
 ```
 npm install --save-dev publish-please
 ```
