@@ -1,10 +1,13 @@
 {
   "name": "publish-please",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Publish your npm modules safely and gracefully.",
   "main": "./lib/index.js",
   "bin": {
     "publish-please": "./bin/cli.js"
+  },
+  "engines": {
+    "node": ">=4.0.0"
   },
   "scripts": {
     "test": "mocha"
@@ -31,10 +34,12 @@
     "bin"
   ],
   "dependencies": {
+    "ban-sensitive-files": "^1.7.2",
     "chalk": "^1.1.1",
     "cross-spawn-async": "^2.1.1",
     "defaults": "^1.0.3",
     "elegant-spinner": "^1.0.1",
+    "globby": "^4.0.0",
     "gulp-util": "^3.0.7",
     "inquirer": "^0.11.0",
     "log-update": "^1.0.2",
@@ -45,7 +50,9 @@
     "spawn-cmd": "0.0.2"
   },
   "devDependencies": {
+    "ban-sensitive-files": "^1.7.2",
     "del": "^1.2.1",
+    "mkdir-promise": "^1.0.0",
     "mocha": "^2.3.4"
   }
 }

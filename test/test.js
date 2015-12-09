@@ -3,6 +3,7 @@ var PluginError = require('gulp-util').PluginError;
 var del         = require('del');
 var writeFile   = require('fs').writeFileSync;
 var readFile    = require('fs').readFileSync;
+var mkdir       = require('mkdir-promise');
 var publish     = require('../lib');
 var cmd         = require('../lib').cmd;
 var getOptions  = require('../lib').getOptions;
@@ -25,11 +26,12 @@ describe('package.json', function () {
         return cmd('git checkout no-package-json')
             .then(function () {
                 return publish({
-                    confirm:          false,
-                    checkUncommitted: false,
-                    checkUntracked:   false,
-                    validateGitTag:   false,
-                    validateBranch:   false
+                    confirm:            false,
+                    sensitiveDataAudit: false,
+                    checkUncommitted:   false,
+                    checkUntracked:     false,
+                    validateGitTag:     false,
+                    validateBranch:     false
                 });
             })
             .then(function () {
@@ -44,21 +46,23 @@ describe('package.json', function () {
 
 
 describe('.publishrc', function () {
-    afterEach(function () {
-        return del('.publishrc');
+    afterEach(function (done) {
+        del('.publishrc', done);
     });
 
     it('Should use options from .publishrc file', function () {
         writeFile('.publishrc', JSON.stringify({
-            confirm:          false,
-            prepublishScript: 'npm test',
-            checkUncommitted: true,
-            checkUntracked:   true
+            confirm:            false,
+            sensitiveDataAudit: false,
+            prepublishScript:   'npm test',
+            checkUncommitted:   true,
+            checkUntracked:     true
         }));
 
         var opts = getOptions({
-            checkUncommitted: false,
-            checkUntracked:   false
+            checkUncommitted:   false,
+            sensitiveDataAudit: false,
+            checkUntracked:     false
         });
 
         assert(!opts.confirm);
@@ -86,10 +90,11 @@ describe('Branch validation', function () {
         return cmd('git checkout no-tag')
             .then(function () {
                 return publish({
-                    confirm:          false,
-                    checkUncommitted: false,
-                    checkUntracked:   false,
-                    validateGitTag:   false
+                    confirm:            false,
+                    sensitiveDataAudit: false,
+                    checkUncommitted:   false,
+                    checkUntracked:     false,
+                    validateGitTag:     false
                 });
             })
             .then(function () {
@@ -105,11 +110,12 @@ describe('Branch validation', function () {
         return cmd('git checkout master')
             .then(function () {
                 return publish({
-                    confirm:          false,
-                    checkUncommitted: false,
-                    checkUntracked:   false,
-                    validateGitTag:   false,
-                    validateBranch:   'no-tag'
+                    confirm:            false,
+                    sensitiveDataAudit: false,
+                    checkUncommitted:   false,
+                    checkUntracked:     false,
+                    validateGitTag:     false,
+                    validateBranch:     'no-tag'
                 });
             })
             .then(function () {
@@ -125,11 +131,12 @@ describe('Branch validation', function () {
         return cmd('git checkout a4b76ae5d285800eadcf16e60c75edc33071d929')
             .then(function () {
                 return publish({
-                    confirm:          false,
-                    checkUncommitted: false,
-                    checkUntracked:   false,
-                    validateGitTag:   false,
-                    validateBranch:   'master'
+                    confirm:            false,
+                    sensitiveDataAudit: false,
+                    checkUncommitted:   false,
+                    checkUntracked:     false,
+                    validateGitTag:     false,
+                    validateBranch:     'master'
                 });
             })
             .then(function () {
@@ -145,11 +152,12 @@ describe('Branch validation', function () {
         return cmd('git checkout no-tag')
             .then(function () {
                 return publish({
-                    confirm:          false,
-                    checkUncommitted: false,
-                    checkUntracked:   false,
-                    validateGitTag:   false,
-                    validateBranch:   'no-tag'
+                    confirm:            false,
+                    sensitiveDataAudit: false,
+                    checkUncommitted:   false,
+                    checkUntracked:     false,
+                    validateGitTag:     false,
+                    validateBranch:     'no-tag'
                 });
             });
     });
@@ -158,11 +166,12 @@ describe('Branch validation', function () {
         return cmd('git checkout no-tag')
             .then(function () {
                 return publish({
-                    confirm:          false,
-                    checkUncommitted: false,
-                    checkUntracked:   false,
-                    validateGitTag:   false,
-                    validateBranch:   false
+                    confirm:            false,
+                    sensitiveDataAudit: false,
+                    checkUncommitted:   false,
+                    checkUntracked:     false,
+                    validateGitTag:     false,
+                    validateBranch:     false
                 });
             });
     });
@@ -173,11 +182,12 @@ describe('Git tag validation', function () {
         return cmd('git checkout tag-doesnt-match-version')
             .then(function () {
                 return publish({
-                    confirm:          false,
-                    checkUncommitted: false,
-                    checkUntracked:   false,
-                    validateGitTag:   true,
-                    validateBranch:   false
+                    confirm:            false,
+                    sensitiveDataAudit: false,
+                    checkUncommitted:   false,
+                    checkUntracked:     false,
+                    validateGitTag:     true,
+                    validateBranch:     false
                 });
             })
             .then(function () {
@@ -193,11 +203,12 @@ describe('Git tag validation', function () {
         return cmd('git checkout no-tag')
             .then(function () {
                 return publish({
-                    confirm:          false,
-                    checkUncommitted: false,
-                    checkUntracked:   false,
-                    validateGitTag:   true,
-                    validateBranch:   false
+                    confirm:            false,
+                    sensitiveDataAudit: false,
+                    checkUncommitted:   false,
+                    checkUntracked:     false,
+                    validateGitTag:     true,
+                    validateBranch:     false
                 });
             })
             .then(function () {
@@ -213,11 +224,12 @@ describe('Git tag validation', function () {
         return cmd('git checkout master')
             .then(function () {
                 return publish({
-                    confirm:          false,
-                    checkUncommitted: false,
-                    checkUntracked:   false,
-                    validateGitTag:   true,
-                    validateBranch:   false
+                    confirm:            false,
+                    sensitiveDataAudit: false,
+                    checkUncommitted:   false,
+                    checkUntracked:     false,
+                    validateGitTag:     true,
+                    validateBranch:     false
                 });
             });
     });
@@ -226,11 +238,12 @@ describe('Git tag validation', function () {
         return cmd('git checkout tag-doesnt-match-version')
             .then(function () {
                 return publish({
-                    confirm:          false,
-                    checkUncommitted: false,
-                    checkUntracked:   false,
-                    validateGitTag:   false,
-                    validateBranch:   false
+                    confirm:            false,
+                    sensitiveDataAudit: false,
+                    checkUncommitted:   false,
+                    checkUntracked:     false,
+                    validateGitTag:     false,
+                    validateBranch:     false
                 });
             });
     });
@@ -247,11 +260,12 @@ describe('Uncommitted changes check', function () {
                 writeFile('README.md', 'Yo!');
 
                 return publish({
-                    confirm:          false,
-                    checkUncommitted: true,
-                    checkUntracked:   false,
-                    validateGitTag:   false,
-                    validateBranch:   false
+                    confirm:            false,
+                    sensitiveDataAudit: false,
+                    checkUncommitted:   true,
+                    checkUntracked:     false,
+                    validateGitTag:     false,
+                    validateBranch:     false
                 });
             })
             .then(function () {
@@ -269,11 +283,12 @@ describe('Uncommitted changes check', function () {
                 writeFile('README.md', 'Yo!');
 
                 return publish({
-                    confirm:          false,
-                    checkUncommitted: false,
-                    checkUntracked:   false,
-                    validateGitTag:   false,
-                    validateBranch:   false
+                    confirm:            false,
+                    sensitiveDataAudit: false,
+                    checkUncommitted:   false,
+                    checkUntracked:     false,
+                    validateGitTag:     false,
+                    validateBranch:     false
                 });
             });
     });
@@ -282,19 +297,20 @@ describe('Uncommitted changes check', function () {
         return cmd('git checkout master')
             .then(function () {
                 return publish({
-                    confirm:          false,
-                    checkUncommitted: true,
-                    checkUntracked:   false,
-                    validateGitTag:   false,
-                    validateBranch:   false
+                    confirm:            false,
+                    sensitiveDataAudit: false,
+                    checkUncommitted:   true,
+                    checkUntracked:     false,
+                    validateGitTag:     false,
+                    validateBranch:     false
                 });
             });
     });
 });
 
 describe('Untracked files check', function () {
-    afterEach(function () {
-        return del('test-file');
+    afterEach(function (done) {
+        del('test-file', done);
     });
 
     it('Should expect no untracked files in the working tree', function () {
@@ -303,11 +319,12 @@ describe('Untracked files check', function () {
                 writeFile('test-file', 'Yo!');
 
                 return publish({
-                    confirm:          false,
-                    checkUncommitted: false,
-                    checkUntracked:   true,
-                    validateGitTag:   false,
-                    validateBranch:   false
+                    confirm:            false,
+                    sensitiveDataAudit: false,
+                    checkUncommitted:   false,
+                    checkUntracked:     true,
+                    validateGitTag:     false,
+                    validateBranch:     false
                 });
             })
             .then(function () {
@@ -325,11 +342,12 @@ describe('Untracked files check', function () {
                 writeFile('test-file', 'Yo!');
 
                 return publish({
-                    confirm:          false,
-                    checkUncommitted: false,
-                    checkUntracked:   false,
-                    validateGitTag:   false,
-                    validateBranch:   false
+                    confirm:            false,
+                    sensitiveDataAudit: false,
+                    checkUncommitted:   false,
+                    checkUntracked:     false,
+                    validateGitTag:     false,
+                    validateBranch:     false
                 });
             });
     });
@@ -338,11 +356,76 @@ describe('Untracked files check', function () {
         return cmd('git checkout master')
             .then(function () {
                 return publish({
-                    confirm:          false,
-                    checkUncommitted: false,
-                    checkUntracked:   true,
-                    validateGitTag:   false,
-                    validateBranch:   false
+                    confirm:            false,
+                    sensitiveDataAudit: false,
+                    checkUncommitted:   false,
+                    checkUntracked:     true,
+                    validateGitTag:     false,
+                    validateBranch:     false
+                });
+            });
+    });
+});
+
+describe('Sensitive information audit', function () {
+    afterEach(function (done) {
+        del('schema.rb', function () {
+            del('test/database.yml', done);
+        });
+    });
+
+    it('Should fail if finds sensitive information', function () {
+        return cmd('git checkout master')
+            .then(function () {
+                return mkdir('test');
+            })
+            .then(function () {
+                writeFile('schema.rb', 'test');
+                writeFile('test/database.yml', 'test');
+            })
+            .then(function () {
+                return publish({
+                    confirm:            false,
+                    sensitiveDataAudit: true,
+                    checkUncommitted:   false,
+                    checkUntracked:     false,
+                    validateGitTag:     false,
+                    validateBranch:     false
+                });
+            })
+            .then(function () {
+                throw new Error('Promise rejection expected');
+            })
+            .catch(function (err) {
+                assert(err instanceof PluginError);
+                assert.strictEqual(err.message, '  * Sensitive data found in the working tree:\n' +
+                                                '    invalid filename schema.rb\n' +
+                                                '     - Ruby On Rails database schema file\n' +
+                                                '     - Contains information on the database schema of a Ruby On Rails application.\n' +
+                                                '    invalid filename test/database.yml\n' +
+                                                '     - Potential Ruby On Rails database configuration file\n' +
+                                                '     - Might contain database credentials.'
+                );
+            });
+    });
+
+    it('Should not perform check if option is disabled', function () {
+        return cmd('git checkout master')
+            .then(function () {
+                return mkdir('test');
+            })
+            .then(function () {
+                writeFile('schema.rb', 'test');
+                writeFile('test/database.yml', 'test');
+            })
+            .then(function () {
+                return publish({
+                    confirm:            false,
+                    sensitiveDataAudit: false,
+                    checkUncommitted:   false,
+                    checkUntracked:     false,
+                    validateGitTag:     false,
+                    validateBranch:     false
                 });
             });
     });
@@ -357,8 +440,9 @@ describe('Prepublish script', function () {
         return cmd('git checkout master')
             .then(function () {
                 return publish({
-                    confirm:          false,
-                    prepublishScript: 'git'
+                    confirm:            false,
+                    sensitiveDataAudit: false,
+                    prepublishScript:   'git'
                 });
             })
             .then(function () {
@@ -374,8 +458,9 @@ describe('Prepublish script', function () {
         return cmd('git checkout master')
             .then(function () {
                 return publish({
-                    confirm:          false,
-                    prepublishScript: 'git mv README.md test-file'
+                    confirm:            false,
+                    sensitiveDataAudit: false,
+                    prepublishScript:   'git mv README.md test-file'
                 });
             })
             .then(function () {
@@ -393,8 +478,9 @@ describe('Publish tag', function () {
         return cmd('git checkout master')
             .then(function () {
                 return publish({
-                    confirm: false,
-                    tag:     'alpha'
+                    confirm:            false,
+                    sensitiveDataAudit: false,
+                    tag:                'alpha'
                 });
             })
             .then(function (npmCmd) {
@@ -406,7 +492,8 @@ describe('Publish tag', function () {
         return cmd('git checkout master')
             .then(function () {
                 return publish({
-                    confirm: false
+                    confirm:            false,
+                    sensitiveDataAudit: false
                 });
             })
             .then(function (npmCmd) {
