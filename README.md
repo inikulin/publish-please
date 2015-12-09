@@ -83,7 +83,7 @@ sensitive data in your packages.
 
 Performed for the following items:
 
-- Private SSH key
+ - Private SSH key
  - Potential cryptographic private key
  - Potential cryptographic key bundle
  - Pidgin OTR private key
