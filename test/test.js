@@ -379,6 +379,10 @@ describe('Prepublish script', function () {
                 });
             })
             .then(function () {
+                throw new Error('Promise rejection expected');
+            })
+            // NOTE: will throw because we have uncommited changes
+            .catch(function () {
                 assert(readFile('test-file'));
             });
     });
