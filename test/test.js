@@ -31,7 +31,8 @@ describe('package.json', function () {
                     checkUncommitted:   false,
                     checkUntracked:     false,
                     validateGitTag:     false,
-                    validateBranch:     false
+                    validateBranch:     false,
+                    nsp:                false
                 });
             })
             .then(function () {
@@ -56,13 +57,15 @@ describe('.publishrc', function () {
             sensitiveDataAudit: false,
             prepublishScript:   'npm test',
             checkUncommitted:   true,
-            checkUntracked:     true
+            checkUntracked:     true,
+            nsp:                false
         }));
 
         var opts = getOptions({
             checkUncommitted:   false,
             sensitiveDataAudit: false,
-            checkUntracked:     false
+            checkUntracked:     false,
+            nsp:                false
         });
 
         assert(!opts.confirm);
@@ -94,7 +97,8 @@ describe('Branch validation', function () {
                     sensitiveDataAudit: false,
                     checkUncommitted:   false,
                     checkUntracked:     false,
-                    validateGitTag:     false
+                    validateGitTag:     false,
+                    nsp:                false
                 });
             })
             .then(function () {
@@ -115,7 +119,8 @@ describe('Branch validation', function () {
                     checkUncommitted:   false,
                     checkUntracked:     false,
                     validateGitTag:     false,
-                    validateBranch:     'no-tag'
+                    validateBranch:     'no-tag',
+                    nsp:                false
                 });
             })
             .then(function () {
@@ -136,7 +141,8 @@ describe('Branch validation', function () {
                     checkUncommitted:   false,
                     checkUntracked:     false,
                     validateGitTag:     false,
-                    validateBranch:     'master'
+                    validateBranch:     'master',
+                    nsp:                false
                 });
             })
             .then(function () {
@@ -157,6 +163,7 @@ describe('Branch validation', function () {
                     checkUncommitted:   false,
                     checkUntracked:     false,
                     validateGitTag:     false,
+                    nsp:                false,
                     validateBranch:     'no-tag'
                 });
             });
@@ -171,7 +178,8 @@ describe('Branch validation', function () {
                     checkUncommitted:   false,
                     checkUntracked:     false,
                     validateGitTag:     false,
-                    validateBranch:     false
+                    validateBranch:     false,
+                    nsp:                false
                 });
             });
     });
@@ -187,7 +195,8 @@ describe('Git tag validation', function () {
                     checkUncommitted:   false,
                     checkUntracked:     false,
                     validateGitTag:     true,
-                    validateBranch:     false
+                    validateBranch:     false,
+                    nsp:                false
                 });
             })
             .then(function () {
@@ -208,7 +217,8 @@ describe('Git tag validation', function () {
                     checkUncommitted:   false,
                     checkUntracked:     false,
                     validateGitTag:     true,
-                    validateBranch:     false
+                    validateBranch:     false,
+                    nsp:                false
                 });
             })
             .then(function () {
@@ -229,7 +239,8 @@ describe('Git tag validation', function () {
                     checkUncommitted:   false,
                     checkUntracked:     false,
                     validateGitTag:     true,
-                    validateBranch:     false
+                    validateBranch:     false,
+                    nsp:                false
                 });
             });
     });
@@ -243,7 +254,8 @@ describe('Git tag validation', function () {
                     checkUncommitted:   false,
                     checkUntracked:     false,
                     validateGitTag:     false,
-                    validateBranch:     false
+                    validateBranch:     false,
+                    nsp:                false
                 });
             });
     });
@@ -265,7 +277,8 @@ describe('Uncommitted changes check', function () {
                     checkUncommitted:   true,
                     checkUntracked:     false,
                     validateGitTag:     false,
-                    validateBranch:     false
+                    validateBranch:     false,
+                    nsp:                false
                 });
             })
             .then(function () {
@@ -288,7 +301,8 @@ describe('Uncommitted changes check', function () {
                     checkUncommitted:   false,
                     checkUntracked:     false,
                     validateGitTag:     false,
-                    validateBranch:     false
+                    validateBranch:     false,
+                    nsp:                false
                 });
             });
     });
@@ -302,7 +316,8 @@ describe('Uncommitted changes check', function () {
                     checkUncommitted:   true,
                     checkUntracked:     false,
                     validateGitTag:     false,
-                    validateBranch:     false
+                    validateBranch:     false,
+                    nsp:                false
                 });
             });
     });
@@ -324,7 +339,8 @@ describe('Untracked files check', function () {
                     checkUncommitted:   false,
                     checkUntracked:     true,
                     validateGitTag:     false,
-                    validateBranch:     false
+                    validateBranch:     false,
+                    nsp:                false
                 });
             })
             .then(function () {
@@ -347,7 +363,8 @@ describe('Untracked files check', function () {
                     checkUncommitted:   false,
                     checkUntracked:     false,
                     validateGitTag:     false,
-                    validateBranch:     false
+                    validateBranch:     false,
+                    nsp:                false
                 });
             });
     });
@@ -361,7 +378,8 @@ describe('Untracked files check', function () {
                     checkUncommitted:   false,
                     checkUntracked:     true,
                     validateGitTag:     false,
-                    validateBranch:     false
+                    validateBranch:     false,
+                    nsp:                false
                 });
             });
     });
@@ -390,7 +408,8 @@ describe('Sensitive information audit', function () {
                     checkUncommitted:   false,
                     checkUntracked:     false,
                     validateGitTag:     false,
-                    validateBranch:     false
+                    validateBranch:     false,
+                    nsp:                false
                 });
             })
             .then(function () {
@@ -425,7 +444,8 @@ describe('Sensitive information audit', function () {
                     checkUncommitted:   false,
                     checkUntracked:     false,
                     validateGitTag:     false,
-                    validateBranch:     false
+                    validateBranch:     false,
+                    nsp:                false
                 });
             });
     });
@@ -442,7 +462,8 @@ describe('Prepublish script', function () {
                 return publish({
                     confirm:            false,
                     sensitiveDataAudit: false,
-                    prepublishScript:   'git'
+                    prepublishScript:   'git',
+                    nsp:                false
                 });
             })
             .then(function () {
@@ -460,7 +481,8 @@ describe('Prepublish script', function () {
                 return publish({
                     confirm:            false,
                     sensitiveDataAudit: false,
-                    prepublishScript:   'git mv README.md test-file'
+                    prepublishScript:   'git mv README.md test-file',
+                    nsp:                false
                 });
             })
             .then(function () {
@@ -480,7 +502,8 @@ describe('Publish tag', function () {
                 return publish({
                     confirm:            false,
                     sensitiveDataAudit: false,
-                    tag:                'alpha'
+                    tag:                'alpha',
+                    nsp:                false
                 });
             })
             .then(function (npmCmd) {
@@ -493,7 +516,8 @@ describe('Publish tag', function () {
             .then(function () {
                 return publish({
                     confirm:            false,
-                    sensitiveDataAudit: false
+                    sensitiveDataAudit: false,
+                    nsp:                false
                 });
             })
             .then(function (npmCmd) {

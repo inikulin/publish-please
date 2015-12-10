@@ -17,6 +17,7 @@
  - Checks that git tag matches version specified in the `package.json`.
  - Checks that there are no uncommitted changes in the working tree.
  - Checks that there are no untracked files in the working tree.
+ - Checks that there are no know security vulnerabilities in your `pacakge.json` by running [nsp](https://nodesecurity.io/tools).
  - Can force usage of the [npm publish tag](https://docs.npmjs.com/cli/publish).
  - Provides release summary and asks for the confirmation.
  - Can be configured via `.publishrc` file.
@@ -65,6 +66,7 @@ gulp.task('publish', ['test'], () => publish(options));
  - **validateBranch** - Check that current branch matches the specified branch. Default: `master`.
  - **tag** - Specifies tag with which package will be published. See [npm publish docs](https://docs.npmjs.com/cli/publish) for more info. Default: `latest`.
  - **prepublishScript** - Specifies command that will be run before publish (e.g. `npm test`). Use it for builds and tests. Default: `null`.
+ - **nsp** - Perfom security vulnerablity check using [nsp](https://nodesecurity.io/tools). Defualt: `true`.
 
 ## .publishrc file
 You can specify publish options in the JSON form via `.publishrc` file in your project directory. E.g.:
@@ -134,6 +136,8 @@ Performed for the following items:
  - Potential MSBuild publish profile
  - PHP dotenv
 
+## Security Vulnerablility Check
+NSP, [Node Security Project](https://nodesecurity.io/tools), checks for known vulnerabilities in your package.json based on the [list of Advisories](https://nodesecurity.io/advisories).
 
 ## Author
 [Ivan Nikulin](https://github.com/inikulin) (ifaaan@gmail.com)
