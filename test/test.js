@@ -144,7 +144,8 @@ describe('Branch validation', function () {
             })
             .catch(function (err) {
                 assert(err instanceof PluginError);
-                assert.strictEqual(err.message, '  * Expected branch to be `master`, but it was `(detached from a4b76ae)`.');
+                var re = /^  \* Expected branch to be `master`, but it was `\((?:HEAD )?detached (?:from|at) a4b76ae\)`.$/;
+                assert(re.test(err.message))
             });
     });
 
