@@ -34,7 +34,6 @@
     "bin"
   ],
   "dependencies": {
-    "ansi2html": "0.0.1",
     "ban-sensitive-files": "^1.7.2",
     "chalk": "^1.1.1",
     "cross-spawn-async": "^2.1.1",
@@ -49,14 +48,12 @@
     "nsp": "^2.1.0",
     "os-family": "^1.0.0",
     "pinkie-promise": "^1.0.0",
-    "spawn-cmd": "0.0.2",
-    "uglify-js": "^2.5.0"
+    "spawn-cmd": "0.0.2"
   },
   "devDependencies": {
     "ban-sensitive-files": "^1.7.2",
     "del": "^1.2.1",
     "mkdir-promise": "^1.0.0",
-    "mocha": "^2.3.4",
-    "uglify-js": "^2.5.0"
+    "mocha": "^2.3.4"
   }
 }
