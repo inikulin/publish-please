@@ -4,6 +4,8 @@
   "rules": {
     "no-alert": 2,
     "no-array-constructor": 2,
+    "no-console": 0,
+    "no-process-exit": 0,
     "no-caller": 2,
     "no-catch-shadow": 2,
     "no-empty-label": 2,
@@ -23,7 +25,6 @@
     "no-new-object": 2,
     "no-new-wrappers": 2,
     "no-octal-escape": 2,
-    "no-process-exit": 2,
     "no-proto": 2,
     "no-return-assign": 2,
     "no-script-url": 2,
