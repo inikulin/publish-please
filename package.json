@@ -45,6 +45,7 @@
     "log-update": "^1.0.2",
     "node-emoji": "^1.0.4",
     "noop-fn": "^1.0.0",
+    "nsp": "^2.1.0",
     "os-family": "^1.0.0",
     "pinkie-promise": "^1.0.0",
     "spawn-cmd": "0.0.2"
