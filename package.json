@@ -51,7 +51,6 @@
   },
   "devDependencies": {
     "babel-eslint": "^4.1.6",
-    "ban-sensitive-files": "^1.7.2",
     "del": "^1.2.1",
     "eslint": "^1.10.3",
     "eslint-plugin-babel": "^3.0.0",
