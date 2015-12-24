@@ -10,7 +10,7 @@
     "node": ">=4.0.0"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "eslint bin lib test && mocha"
   },
   "repository": {
     "type": "git",
@@ -46,12 +46,15 @@
     "node-emoji": "^1.0.4",
     "noop-fn": "^1.0.0",
     "os-family": "^1.0.0",
-    "pinkie-promise": "^1.0.0",
+    "promisify-event": "^1.0.0",
     "spawn-cmd": "0.0.2"
   },
   "devDependencies": {
+    "babel-eslint": "^4.1.6",
     "ban-sensitive-files": "^1.7.2",
     "del": "^1.2.1",
+    "eslint": "^1.10.3",
+    "eslint-plugin-babel": "^3.0.0",
     "mkdir-promise": "^1.0.0",
     "mocha": "^2.3.4"
   }

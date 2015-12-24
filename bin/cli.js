@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-var chalk   = require('chalk');
-var publish = require('../lib');
+const chalk   = require('chalk');
+const publish = require('../lib');
 
-publish().catch(function (err) {
+publish().catch(err => {
     console.log(chalk.red.bold('ERRORS'));
     console.log(err.message);
-    process.exit(1)
+    process.exit(1);
 });

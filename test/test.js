@@ -1,56 +1,64 @@
-var assert      = require('assert');
-var PluginError = require('gulp-util').PluginError;
-var del         = require('del');
-var writeFile   = require('fs').writeFileSync;
-var readFile    = require('fs').readFileSync;
-var mkdir       = require('mkdir-promise');
-var publish     = require('../lib');
-var cmd         = require('../lib').cmd;
-var getOptions  = require('../lib').getOptions;
+const assert      = require('assert');
+const PluginError = require('gulp-util').PluginError;
+const del         = require('del');
+const writeFile   = require('fs').writeFileSync;
+const readFile    = require('fs').readFileSync;
+const mkdir       = require('mkdir-promise');
+const defaults    = require('defaults');
+const publish     = require('../lib');
+const cmd         = require('../lib').cmd;
+const getOptions  = require('../lib').getOptions;
 
-before(function () {
+
+function getTestOptions (settings) {
+    const disabled = {
+        confirm:            false,
+        sensitiveDataAudit: false,
+        checkUncommitted:   false,
+        checkUntracked:     false,
+        validateGitTag:     false,
+        validateBranch:     false,
+        tag:                null,
+        prepublishScript:   null
+    };
+
+    if (settings && settings.remove)
+        delete disabled[settings.remove];
+
+
+    return defaults(settings && settings.set, disabled);
+}
+
+before(() => {
     publish.testMode = true;
 
-    return cmd('git clone https://github.com/inikulin/publish-please-test-repo.git').then(function () {
-        process.chdir('publish-please-test-repo');
-    });
+    return cmd('git clone https://github.com/inikulin/publish-please-test-repo.git')
+        .then(() => process.chdir('publish-please-test-repo'));
 });
 
-after(function (done) {
+after(done => {
     process.chdir('../');
     del('publish-please-test-repo', done);
 });
 
-describe('package.json', function () {
-    it('Should validate package.json existence', function () {
-        return cmd('git checkout no-package-json')
-            .then(function () {
-                return publish({
-                    confirm:            false,
-                    sensitiveDataAudit: false,
-                    checkUncommitted:   false,
-                    checkUntracked:     false,
-                    validateGitTag:     false,
-                    validateBranch:     false
-                });
-            })
-            .then(function () {
+describe('package.json', () => {
+    it('Should validate package.json existence', () =>
+        cmd('git checkout no-package-json')
+            .then(() => publish(getTestOptions()))
+            .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(function (err) {
+            .catch(err => {
                 assert(err instanceof PluginError);
                 assert.strictEqual(err.message, "Can't parse package.json: file doesn't exist or it's not a valid JSON file.");
-            });
-    });
+            }));
 });
 
 
-describe('.publishrc', function () {
-    afterEach(function (done) {
-        del('.publishrc', done);
-    });
+describe('.publishrc', () => {
+    afterEach(done => del('.publishrc', done));
 
-    it('Should use options from .publishrc file', function () {
+    it('Should use options from .publishrc file', () => {
         writeFile('.publishrc', JSON.stringify({
             confirm:            false,
             sensitiveDataAudit: false,
@@ -59,7 +67,7 @@ describe('.publishrc', function () {
             checkUntracked:     true
         }));
 
-        var opts = getOptions({
+        const opts = getOptions({
             checkUncommitted:   false,
             sensitiveDataAudit: false,
             checkUntracked:     false
@@ -72,7 +80,7 @@ describe('.publishrc', function () {
         assert.strictEqual(opts.validateBranch, 'master');
     });
 
-    it('Should expect .publishrc to be a valid JSON file', function () {
+    it('Should expect .publishrc to be a valid JSON file', () => {
         writeFile('.publishrc', 'yoyo123');
 
         try {
@@ -85,319 +93,161 @@ describe('.publishrc', function () {
     });
 });
 
-describe('Branch validation', function () {
-    it('Should expect `master` branch by default', function () {
-        return cmd('git checkout no-tag')
-            .then(function () {
-                return publish({
-                    confirm:            false,
-                    sensitiveDataAudit: false,
-                    checkUncommitted:   false,
-                    checkUntracked:     false,
-                    validateGitTag:     false
-                });
-            })
-            .then(function () {
+describe('Branch validation', () => {
+    it('Should expect `master` branch by default', () =>
+        cmd('git checkout no-tag')
+            .then(() => publish(getTestOptions({ remove: 'validateBranch' })))
+            .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(function (err) {
+            .catch(err => {
                 assert(err instanceof PluginError);
                 assert.strictEqual(err.message, '  * Expected branch to be `master`, but it was `no-tag`.');
-            });
-    });
+            }));
 
-    it('Should validate branch passed via parameter', function () {
-        return cmd('git checkout master')
-            .then(function () {
-                return publish({
-                    confirm:            false,
-                    sensitiveDataAudit: false,
-                    checkUncommitted:   false,
-                    checkUntracked:     false,
-                    validateGitTag:     false,
-                    validateBranch:     'no-tag'
-                });
-            })
-            .then(function () {
+
+    it('Should validate branch passed via parameter', () =>
+        cmd('git checkout master')
+            .then(() => publish(getTestOptions({ set: { validateBranch: 'no-tag' } })))
+            .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(function (err) {
+            .catch(err => {
                 assert(err instanceof PluginError);
                 assert.strictEqual(err.message, '  * Expected branch to be `no-tag`, but it was `master`.');
-            });
-    });
+            }));
 
-    it('Should expect the latest commit in the branch', function () {
-        return cmd('git checkout a4b76ae5d285800eadcf16e60c75edc33071d929')
-            .then(function () {
-                return publish({
-                    confirm:            false,
-                    sensitiveDataAudit: false,
-                    checkUncommitted:   false,
-                    checkUntracked:     false,
-                    validateGitTag:     false,
-                    validateBranch:     'master'
-                });
-            })
-            .then(function () {
+    it('Should expect the latest commit in the branch', () =>
+        cmd('git checkout a4b76ae5d285800eadcf16e60c75edc33071d929')
+            .then(() => publish(getTestOptions({ set: { validateBranch: 'master' } })))
+            .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(function (err) {
+            .catch(err => {
+                const msgRe = /^ {2}\* Expected branch to be `master`, but it was `\((?:HEAD )?detached (?:from|at) a4b76ae\)`.$/;
+
                 assert(err instanceof PluginError);
-                var re = /^  \* Expected branch to be `master`, but it was `\((?:HEAD )?detached (?:from|at) a4b76ae\)`.$/;
-                assert(re.test(err.message))
-            });
-    });
+                assert(msgRe.test(err.message));
+            }));
 
-    it('Should pass validation', function () {
-        return cmd('git checkout no-tag')
-            .then(function () {
-                return publish({
-                    confirm:            false,
-                    sensitiveDataAudit: false,
-                    checkUncommitted:   false,
-                    checkUntracked:     false,
-                    validateGitTag:     false,
-                    validateBranch:     'no-tag'
-                });
-            });
-    });
+    it('Should pass validation', () =>
+        cmd('git checkout no-tag')
+            .then(() => publish(getTestOptions({ set: { validateBranch: 'no-tag' } }))));
 
-    it('Should not validate if option is disabled', function () {
-        return cmd('git checkout no-tag')
-            .then(function () {
-                return publish({
-                    confirm:            false,
-                    sensitiveDataAudit: false,
-                    checkUncommitted:   false,
-                    checkUntracked:     false,
-                    validateGitTag:     false,
-                    validateBranch:     false
-                });
-            });
-    });
+    it('Should not validate if option is disabled', () =>
+        cmd('git checkout no-tag')
+            .then(() => publish(getTestOptions())));
 });
 
-describe('Git tag validation', function () {
-    it('Should expect git tag to match version', function () {
-        return cmd('git checkout tag-doesnt-match-version')
-            .then(function () {
-                return publish({
-                    confirm:            false,
-                    sensitiveDataAudit: false,
-                    checkUncommitted:   false,
-                    checkUntracked:     false,
-                    validateGitTag:     true,
-                    validateBranch:     false
-                });
-            })
-            .then(function () {
+describe('Git tag validation', () => {
+    it('Should expect git tag to match version', () =>
+        cmd('git checkout tag-doesnt-match-version')
+            .then(() => publish(getTestOptions({ set: { validateGitTag: true } })))
+            .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(function (err) {
+            .catch(err => {
                 assert(err instanceof PluginError);
                 assert.strictEqual(err.message, '  * Expected git tag to be `1.0.0` or `v1.0.0`, but it was `v0.0.42`.');
-            });
-    });
+            }));
 
-    it('Should expect git tag to exist', function () {
-        return cmd('git checkout no-tag')
-            .then(function () {
-                return publish({
-                    confirm:            false,
-                    sensitiveDataAudit: false,
-                    checkUncommitted:   false,
-                    checkUntracked:     false,
-                    validateGitTag:     true,
-                    validateBranch:     false
-                });
-            })
-            .then(function () {
+    it('Should expect git tag to exist', () =>
+        cmd('git checkout no-tag')
+            .then(() => publish(getTestOptions({ set: { validateGitTag: true } })))
+            .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(function (err) {
+            .catch(err => {
                 assert(err instanceof PluginError);
                 assert.strictEqual(err.message, "  * Latest commit doesn't have git tag.");
-            });
-    });
+            }));
 
-    it('Should pass validation', function () {
-        return cmd('git checkout master')
-            .then(function () {
-                return publish({
-                    confirm:            false,
-                    sensitiveDataAudit: false,
-                    checkUncommitted:   false,
-                    checkUntracked:     false,
-                    validateGitTag:     true,
-                    validateBranch:     false
-                });
-            });
-    });
+    it('Should pass validation', () =>
+        cmd('git checkout master')
+            .then(() => publish(getTestOptions({ set: { validateGitTag: true } }))));
 
-    it('Should not validate if option is disabled', function () {
-        return cmd('git checkout tag-doesnt-match-version')
-            .then(function () {
-                return publish({
-                    confirm:            false,
-                    sensitiveDataAudit: false,
-                    checkUncommitted:   false,
-                    checkUntracked:     false,
-                    validateGitTag:     false,
-                    validateBranch:     false
-                });
-            });
-    });
+    it('Should not validate if option is disabled', () =>
+        cmd('git checkout tag-doesnt-match-version')
+            .then(() => publish(getTestOptions())));
 });
 
-describe('Uncommitted changes check', function () {
-    afterEach(function () {
-        return cmd('git reset --hard HEAD');
-    });
+describe('Uncommitted changes check', () => {
+    afterEach(() => cmd('git reset --hard HEAD'));
 
-    it('Should expect no uncommitted changes in the working tree', function () {
-        return cmd('git checkout master')
-            .then(function () {
+    it('Should expect no uncommitted changes in the working tree', () =>
+        cmd('git checkout master')
+            .then(() => {
                 writeFile('README.md', 'Yo!');
 
-                return publish({
-                    confirm:            false,
-                    sensitiveDataAudit: false,
-                    checkUncommitted:   true,
-                    checkUntracked:     false,
-                    validateGitTag:     false,
-                    validateBranch:     false
-                });
+                return publish(getTestOptions({ set: { checkUncommitted: true } }));
             })
-            .then(function () {
+            .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(function (err) {
+            .catch(err => {
                 assert(err instanceof PluginError);
-                assert.strictEqual(err.message, "  * There are uncommitted changes in the working tree.");
-            });
-    });
+                assert.strictEqual(err.message, '  * There are uncommitted changes in the working tree.');
+            }));
 
-    it('Should pass validation if option is disabled', function () {
-        return cmd('git checkout master')
-            .then(function () {
+    it('Should pass validation if option is disabled', () =>
+        cmd('git checkout master')
+            .then(() => {
                 writeFile('README.md', 'Yo!');
 
-                return publish({
-                    confirm:            false,
-                    sensitiveDataAudit: false,
-                    checkUncommitted:   false,
-                    checkUntracked:     false,
-                    validateGitTag:     false,
-                    validateBranch:     false
-                });
-            });
-    });
+                return publish(getTestOptions());
+            }));
 
-    it('Should pass validation', function () {
-        return cmd('git checkout master')
-            .then(function () {
-                return publish({
-                    confirm:            false,
-                    sensitiveDataAudit: false,
-                    checkUncommitted:   true,
-                    checkUntracked:     false,
-                    validateGitTag:     false,
-                    validateBranch:     false
-                });
-            });
-    });
+    it('Should pass validation', () =>
+        cmd('git checkout master')
+            .then(() => publish(getTestOptions({ set: { checkUncommitted: true } }))));
 });
 
-describe('Untracked files check', function () {
-    afterEach(function (done) {
-        del('test-file', done);
-    });
+describe('Untracked files check', () => {
+    afterEach(done => del('test-file', done));
 
-    it('Should expect no untracked files in the working tree', function () {
-        return cmd('git checkout master')
-            .then(function () {
+    it('Should expect no untracked files in the working tree', () =>
+        cmd('git checkout master')
+            .then(() => {
                 writeFile('test-file', 'Yo!');
 
-                return publish({
-                    confirm:            false,
-                    sensitiveDataAudit: false,
-                    checkUncommitted:   false,
-                    checkUntracked:     true,
-                    validateGitTag:     false,
-                    validateBranch:     false
-                });
+                return publish(getTestOptions({ set: { checkUntracked: true } }));
             })
-            .then(function () {
+            .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(function (err) {
+            .catch(err => {
                 assert(err instanceof PluginError);
-                assert.strictEqual(err.message, "  * There are untracked files in the working tree.");
-            });
-    });
+                assert.strictEqual(err.message, '  * There are untracked files in the working tree.');
+            }));
 
-    it('Should pass validation if option is disabled', function () {
-        return cmd('git checkout master')
-            .then(function () {
+    it('Should pass validation if option is disabled', () =>
+        cmd('git checkout master')
+            .then(() => {
                 writeFile('test-file', 'Yo!');
 
-                return publish({
-                    confirm:            false,
-                    sensitiveDataAudit: false,
-                    checkUncommitted:   false,
-                    checkUntracked:     false,
-                    validateGitTag:     false,
-                    validateBranch:     false
-                });
-            });
-    });
+                return publish(getTestOptions());
+            }));
 
-    it('Should pass validation', function () {
-        return cmd('git checkout master')
-            .then(function () {
-                return publish({
-                    confirm:            false,
-                    sensitiveDataAudit: false,
-                    checkUncommitted:   false,
-                    checkUntracked:     true,
-                    validateGitTag:     false,
-                    validateBranch:     false
-                });
-            });
-    });
+    it('Should pass validation', () =>
+        cmd('git checkout master')
+            .then(() => publish(getTestOptions({ set: { checkUntracked: true } }))));
 });
 
-describe('Sensitive information audit', function () {
-    afterEach(function (done) {
-        del('schema.rb', function () {
-            del('test/database.yml', done);
-        });
-    });
+describe('Sensitive information audit', () => {
+    afterEach(done => del('schema.rb', () => del('test/database.yml', done)));
 
-    it('Should fail if finds sensitive information', function () {
-        return cmd('git checkout master')
-            .then(function () {
-                return mkdir('test');
-            })
-            .then(function () {
+    it('Should fail if finds sensitive information', () =>
+        cmd('git checkout master')
+            .then(() => mkdir('test'))
+            .then(() => {
                 writeFile('schema.rb', 'test');
                 writeFile('test/database.yml', 'test');
             })
-            .then(function () {
-                return publish({
-                    confirm:            false,
-                    sensitiveDataAudit: true,
-                    checkUncommitted:   false,
-                    checkUntracked:     false,
-                    validateGitTag:     false,
-                    validateBranch:     false
-                });
-            })
-            .then(function () {
+            .then(() => publish(getTestOptions({ set: { sensitiveDataAudit: true } })))
+            .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(function (err) {
+            .catch(err => {
                 assert(err instanceof PluginError);
                 assert.strictEqual(err.message, '  * Sensitive data found in the working tree:\n' +
                                                 '    invalid filename schema.rb\n' +
@@ -407,98 +257,46 @@ describe('Sensitive information audit', function () {
                                                 '     - Potential Ruby On Rails database configuration file\n' +
                                                 '     - Might contain database credentials.'
                 );
-            });
-    });
+            }));
 
-    it('Should not perform check if option is disabled', function () {
-        return cmd('git checkout master')
-            .then(function () {
-                return mkdir('test');
-            })
-            .then(function () {
+    it('Should not perform check if option is disabled', () =>
+        cmd('git checkout master')
+            .then(() => mkdir('test'))
+            .then(() => {
                 writeFile('schema.rb', 'test');
                 writeFile('test/database.yml', 'test');
             })
-            .then(function () {
-                return publish({
-                    confirm:            false,
-                    sensitiveDataAudit: false,
-                    checkUncommitted:   false,
-                    checkUntracked:     false,
-                    validateGitTag:     false,
-                    validateBranch:     false
-                });
-            });
-    });
+            .then(() => publish(getTestOptions())));
 });
 
-describe('Prepublish script', function () {
-    afterEach(function () {
-        return cmd('git reset --hard HEAD');
-    });
+describe('Prepublish script', () => {
+    afterEach(() => cmd('git reset --hard HEAD'));
 
-    it('Should fail if prepublish script fail', function () {
-        return cmd('git checkout master')
-            .then(function () {
-                return publish({
-                    confirm:            false,
-                    sensitiveDataAudit: false,
-                    prepublishScript:   'git'
-                });
-            })
-            .then(function () {
+    it('Should fail if prepublish script fail', () =>
+        cmd('git checkout master')
+            .then(() => publish(getTestOptions({ set: { prepublishScript: 'git' } })))
+            .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(function (err) {
+            .catch(err => {
                 assert(err instanceof PluginError);
                 assert.strictEqual(err.message, 'Command `git` exited with code 1.');
-            });
-    });
+            }));
 
-    it('Should run prepublish script', function () {
-        return cmd('git checkout master')
-            .then(function () {
-                return publish({
-                    confirm:            false,
-                    sensitiveDataAudit: false,
-                    prepublishScript:   'git mv README.md test-file'
-                });
-            })
-            .then(function () {
-                throw new Error('Promise rejection expected');
-            })
-            // NOTE: will throw because we have uncommited changes
-            .catch(function () {
-                assert(readFile('test-file'));
-            });
-    });
+    it('Should run prepublish script', () =>
+        cmd('git checkout master')
+            .then(() => publish(getTestOptions({ set: { prepublishScript: 'git mv README.md test-file' } })))
+            .then(() => assert(readFile('test-file'))));
 });
 
-describe('Publish tag', function () {
-    it('Should publish with the given tag', function () {
-        return cmd('git checkout master')
-            .then(function () {
-                return publish({
-                    confirm:            false,
-                    sensitiveDataAudit: false,
-                    tag:                'alpha'
-                });
-            })
-            .then(function (npmCmd) {
-                assert.strictEqual(npmCmd, 'npm publish --tag alpha');
-            });
-    });
+describe('Publish tag', () => {
+    it('Should publish with the given tag', () =>
+        cmd('git checkout master')
+            .then(() => publish(getTestOptions({ set: { tag: 'alpha' } })))
+            .then(npmCmd => assert.strictEqual(npmCmd, 'npm publish --tag alpha')));
 
-    it('Should publish with the `latest` tag by default', function () {
-        return cmd('git checkout master')
-            .then(function () {
-                return publish({
-                    confirm:            false,
-                    sensitiveDataAudit: false
-                });
-            })
-            .then(function (npmCmd) {
-                assert.strictEqual(npmCmd, 'npm publish --tag latest');
-            });
-    });
+    it('Should publish with the `latest` tag by default', () =>
+        cmd('git checkout master')
+            .then(() => publish(getTestOptions({ remove: 'tag' })))
+            .then(npmCmd => assert.strictEqual(npmCmd, 'npm publish --tag latest')));
 });
