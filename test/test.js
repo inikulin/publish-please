@@ -38,9 +38,9 @@ before(() => {
         .then(() => process.chdir('publish-please-test-repo'));
 });
 
-after(done => {
+after(() => {
     process.chdir('../');
-    del('publish-please-test-repo', done);
+    return del('publish-please-test-repo');
 });
 
 describe('package.json', () => {
@@ -58,7 +58,7 @@ describe('package.json', () => {
 
 
 describe('.publishrc', () => {
-    afterEach(done => del('.publishrc', done));
+    afterEach(() => del('.publishrc'));
 
     it('Should use options from .publishrc file', () => {
         writeFile('.publishrc', JSON.stringify({
@@ -205,7 +205,7 @@ describe('Uncommitted changes check', () => {
 });
 
 describe('Untracked files check', () => {
-    afterEach(done => del('test-file', done));
+    afterEach(() => del('test-file'));
 
     it('Should expect no untracked files in the working tree', () =>
         exec('git checkout master')
@@ -236,7 +236,10 @@ describe('Untracked files check', () => {
 });
 
 describe('Sensitive information audit', () => {
-    afterEach(done => del('schema.rb', () => del('test/database.yml', done)));
+    afterEach(() => Promise.all([
+        del('schema.rb'),
+        del('test/database.yml')
+    ]));
 
     it('Should fail if finds sensitive information', () =>
         exec('git checkout master')

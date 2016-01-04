@@ -38,20 +38,14 @@
     "chalk": "^1.1.1",
     "cross-spawn-async": "^2.1.1",
     "defaults": "^1.0.3",
-    "elegant-spinner": "^1.0.1",
-    "globby": "^4.0.0",
     "gulp-util": "^3.0.7",
     "inquirer": "^0.11.0",
-    "log-update": "^1.0.2",
     "node-emoji": "^1.0.4",
-    "noop-fn": "^1.0.0",
-    "os-family": "^1.0.0",
-    "promisify-event": "^1.0.0",
-    "spawn-cmd": "0.0.2"
+    "promisify-event": "^1.0.0"
   },
   "devDependencies": {
     "babel-eslint": "^4.1.6",
-    "del": "^1.2.1",
+    "del": "^2.2.0",
     "eslint": "^1.10.3",
     "eslint-plugin-babel": "^3.0.0",
     "mkdir-promise": "^1.0.0",
