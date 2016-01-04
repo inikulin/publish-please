@@ -8,7 +8,7 @@ const readFile    = require('fs').readFileSync;
 const mkdir       = require('mkdir-promise');
 const defaults    = require('defaults');
 const publish     = require('../lib');
-const exec        = require('../lib/cp').exec;
+const exec        = require('../lib/utils/cp').exec;
 const getOptions  = require('../lib').getOptions;
 
 
@@ -34,13 +34,14 @@ function getTestOptions (settings) {
 before(() => {
     publish.testMode = true;
 
-    return exec('git clone https://github.com/inikulin/publish-please-test-repo.git')
-        .then(() => process.chdir('publish-please-test-repo'));
+    return del('testing-repo')
+        .then(() => exec('git clone https://github.com/inikulin/testing-repo.git'))
+        .then(() => process.chdir('testing-repo'));
 });
 
 after(() => {
     process.chdir('../');
-    return del('publish-please-test-repo');
+    return del('testing-repo');
 });
 
 describe('package.json', () => {
@@ -97,64 +98,67 @@ describe('.publishrc', () => {
 
 describe('Branch validation', () => {
     it('Should expect `master` branch by default', () =>
-        exec('git checkout no-tag')
+        exec('git checkout some-branch')
             .then(() => publish(getTestOptions({ remove: 'validateBranch' })))
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
             .catch(err => {
                 assert(err instanceof PluginError);
-                assert.strictEqual(err.message, '  * Expected branch to be `master`, but it was `no-tag`.');
+                assert.strictEqual(err.message, '  * Expected branch to be `master`, but it was `some-branch`.');
             }));
 
 
     it('Should validate branch passed via parameter', () =>
         exec('git checkout master')
-            .then(() => publish(getTestOptions({ set: { validateBranch: 'no-tag' } })))
+            .then(() => publish(getTestOptions({ set: { validateBranch: 'no-package-json' } })))
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
             .catch(err => {
                 assert(err instanceof PluginError);
-                assert.strictEqual(err.message, '  * Expected branch to be `no-tag`, but it was `master`.');
+                assert.strictEqual(err.message, '  * Expected branch to be `no-package-json`, but it was `master`.');
             }));
 
     it('Should expect the latest commit in the branch', () =>
-        exec('git checkout a4b76ae5d285800eadcf16e60c75edc33071d929')
+        exec('git checkout 15a1ef78338cf1fa60c318828970b2b3e70004d1')
             .then(() => publish(getTestOptions({ set: { validateBranch: 'master' } })))
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
             .catch(err => {
-                const msgRe = /^ {2}\* Expected branch to be `master`, but it was `\((?:HEAD )?detached (?:from|at) a4b76ae\)`.$/;
+                const msgRe = /^ {2}\* Expected branch to be `master`, but it was `\((?:HEAD )?detached (?:from|at) 15a1ef7\)`.$/;
 
                 assert(err instanceof PluginError);
                 assert(msgRe.test(err.message));
             }));
 
     it('Should pass validation', () =>
-        exec('git checkout no-tag')
-            .then(() => publish(getTestOptions({ set: { validateBranch: 'no-tag' } }))));
+        exec('git checkout some-branch')
+            .then(() => publish(getTestOptions({ set: { validateBranch: 'some-branch' } }))));
 
     it('Should not validate if option is disabled', () =>
-        exec('git checkout no-tag')
+        exec('git checkout some-branch')
             .then(() => publish(getTestOptions())));
 });
 
 describe('Git tag validation', () => {
+    afterEach(() => exec('git tag | xargs git tag -d'));
+
     it('Should expect git tag to match version', () =>
-        exec('git checkout tag-doesnt-match-version')
+        exec('git checkout master')
+            .then(() => exec('git tag v0.0.42'))
             .then(() => publish(getTestOptions({ set: { validateGitTag: true } })))
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
             .catch(err => {
                 assert(err instanceof PluginError);
-                assert.strictEqual(err.message, '  * Expected git tag to be `1.0.0` or `v1.0.0`, but it was `v0.0.42`.');
+                assert.strictEqual(err.message, '  * Expected git tag to be `1.3.77` or `v1.3.77`, but it was `v0.0.42`.');
             }));
 
     it('Should expect git tag to exist', () =>
-        exec('git checkout no-tag')
+        exec('git checkout master')
             .then(() => publish(getTestOptions({ set: { validateGitTag: true } })))
             .then(() => {
                 throw new Error('Promise rejection expected');
@@ -166,10 +170,12 @@ describe('Git tag validation', () => {
 
     it('Should pass validation', () =>
         exec('git checkout master')
+            .then(() => exec('git tag v1.3.77'))
             .then(() => publish(getTestOptions({ set: { validateGitTag: true } }))));
 
     it('Should not validate if option is disabled', () =>
-        exec('git checkout tag-doesnt-match-version')
+        exec('git checkout master')
+            .then(() => exec('git tag v0.0.42'))
             .then(() => publish(getTestOptions())));
 });
 
