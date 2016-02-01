@@ -1,7 +1,6 @@
 'use strict';
 
 const assert      = require('assert');
-const PluginError = require('gulp-util').PluginError;
 const del         = require('del');
 const writeFile   = require('fs').writeFileSync;
 const readFile    = require('fs').readFileSync;
@@ -51,10 +50,7 @@ describe('package.json', () => {
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err => {
-                assert(err instanceof PluginError);
-                assert.strictEqual(err.message, "package.json file doesn't exist.");
-            }));
+            .catch(err => assert.strictEqual(err.message, "package.json file doesn't exist.")));
 });
 
 
@@ -90,7 +86,6 @@ describe('.publishrc', () => {
             getOptions();
         }
         catch (err) {
-            assert(err instanceof PluginError);
             assert.strictEqual(err.message, '.publishrc is not a valid JSON file.');
         }
     });
@@ -103,10 +98,7 @@ describe('Branch validation', () => {
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err => {
-                assert(err instanceof PluginError);
-                assert.strictEqual(err.message, '  * Expected branch to be `master`, but it was `some-branch`.');
-            }));
+            .catch(err => assert.strictEqual(err.message, '  * Expected branch to be `master`, but it was `some-branch`.')));
 
 
     it('Should validate branch passed via parameter', () =>
@@ -115,10 +107,7 @@ describe('Branch validation', () => {
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err => {
-                assert(err instanceof PluginError);
-                assert.strictEqual(err.message, '  * Expected branch to be `no-package-json`, but it was `master`.');
-            }));
+            .catch(err => assert.strictEqual(err.message, '  * Expected branch to be `no-package-json`, but it was `master`.')));
 
     it('Should expect the latest commit in the branch', () =>
         exec('git checkout 15a1ef78338cf1fa60c318828970b2b3e70004d1')
@@ -129,7 +118,6 @@ describe('Branch validation', () => {
             .catch(err => {
                 const msgRe = /^ {2}\* Expected branch to be `master`, but it was `\((?:HEAD )?detached (?:from|at) 15a1ef7\)`.$/;
 
-                assert(err instanceof PluginError);
                 assert(msgRe.test(err.message));
             }));
 
@@ -152,10 +140,7 @@ describe('Git tag validation', () => {
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err => {
-                assert(err instanceof PluginError);
-                assert.strictEqual(err.message, '  * Expected git tag to be `1.3.77` or `v1.3.77`, but it was `v0.0.42`.');
-            }));
+            .catch(err => assert.strictEqual(err.message, '  * Expected git tag to be `1.3.77` or `v1.3.77`, but it was `v0.0.42`.')));
 
     it('Should expect git tag to exist', () =>
         exec('git checkout master')
@@ -163,10 +148,7 @@ describe('Git tag validation', () => {
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err => {
-                assert(err instanceof PluginError);
-                assert.strictEqual(err.message, "  * Latest commit doesn't have git tag.");
-            }));
+            .catch(err => assert.strictEqual(err.message, "  * Latest commit doesn't have git tag.")));
 
     it('Should pass validation', () =>
         exec('git checkout master')
@@ -192,10 +174,7 @@ describe('Uncommitted changes check', () => {
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err => {
-                assert(err instanceof PluginError);
-                assert.strictEqual(err.message, '  * There are uncommitted changes in the working tree.');
-            }));
+            .catch(err => assert.strictEqual(err.message, '  * There are uncommitted changes in the working tree.')));
 
     it('Should pass validation if option is disabled', () =>
         exec('git checkout master')
@@ -223,10 +202,7 @@ describe('Untracked files check', () => {
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err => {
-                assert(err instanceof PluginError);
-                assert.strictEqual(err.message, '  * There are untracked files in the working tree.');
-            }));
+            .catch(err => assert.strictEqual(err.message, '  * There are untracked files in the working tree.')));
 
     it('Should pass validation if option is disabled', () =>
         exec('git checkout master')
@@ -260,7 +236,6 @@ describe('Sensitive information audit', () => {
                 throw new Error('Promise rejection expected');
             })
             .catch(err => {
-                assert(err instanceof PluginError);
                 assert.strictEqual(err.message, '  * Sensitive data found in the working tree:\n' +
                                                 '    invalid filename lib/database.yml\n' +
                                                 '     - Potential Ruby On Rails database configuration file\n' +
@@ -290,10 +265,7 @@ describe('Prepublish script', () => {
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err => {
-                assert(err instanceof PluginError);
-                assert.strictEqual(err.message, 'Command `git` exited with code 1.');
-            }));
+            .catch(err => assert.strictEqual(err.message, 'Command `git` exited with code 1.')));
 
     it('Should run prepublish script', () =>
         exec('git checkout master')
