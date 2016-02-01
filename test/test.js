@@ -7,8 +7,8 @@ const writeFile   = require('fs').writeFileSync;
 const readFile    = require('fs').readFileSync;
 const mkdir       = require('mkdir-promise');
 const defaults    = require('defaults');
+const exec        = require('cp-sugar').exec;
 const publish     = require('../lib');
-const exec        = require('../lib/utils/cp').exec;
 const getOptions  = require('../lib').getOptions;
 
 
