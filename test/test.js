@@ -1,3 +1,5 @@
+'use strict';
+
 const assert      = require('assert');
 const PluginError = require('gulp-util').PluginError;
 const del         = require('del');
@@ -6,7 +8,7 @@ const readFile    = require('fs').readFileSync;
 const mkdir       = require('mkdir-promise');
 const defaults    = require('defaults');
 const publish     = require('../lib');
-const cmd         = require('../lib').cmd;
+const exec        = require('../lib/utils/cp').exec;
 const getOptions  = require('../lib').getOptions;
 
 
@@ -32,31 +34,32 @@ function getTestOptions (settings) {
 before(() => {
     publish.testMode = true;
 
-    return cmd('git clone https://github.com/inikulin/publish-please-test-repo.git')
-        .then(() => process.chdir('publish-please-test-repo'));
+    return del('testing-repo')
+        .then(() => exec('git clone https://github.com/inikulin/testing-repo.git'))
+        .then(() => process.chdir('testing-repo'));
 });
 
-after(done => {
+after(() => {
     process.chdir('../');
-    del('publish-please-test-repo', done);
+    return del('testing-repo');
 });
 
 describe('package.json', () => {
     it('Should validate package.json existence', () =>
-        cmd('git checkout no-package-json')
+        exec('git checkout no-package-json')
             .then(() => publish(getTestOptions()))
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
             .catch(err => {
                 assert(err instanceof PluginError);
-                assert.strictEqual(err.message, "Can't parse package.json: file doesn't exist or it's not a valid JSON file.");
+                assert.strictEqual(err.message, "package.json file doesn't exist.");
             }));
 });
 
 
 describe('.publishrc', () => {
-    afterEach(done => del('.publishrc', done));
+    afterEach(() => del('.publishrc'));
 
     it('Should use options from .publishrc file', () => {
         writeFile('.publishrc', JSON.stringify({
@@ -95,64 +98,67 @@ describe('.publishrc', () => {
 
 describe('Branch validation', () => {
     it('Should expect `master` branch by default', () =>
-        cmd('git checkout no-tag')
+        exec('git checkout some-branch')
             .then(() => publish(getTestOptions({ remove: 'validateBranch' })))
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
             .catch(err => {
                 assert(err instanceof PluginError);
-                assert.strictEqual(err.message, '  * Expected branch to be `master`, but it was `no-tag`.');
+                assert.strictEqual(err.message, '  * Expected branch to be `master`, but it was `some-branch`.');
             }));
 
 
     it('Should validate branch passed via parameter', () =>
-        cmd('git checkout master')
-            .then(() => publish(getTestOptions({ set: { validateBranch: 'no-tag' } })))
+        exec('git checkout master')
+            .then(() => publish(getTestOptions({ set: { validateBranch: 'no-package-json' } })))
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
             .catch(err => {
                 assert(err instanceof PluginError);
-                assert.strictEqual(err.message, '  * Expected branch to be `no-tag`, but it was `master`.');
+                assert.strictEqual(err.message, '  * Expected branch to be `no-package-json`, but it was `master`.');
             }));
 
     it('Should expect the latest commit in the branch', () =>
-        cmd('git checkout a4b76ae5d285800eadcf16e60c75edc33071d929')
+        exec('git checkout 15a1ef78338cf1fa60c318828970b2b3e70004d1')
             .then(() => publish(getTestOptions({ set: { validateBranch: 'master' } })))
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
             .catch(err => {
-                const msgRe = /^ {2}\* Expected branch to be `master`, but it was `\((?:HEAD )?detached (?:from|at) a4b76ae\)`.$/;
+                const msgRe = /^ {2}\* Expected branch to be `master`, but it was `\((?:HEAD )?detached (?:from|at) 15a1ef7\)`.$/;
 
                 assert(err instanceof PluginError);
                 assert(msgRe.test(err.message));
             }));
 
     it('Should pass validation', () =>
-        cmd('git checkout no-tag')
-            .then(() => publish(getTestOptions({ set: { validateBranch: 'no-tag' } }))));
+        exec('git checkout some-branch')
+            .then(() => publish(getTestOptions({ set: { validateBranch: 'some-branch' } }))));
 
     it('Should not validate if option is disabled', () =>
-        cmd('git checkout no-tag')
+        exec('git checkout some-branch')
             .then(() => publish(getTestOptions())));
 });
 
 describe('Git tag validation', () => {
+    afterEach(() => exec('git tag | xargs git tag -d'));
+
     it('Should expect git tag to match version', () =>
-        cmd('git checkout tag-doesnt-match-version')
+        exec('git checkout master')
+            .then(() => exec('git tag v0.0.42'))
             .then(() => publish(getTestOptions({ set: { validateGitTag: true } })))
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
             .catch(err => {
                 assert(err instanceof PluginError);
-                assert.strictEqual(err.message, '  * Expected git tag to be `1.0.0` or `v1.0.0`, but it was `v0.0.42`.');
+                assert.strictEqual(err.message, '  * Expected git tag to be `1.3.77` or `v1.3.77`, but it was `v0.0.42`.');
             }));
 
     it('Should expect git tag to exist', () =>
-        cmd('git checkout no-tag')
+        exec('git checkout master')
             .then(() => publish(getTestOptions({ set: { validateGitTag: true } })))
             .then(() => {
                 throw new Error('Promise rejection expected');
@@ -163,19 +169,21 @@ describe('Git tag validation', () => {
             }));
 
     it('Should pass validation', () =>
-        cmd('git checkout master')
+        exec('git checkout master')
+            .then(() => exec('git tag v1.3.77'))
             .then(() => publish(getTestOptions({ set: { validateGitTag: true } }))));
 
     it('Should not validate if option is disabled', () =>
-        cmd('git checkout tag-doesnt-match-version')
+        exec('git checkout master')
+            .then(() => exec('git tag v0.0.42'))
             .then(() => publish(getTestOptions())));
 });
 
 describe('Uncommitted changes check', () => {
-    afterEach(() => cmd('git reset --hard HEAD'));
+    afterEach(() => exec('git reset --hard HEAD'));
 
     it('Should expect no uncommitted changes in the working tree', () =>
-        cmd('git checkout master')
+        exec('git checkout master')
             .then(() => {
                 writeFile('README.md', 'Yo!');
 
@@ -190,7 +198,7 @@ describe('Uncommitted changes check', () => {
             }));
 
     it('Should pass validation if option is disabled', () =>
-        cmd('git checkout master')
+        exec('git checkout master')
             .then(() => {
                 writeFile('README.md', 'Yo!');
 
@@ -198,15 +206,15 @@ describe('Uncommitted changes check', () => {
             }));
 
     it('Should pass validation', () =>
-        cmd('git checkout master')
+        exec('git checkout master')
             .then(() => publish(getTestOptions({ set: { checkUncommitted: true } }))));
 });
 
 describe('Untracked files check', () => {
-    afterEach(done => del('test-file', done));
+    afterEach(() => del('test-file'));
 
     it('Should expect no untracked files in the working tree', () =>
-        cmd('git checkout master')
+        exec('git checkout master')
             .then(() => {
                 writeFile('test-file', 'Yo!');
 
@@ -221,7 +229,7 @@ describe('Untracked files check', () => {
             }));
 
     it('Should pass validation if option is disabled', () =>
-        cmd('git checkout master')
+        exec('git checkout master')
             .then(() => {
                 writeFile('test-file', 'Yo!');
 
@@ -229,19 +237,22 @@ describe('Untracked files check', () => {
             }));
 
     it('Should pass validation', () =>
-        cmd('git checkout master')
+        exec('git checkout master')
             .then(() => publish(getTestOptions({ set: { checkUntracked: true } }))));
 });
 
 describe('Sensitive information audit', () => {
-    afterEach(done => del('schema.rb', () => del('test/database.yml', done)));
+    afterEach(() => Promise.all([
+        del('schema.rb'),
+        del('test/database.yml')
+    ]));
 
     it('Should fail if finds sensitive information', () =>
-        cmd('git checkout master')
+        exec('git checkout master')
             .then(() => mkdir('test'))
             .then(() => {
-                writeFile('schema.rb', 'test');
-                writeFile('test/database.yml', 'test');
+                writeFile('lib/schema.rb', 'test');
+                writeFile('lib/database.yml', 'test');
             })
             .then(() => publish(getTestOptions({ set: { sensitiveDataAudit: true } })))
             .then(() => {
@@ -250,17 +261,17 @@ describe('Sensitive information audit', () => {
             .catch(err => {
                 assert(err instanceof PluginError);
                 assert.strictEqual(err.message, '  * Sensitive data found in the working tree:\n' +
-                                                '    invalid filename schema.rb\n' +
-                                                '     - Ruby On Rails database schema file\n' +
-                                                '     - Contains information on the database schema of a Ruby On Rails application.\n' +
-                                                '    invalid filename test/database.yml\n' +
+                                                '    invalid filename lib/database.yml\n' +
                                                 '     - Potential Ruby On Rails database configuration file\n' +
-                                                '     - Might contain database credentials.'
+                                                '     - Might contain database credentials.\n' +
+                                                '    invalid filename lib/schema.rb\n' +
+                                                '     - Ruby On Rails database schema file\n' +
+                                                '     - Contains information on the database schema of a Ruby On Rails application.'
                 );
             }));
 
     it('Should not perform check if option is disabled', () =>
-        cmd('git checkout master')
+        exec('git checkout master')
             .then(() => mkdir('test'))
             .then(() => {
                 writeFile('schema.rb', 'test');
@@ -270,10 +281,10 @@ describe('Sensitive information audit', () => {
 });
 
 describe('Prepublish script', () => {
-    afterEach(() => cmd('git reset --hard HEAD'));
+    afterEach(() => exec('git reset --hard HEAD'));
 
     it('Should fail if prepublish script fail', () =>
-        cmd('git checkout master')
+        exec('git checkout master')
             .then(() => publish(getTestOptions({ set: { prepublishScript: 'git' } })))
             .then(() => {
                 throw new Error('Promise rejection expected');
@@ -284,19 +295,19 @@ describe('Prepublish script', () => {
             }));
 
     it('Should run prepublish script', () =>
-        cmd('git checkout master')
+        exec('git checkout master')
             .then(() => publish(getTestOptions({ set: { prepublishScript: 'git mv README.md test-file' } })))
             .then(() => assert(readFile('test-file'))));
 });
 
 describe('Publish tag', () => {
     it('Should publish with the given tag', () =>
-        cmd('git checkout master')
+        exec('git checkout master')
             .then(() => publish(getTestOptions({ set: { tag: 'alpha' } })))
             .then(npmCmd => assert.strictEqual(npmCmd, 'npm publish --tag alpha')));
 
     it('Should publish with the `latest` tag by default', () =>
-        cmd('git checkout master')
+        exec('git checkout master')
             .then(() => publish(getTestOptions({ remove: 'tag' })))
             .then(npmCmd => assert.strictEqual(npmCmd, 'npm publish --tag latest')));
 });
