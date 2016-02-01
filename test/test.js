@@ -53,7 +53,7 @@ describe('package.json', () => {
             })
             .catch(err => {
                 assert(err instanceof PluginError);
-                assert.strictEqual(err.message, "Can't parse package.json: file doesn't exist or it's not a valid JSON file.");
+                assert.strictEqual(err.message, "package.json file doesn't exist.");
             }));
 });
 
@@ -251,8 +251,8 @@ describe('Sensitive information audit', () => {
         exec('git checkout master')
             .then(() => mkdir('test'))
             .then(() => {
-                writeFile('schema.rb', 'test');
-                writeFile('test/database.yml', 'test');
+                writeFile('lib/schema.rb', 'test');
+                writeFile('lib/database.yml', 'test');
             })
             .then(() => publish(getTestOptions({ set: { sensitiveDataAudit: true } })))
             .then(() => {
@@ -261,12 +261,12 @@ describe('Sensitive information audit', () => {
             .catch(err => {
                 assert(err instanceof PluginError);
                 assert.strictEqual(err.message, '  * Sensitive data found in the working tree:\n' +
-                                                '    invalid filename schema.rb\n' +
-                                                '     - Ruby On Rails database schema file\n' +
-                                                '     - Contains information on the database schema of a Ruby On Rails application.\n' +
-                                                '    invalid filename test/database.yml\n' +
+                                                '    invalid filename lib/database.yml\n' +
                                                 '     - Potential Ruby On Rails database configuration file\n' +
-                                                '     - Might contain database credentials.'
+                                                '     - Might contain database credentials.\n' +
+                                                '    invalid filename lib/schema.rb\n' +
+                                                '     - Ruby On Rails database schema file\n' +
+                                                '     - Contains information on the database schema of a Ruby On Rails application.'
                 );
             }));
 

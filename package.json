@@ -41,9 +41,9 @@
     "elegant-status": "^1.0.0",
     "gulp-util": "^3.0.7",
     "inquirer": "^0.11.0",
-    "irish-pub": "^0.2.0",
     "node-emoji": "^1.0.4",
     "noop-fn": "^1.0.0",
+    "pkgd": "^1.0.0",
     "promisify-event": "^1.0.0"
   },
   "devDependencies": {
