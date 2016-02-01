@@ -253,6 +253,7 @@ describe('Sensitive information audit', () => {
             .then(() => {
                 writeFile('lib/schema.rb', 'test');
                 writeFile('lib/database.yml', 'test');
+                writeFile('test/database.yml', 'test');
             })
             .then(() => publish(getTestOptions({ set: { sensitiveDataAudit: true } })))
             .then(() => {
