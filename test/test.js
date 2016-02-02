@@ -45,6 +45,8 @@ after(() => {
     return del('testing-repo');
 });
 
+afterEach(() => exec('git reset --hard HEAD').then(exec('git clean -f -d')));
+
 describe('package.json', () => {
     it('Should validate package.json existence', () =>
         exec('git checkout no-package-json')
@@ -57,8 +59,6 @@ describe('package.json', () => {
 
 
 describe('.publishrc', () => {
-    afterEach(() => del('.publishrc'));
-
     it('Should use options from .publishrc file', () => {
         writeFile('.publishrc', JSON.stringify({
             confirm:            false,
@@ -164,8 +164,6 @@ describe('Git tag validation', () => {
 });
 
 describe('Uncommitted changes check', () => {
-    afterEach(() => exec('git reset --hard HEAD'));
-
     it('Should expect no uncommitted changes in the working tree', () =>
         exec('git checkout master')
             .then(() => {
@@ -192,8 +190,6 @@ describe('Uncommitted changes check', () => {
 });
 
 describe('Untracked files check', () => {
-    afterEach(() => del('test-file'));
-
     it('Should expect no untracked files in the working tree', () =>
         exec('git checkout master')
             .then(() => {
@@ -220,11 +216,6 @@ describe('Untracked files check', () => {
 });
 
 describe('Sensitive information audit', () => {
-    afterEach(() => Promise.all([
-        del('schema.rb'),
-        del('test/database.yml')
-    ]));
-
     it('Should fail if finds sensitive information', () =>
         exec('git checkout master')
             .then(() => mkdir('test'))
@@ -248,6 +239,22 @@ describe('Sensitive information audit', () => {
                 );
             }));
 
+    it('Should not perform check for files specified in opts.ignore', () =>
+        exec('git checkout master')
+            .then(() => mkdir('test'))
+            .then(() => {
+                writeFile('lib/schema.rb', 'test');
+                writeFile('lib/1.keychain', 'test');
+                writeFile('lib/2.keychain', 'test');
+            })
+            .then(() => publish(getTestOptions({
+                set: {
+                    sensitiveDataAudit: {
+                        ignore: ['lib/schema.rb', 'lib/*.keychain']
+                    }
+                }
+            }))));
+
     it('Should not perform check if option is disabled', () =>
         exec('git checkout master')
             .then(() => mkdir('test'))
@@ -259,10 +266,9 @@ describe('Sensitive information audit', () => {
 });
 
 describe('Node security project audit', () => {
-    afterEach(() => exec('git reset --hard HEAD'));
-
     it('Should fail if there are vulnerable dependencies', () =>
-        pkgd()
+        exec('git checkout master')
+            .then(() => pkgd())
             .then(pkgInfo => {
                 pkgInfo.cfg.dependencies = { 'ms': '0.7.0' };
 
@@ -278,7 +284,8 @@ describe('Node security project audit', () => {
             }));
 
     it('Should not perform check if option is disabled', () =>
-        pkgd()
+        exec('git checkout master')
+            .then(() => pkgd())
             .then(pkgInfo => {
                 pkgInfo.cfg.dependencies = { 'ms': '0.7.0' };
 
@@ -288,8 +295,6 @@ describe('Node security project audit', () => {
 });
 
 describe('Prepublish script', () => {
-    afterEach(() => exec('git reset --hard HEAD'));
-
     it('Should fail if prepublish script fail', () =>
         exec('git checkout master')
             .then(() => publish(getTestOptions({ set: { prepublishScript: 'git' } })))

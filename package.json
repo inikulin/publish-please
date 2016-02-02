@@ -40,6 +40,7 @@
     "cross-spawn-async": "^2.1.1",
     "defaults": "^1.0.3",
     "elegant-status": "^1.0.0",
+    "globby": "^4.0.0",
     "inquirer": "^0.11.0",
     "node-emoji": "^1.0.4",
     "noop-fn": "^1.0.0",
