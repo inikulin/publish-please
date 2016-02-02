@@ -43,6 +43,7 @@
     "inquirer": "^0.11.0",
     "node-emoji": "^1.0.4",
     "noop-fn": "^1.0.0",
+    "nsp": "^2.2.0",
     "pkgd": "^1.0.0",
     "promisify-event": "^1.0.0"
   },

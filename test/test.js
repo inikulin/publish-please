@@ -1,14 +1,15 @@
 'use strict';
 
-const assert      = require('assert');
-const del         = require('del');
-const writeFile   = require('fs').writeFileSync;
-const readFile    = require('fs').readFileSync;
-const mkdir       = require('mkdir-promise');
-const defaults    = require('defaults');
-const exec        = require('cp-sugar').exec;
-const publish     = require('../lib');
-const getOptions  = require('../lib').getOptions;
+const assert     = require('assert');
+const del        = require('del');
+const writeFile  = require('fs').writeFileSync;
+const readFile   = require('fs').readFileSync;
+const mkdir      = require('mkdir-promise');
+const defaults   = require('defaults');
+const exec       = require('cp-sugar').exec;
+const pkgd       = require('pkgd');
+const publish    = require('../lib');
+const getOptions = require('../lib').getOptions;
 
 
 function getTestOptions (settings) {
@@ -19,6 +20,7 @@ function getTestOptions (settings) {
         checkUntracked:     false,
         validateGitTag:     false,
         validateBranch:     false,
+        nsp:                false,
         tag:                null,
         prepublishScript:   null
     };
@@ -254,6 +256,35 @@ describe('Sensitive information audit', () => {
                 writeFile('test/database.yml', 'test');
             })
             .then(() => publish(getTestOptions())));
+});
+
+describe('Node security project audit', () => {
+    afterEach(() => exec('git reset --hard HEAD'));
+
+    it('Should fail if there are vulnerable dependencies', () =>
+        pkgd()
+            .then(pkgInfo => {
+                pkgInfo.cfg.dependencies = { 'ms': '0.7.0' };
+
+                writeFile('package.json', JSON.stringify(pkgInfo.cfg));
+            })
+            .then(() => publish(getTestOptions({ set: { nsp: true } })))
+            .then(() => {
+                throw new Error('Promise rejection expected');
+            })
+            .catch(err => {
+                assert(err.message.indexOf('1 vulnerabilities found') > -1);
+                assert(err.message.indexOf('ms@0.7.0') > -1);
+            }));
+
+    it('Should not perform check if option is disabled', () =>
+        pkgd()
+            .then(pkgInfo => {
+                pkgInfo.cfg.dependencies = { 'ms': '0.7.0' };
+
+                writeFile('package.json', JSON.stringify(pkgInfo.cfg));
+            })
+            .then(() => publish(getTestOptions({ set: { nsp: false } }))));
 });
 
 describe('Prepublish script', () => {
