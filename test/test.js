@@ -6,6 +6,7 @@ const writeFile  = require('fs').writeFileSync;
 const readFile   = require('fs').readFileSync;
 const mkdir      = require('mkdir-promise');
 const defaults   = require('lodash/defaultsDeep');
+const unset      = require('lodash/unset');
 const exec       = require('cp-sugar').exec;
 const pkgd       = require('pkgd');
 const publish    = require('../lib/publish');
@@ -14,19 +15,22 @@ const getOptions = require('../lib/publish').getOptions;
 
 function getTestOptions (settings) {
     const disabled = {
-        confirm:            false,
-        sensitiveDataAudit: false,
-        checkUncommitted:   false,
-        checkUntracked:     false,
-        validateGitTag:     false,
-        validateBranch:     false,
-        nsp:                false,
-        tag:                null,
-        prepublishScript:   null
+        validations: {
+            sensitiveData:          false,
+            uncommittedChanges:     false,
+            untrackedFiles:         false,
+            gitTag:                 false,
+            branch:                 false,
+            vulnerableDependencies: false
+        },
+
+        confirm:          false,
+        publishTag:       null,
+        prePublishScript: null
     };
 
     if (settings && settings.remove)
-        delete disabled[settings.remove];
+        unset(disabled, settings.remove);
 
 
     return defaults({}, settings && settings.set, disabled);
@@ -62,24 +66,28 @@ describe('package.json', () => {
 describe('.publishrc', () => {
     it('Should use options from .publishrc file', () => {
         writeFile('.publishrc', JSON.stringify({
-            confirm:            false,
-            sensitiveDataAudit: false,
-            prepublishScript:   'npm test',
-            checkUncommitted:   true,
-            checkUntracked:     true
+            confirm:     false,
+            validations: {
+                sensitiveData:      false,
+                uncommittedChanges: true,
+                untrackedFiles:     true
+            }
         }));
 
         const opts = getOptions({
-            checkUncommitted:   false,
-            sensitiveDataAudit: false,
-            checkUntracked:     false
+            validations: {
+                uncommittedChanges: false,
+                sensitiveData:      false,
+                untrackedFiles:     false
+            }
         });
 
         assert(!opts.confirm);
-        assert.strictEqual(opts.prepublishScript, 'npm test');
-        assert(!opts.checkUncommitted);
-        assert(!opts.checkUntracked);
-        assert.strictEqual(opts.validateBranch, 'master');
+        assert.strictEqual(opts.prePublishScript, 'npm test');
+        assert.strictEqual(opts.publishTag, 'latest');
+        assert.strictEqual(opts.validations.branch, 'master');
+        assert(!opts.validations.uncommittedChanges);
+        assert(!opts.validations.untrackedFiles);
     });
 
     it('Should expect .publishrc to be a valid JSON file', () => {
@@ -97,7 +105,7 @@ describe('.publishrc', () => {
 describe('Branch validation', () => {
     it('Should expect `master` branch by default', () =>
         exec('git checkout some-branch')
-            .then(() => publish(getTestOptions({ remove: 'validateBranch' })))
+            .then(() => publish(getTestOptions({ remove: 'validations.branch' })))
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
@@ -106,7 +114,7 @@ describe('Branch validation', () => {
 
     it('Should validate branch passed via parameter', () =>
         exec('git checkout master')
-            .then(() => publish(getTestOptions({ set: { validateBranch: 'no-package-json' } })))
+            .then(() => publish(getTestOptions({ set: { validations: { branch: 'no-package-json' } } })))
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
@@ -114,7 +122,7 @@ describe('Branch validation', () => {
 
     it('Should expect the latest commit in the branch', () =>
         exec('git checkout 15a1ef78338cf1fa60c318828970b2b3e70004d1')
-            .then(() => publish(getTestOptions({ set: { validateBranch: 'master' } })))
+            .then(() => publish(getTestOptions({ set: { validations: { branch: 'master' } } })))
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
@@ -126,7 +134,7 @@ describe('Branch validation', () => {
 
     it('Should pass validation', () =>
         exec('git checkout some-branch')
-            .then(() => publish(getTestOptions({ set: { validateBranch: 'some-branch' } }))));
+            .then(() => publish(getTestOptions({ set: { validations: { branch: 'some-branch' } } }))));
 
     it('Should not validate if option is disabled', () =>
         exec('git checkout some-branch')
@@ -139,7 +147,7 @@ describe('Git tag validation', () => {
     it('Should expect git tag to match version', () =>
         exec('git checkout master')
             .then(() => exec('git tag v0.0.42'))
-            .then(() => publish(getTestOptions({ set: { validateGitTag: true } })))
+            .then(() => publish(getTestOptions({ set: { validations: { gitTag: true } } })))
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
@@ -147,7 +155,7 @@ describe('Git tag validation', () => {
 
     it('Should expect git tag to exist', () =>
         exec('git checkout master')
-            .then(() => publish(getTestOptions({ set: { validateGitTag: true } })))
+            .then(() => publish(getTestOptions({ set: { validations: { gitTag: true } } })))
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
@@ -156,7 +164,7 @@ describe('Git tag validation', () => {
     it('Should pass validation', () =>
         exec('git checkout master')
             .then(() => exec('git tag v1.3.77'))
-            .then(() => publish(getTestOptions({ set: { validateGitTag: true } }))));
+            .then(() => publish(getTestOptions({ set: { validations: { gitTag: true } } }))));
 
     it('Should not validate if option is disabled', () =>
         exec('git checkout master')
@@ -170,7 +178,7 @@ describe('Uncommitted changes check', () => {
             .then(() => {
                 writeFile('README.md', 'Yo!');
 
-                return publish(getTestOptions({ set: { checkUncommitted: true } }));
+                return publish(getTestOptions({ set: { validations: { uncommittedChanges: true } } }));
             })
             .then(() => {
                 throw new Error('Promise rejection expected');
@@ -187,7 +195,7 @@ describe('Uncommitted changes check', () => {
 
     it('Should pass validation', () =>
         exec('git checkout master')
-            .then(() => publish(getTestOptions({ set: { checkUncommitted: true } }))));
+            .then(() => publish(getTestOptions({ set: { validations: { uncommittedChanges: true } } }))));
 });
 
 describe('Untracked files check', () => {
@@ -196,7 +204,7 @@ describe('Untracked files check', () => {
             .then(() => {
                 writeFile('test-file', 'Yo!');
 
-                return publish(getTestOptions({ set: { checkUntracked: true } }));
+                return publish(getTestOptions({ set: { validations: { untrackedFiles: true } } }));
             })
             .then(() => {
                 throw new Error('Promise rejection expected');
@@ -213,7 +221,7 @@ describe('Untracked files check', () => {
 
     it('Should pass validation', () =>
         exec('git checkout master')
-            .then(() => publish(getTestOptions({ set: { checkUntracked: true } }))));
+            .then(() => publish(getTestOptions({ set: { validations: { untrackedFiles: true } } }))));
 });
 
 describe('Sensitive information audit', () => {
@@ -225,7 +233,7 @@ describe('Sensitive information audit', () => {
                 writeFile('lib/database.yml', 'test');
                 writeFile('test/database.yml', 'test');
             })
-            .then(() => publish(getTestOptions({ set: { sensitiveDataAudit: true } })))
+            .then(() => publish(getTestOptions({ set: { validations: { sensitiveData: true } } })))
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
@@ -250,8 +258,10 @@ describe('Sensitive information audit', () => {
             })
             .then(() => publish(getTestOptions({
                 set: {
-                    sensitiveDataAudit: {
-                        ignore: ['lib/schema.rb', 'lib/*.keychain']
+                    validations: {
+                        sensitiveData: {
+                            ignore: ['lib/schema.rb', 'lib/*.keychain']
+                        }
                     }
                 }
             }))));
@@ -275,7 +285,7 @@ describe('Node security project audit', () => {
 
                 writeFile('package.json', JSON.stringify(pkgInfo.cfg));
             })
-            .then(() => publish(getTestOptions({ set: { nsp: true } })))
+            .then(() => publish(getTestOptions({ set: { validations: { vulnerableDependencies: true } } })))
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
@@ -292,13 +302,13 @@ describe('Node security project audit', () => {
 
                 writeFile('package.json', JSON.stringify(pkgInfo.cfg));
             })
-            .then(() => publish(getTestOptions({ set: { nsp: false } }))));
+            .then(() => publish(getTestOptions({ set: { validations: { vulnerableDependencies: false } } }))));
 });
 
 describe('Prepublish script', () => {
     it('Should fail if prepublish script fail', () =>
         exec('git checkout master')
-            .then(() => publish(getTestOptions({ set: { prepublishScript: 'git' } })))
+            .then(() => publish(getTestOptions({ set: { prePublishScript: 'git' } })))
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
@@ -306,19 +316,19 @@ describe('Prepublish script', () => {
 
     it('Should run prepublish script', () =>
         exec('git checkout master')
-            .then(() => publish(getTestOptions({ set: { prepublishScript: 'git mv README.md test-file' } })))
+            .then(() => publish(getTestOptions({ set: { prePublishScript: 'git mv README.md test-file' } })))
             .then(() => assert(readFile('test-file'))));
 });
 
 describe('Publish tag', () => {
     it('Should publish with the given tag', () =>
         exec('git checkout master')
-            .then(() => publish(getTestOptions({ set: { tag: 'alpha' } })))
+            .then(() => publish(getTestOptions({ set: { publishTag: 'alpha' } })))
             .then(npmCmd => assert.strictEqual(npmCmd, 'npm publish --tag alpha')));
 
     it('Should publish with the `latest` tag by default', () =>
         exec('git checkout master')
-            .then(() => publish(getTestOptions({ remove: 'tag' })))
+            .then(() => publish(getTestOptions({ remove: 'publishTag' })))
             .then(npmCmd => assert.strictEqual(npmCmd, 'npm publish --tag latest')));
 });
 
