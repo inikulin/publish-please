@@ -5,7 +5,7 @@ const del        = require('del');
 const writeFile  = require('fs').writeFileSync;
 const readFile   = require('fs').readFileSync;
 const mkdir      = require('mkdir-promise');
-const defaults   = require('defaults');
+const defaults   = require('lodash/defaultsDeep');
 const exec       = require('cp-sugar').exec;
 const pkgd       = require('pkgd');
 const publish    = require('../lib/publish');
@@ -29,11 +29,12 @@ function getTestOptions (settings) {
         delete disabled[settings.remove];
 
 
-    return defaults(settings && settings.set, disabled);
+    return defaults({}, settings && settings.set, disabled);
 }
 
 before(() => {
-    publish.testMode = true;
+    require('../lib/publish').testMode     = true;
+    require('../lib/validations').testMode = true;
 
     return del('testing-repo')
         .then(() => exec('git clone https://github.com/inikulin/testing-repo.git'))
