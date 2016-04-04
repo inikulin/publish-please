@@ -344,8 +344,8 @@ describe('Guard', () => {
 
     it('Should allow publishing with special flag', () =>
         exec('npm publish --with-publish-please')
-            // NOTE: it will reject anyway because this package version already
-            // published or test host don't have permissions to do that
+        // NOTE: it will reject anyway because this package version already
+        // published or test host don't have permissions to do that
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
@@ -353,4 +353,6 @@ describe('Guard', () => {
                 assert(err.message.indexOf(GUARD_ERROR) < 0);
             })
     );
+
+    it('Should not fail on `install`', () => exec('npm install'));
 });
