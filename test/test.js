@@ -8,8 +8,8 @@ const mkdir      = require('mkdir-promise');
 const defaults   = require('defaults');
 const exec       = require('cp-sugar').exec;
 const pkgd       = require('pkgd');
-const publish    = require('../lib');
-const getOptions = require('../lib').getOptions;
+const publish    = require('../lib/publish');
+const getOptions = require('../lib/publish').getOptions;
 
 
 function getTestOptions (settings) {
@@ -319,4 +319,38 @@ describe('Publish tag', () => {
         exec('git checkout master')
             .then(() => publish(getTestOptions({ remove: 'tag' })))
             .then(npmCmd => assert.strictEqual(npmCmd, 'npm publish --tag latest')));
+});
+
+describe('Guard', () => {
+    const GUARD_ERROR = "Failed at the testing-repo@1.3.77 prepublish script 'node ../lib/guard.js'";
+
+    beforeEach(() => {
+        const pkg = JSON.parse(readFile('package.json').toString());
+
+        pkg.scripts = { prepublish: 'node ../lib/guard.js' };
+
+        writeFile('package.json', JSON.stringify(pkg));
+    });
+
+    it('Should prevent publishing without special flag', () =>
+        exec('npm publish')
+            .then(() => {
+                throw new Error('Promise rejection expected');
+            })
+            .catch(err => {
+                assert(err.message.indexOf(GUARD_ERROR) >= 0);
+            })
+    );
+
+    it('Should allow publishing with special flag', () =>
+        exec('npm publish --with-publish-please')
+            // NOTE: it will reject anyway because this package version already
+            // published or test host don't have permissions to do that
+            .then(() => {
+                throw new Error('Promise rejection expected');
+            })
+            .catch(err => {
+                assert(err.message.indexOf(GUARD_ERROR) < 0);
+            })
+    );
 });

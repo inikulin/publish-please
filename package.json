@@ -4,13 +4,15 @@
   "description": "Publish your npm modules safely and gracefully.",
   "main": "./lib/index.js",
   "bin": {
-    "publish-please": "./bin/cli.js"
+    "publish-please": "./bin/publish.js",
+    "publish-please-guard": "./bin/guard.js"
   },
   "engines": {
     "node": ">=4.0.0"
   },
   "scripts": {
-    "test": "eslint bin lib test && mocha"
+    "test": "eslint bin lib test && mocha",
+    "prepublish": "node lib/guard.js"
   },
   "repository": {
     "type": "git",
