@@ -4,8 +4,7 @@
   "description": "Publish your npm modules safely and gracefully.",
   "main": "./lib/index.js",
   "bin": {
-    "publish-please": "./bin/publish.js",
-    "publish-please-guard": "./bin/guard.js"
+    "publish-please": "./bin/publish-please.js"
   },
   "engines": {
     "node": ">=4.0.0"
@@ -47,7 +46,8 @@
     "node-emoji": "^1.0.4",
     "nsp": "^2.2.0",
     "pkgd": "^1.0.0",
-    "promisify-event": "^1.0.0"
+    "promisify-event": "^1.0.0",
+    "read-pkg": "^1.1.0"
   },
   "devDependencies": {
     "babel-eslint": "^4.1.6",
