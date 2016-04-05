@@ -5,6 +5,7 @@ const del        = require('del');
 const writeFile  = require('fs').writeFileSync;
 const readFile   = require('fs').readFileSync;
 const mkdir      = require('mkdir-promise');
+const sep        = require('path').sep;
 const defaults   = require('lodash/defaultsDeep');
 const unset      = require('lodash/unset');
 const exec       = require('cp-sugar').exec;
@@ -324,12 +325,12 @@ describe('Publish tag', () => {
     it('Should publish with the given tag', () =>
         exec('git checkout master')
             .then(() => publish(getTestOptions({ set: { publishTag: 'alpha' } })))
-            .then(npmCmd => assert.strictEqual(npmCmd, 'npm publish --tag alpha')));
+            .then(npmCmd => assert.strictEqual(npmCmd, 'npm publish --tag alpha --with-publish-please')));
 
     it('Should publish with the `latest` tag by default', () =>
         exec('git checkout master')
             .then(() => publish(getTestOptions({ remove: 'publishTag' })))
-            .then(npmCmd => assert.strictEqual(npmCmd, 'npm publish --tag latest')));
+            .then(npmCmd => assert.strictEqual(npmCmd, 'npm publish --tag latest --with-publish-please')));
 });
 
 describe('Guard', () => {
@@ -366,4 +367,72 @@ describe('Guard', () => {
     );
 
     it('Should not fail on `install`', () => exec('npm install'));
+});
+
+describe('Init', () => {
+    beforeEach(() => {
+        const initJs = readFile('../lib/init.js');
+
+        return mkdir('node_modules/publish-please/lib'.replace(/\\|\//g, sep))
+            .then(() => writeFile('node_modules/publish-please/lib/init.js', initJs));
+    });
+
+    it('Should add hooks to package.json', () =>
+        exec('node node_modules/publish-please/lib/init.js --test-mode')
+            .then(() => {
+                const cfg = JSON.parse(readFile('package.json').toString());
+
+                assert.strictEqual(cfg.scripts['publish-please'], 'publish-please');
+                assert.strictEqual(cfg.scripts['prepublish'], 'publish-please guard');
+            })
+    );
+
+    it('Should add hooks to package.json', () =>
+        exec('node node_modules/publish-please/lib/init.js --test-mode')
+            .then(() => {
+                const cfg = JSON.parse(readFile('package.json').toString());
+
+                assert.strictEqual(cfg.scripts['publish-please'], 'publish-please');
+                assert.strictEqual(cfg.scripts['prepublish'], 'publish-please guard');
+            })
+    );
+
+    it('Should add guard gracefully', () => {
+        writeFile('package.json', JSON.stringify({
+            scripts: {
+                prepublish: 'yo'
+            }
+        }));
+
+        return exec('node node_modules/publish-please/lib/init.js --test-mode')
+            .then(() => {
+                const cfg = JSON.parse(readFile('package.json').toString());
+
+                assert.strictEqual(cfg.scripts['prepublish'], 'publish-please guard && yo');
+            });
+
+    });
+
+    it("Should not modify config if it's already modified", () =>
+        exec('node node_modules/publish-please/lib/init.js --test-mode')
+            .then(() => exec('node node_modules/publish-please/lib/init.js --test-mode'))
+            .then(() => {
+                const cfg = JSON.parse(readFile('package.json').toString());
+
+                assert.strictEqual(cfg.scripts['publish-please'], 'publish-please');
+                assert.strictEqual(cfg.scripts['prepublish'], 'publish-please guard');
+            })
+    );
+
+    it("Should exit with error if package.json doesn't exists", () =>
+        del('package.json')
+            .then(() => exec('node node_modules/publish-please/lib/init.js --test-mode'))
+            .then(() => {
+                throw new Error('Promise rejection expected');
+            })
+            .catch(err => {
+                assert.strictEqual(err.code, 1);
+            })
+    );
+
 });
