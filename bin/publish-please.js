@@ -1,10 +1,5 @@
 #!/usr/bin/env node
 
-const chalk   = require('chalk');
-const publish = require('../lib/publish');
+'use strict';
 
-publish().catch(err => {
-    console.log(chalk.red.bold('ERRORS'));
-    console.log(err.message);
-    process.exit(1);
-});
+require('../lib');
