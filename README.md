@@ -13,7 +13,7 @@ There are numerous ways to "shoot yourself in the foot" using `npm publish`. The
 `npm publish` for your packages with safe and more functional alternative, which will allow you to:
 
  - Run tests or build steps before publishing (because `prepublish` is [broken](https://medium.com/greenkeeper-blog/what-is-npm-s-prepublish-and-why-is-it-so-confusing-a948373e6be1#.a40w9sdy6)).
- - Perform check for the [sensitive data](#sensitive-information-audit) in your package to be sure that you didn't leak it by accident(#sensitive-information-audit) (Further reading: [Do not underestimate credentials leaks](https://github.com/ChALkeR/notes/blob/master/Do-not-underestimate-credentials-leaks.md)).
+ - Perform check for the [sensitive data](#sensitive-information-audit) in your package to be sure that you didn't leak it by accident (Further reading: [Do not underestimate credentials leaks](https://github.com/ChALkeR/notes/blob/master/Do-not-underestimate-credentials-leaks.md)).
  - Perform check for vulnerable dependencies using [Node Security Project](https://nodesecurity.io/) data.
  - Check that you are in the correct git branch.
  - Check that git tag matches version specified in the `package.json`.
