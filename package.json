@@ -1,6 +1,6 @@
 {
   "name": "publish-please",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Publish your npm modules safely and gracefully.",
   "main": "./lib/index.js",
   "bin": {
