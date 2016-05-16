@@ -3,79 +3,69 @@
 [![Build Status](https://api.travis-ci.org/inikulin/publish-please.svg)](https://travis-ci.org/inikulin/publish-please)
 
 <p align="center">
-<i>CLI tool and Gulp plugin that allows you publish npm modules safely and gracefully.</i>
+<i>Safe and highly functional replacement for `npm publish`.</i>
 </p>
 <p align="center">
     <img src="https://raw.githubusercontent.com/inikulin/publish-please/master/media/demo.gif" alt="demo" />
 </p>
 
-## So what it does exactly?
+There are numerous ways to "shoot yourself in the foot" using `npm publish`. The purpose of this module is to replace
+`npm publish` for your packages with safe and more functional alternative, which will allow you to:
 
- - Can run tests or build steps before publishing (because `prepublish` is [broken](https://medium.com/greenkeeper-blog/what-is-npm-s-prepublish-and-why-is-it-so-confusing-a948373e6be1#.a40w9sdy6)).
- - Performs [sensitive information audit](#sensitive-information-audit) (Further reading: [Do not underestimate credentials leaks](https://github.com/ChALkeR/notes/blob/master/Do-not-underestimate-credentials-leaks.md)).
- - Checks that you are in the correct git branch.
- - Checks that git tag matches version specified in the `package.json`.
- - Checks that there are no uncommitted changes in the working tree.
- - Checks that there are no untracked files in the working tree.
- - Can force usage of the [npm publish tag](https://docs.npmjs.com/cli/publish).
- - Provides release summary and asks for the confirmation.
- - Can be configured via `.publishrc` file.
- - Can be used as CLI tool or [Gulp](https://github.com/gulpjs/gulp) plugin.
+ - Run tests or build steps before publishing (because `prepublish` is [broken](https://medium.com/greenkeeper-blog/what-is-npm-s-prepublish-and-why-is-it-so-confusing-a948373e6be1#.a40w9sdy6)).
+ - Perform check for the [sensitive data](#sensitive-information-audit) in your package to be sure that you didn't leak it by accident(#sensitive-information-audit) (Further reading: [Do not underestimate credentials leaks](https://github.com/ChALkeR/notes/blob/master/Do-not-underestimate-credentials-leaks.md)).
+ - Perform check for vulnerable dependencies using [Node Security Project](https://nodesecurity.io/) data.
+ - Check that you are in the correct git branch.
+ - Check that git tag matches version specified in the `package.json`.
+ - Check that there are no uncommitted changes in the working tree.
+ - Check that there are no untracked files in the working tree.
+ - Force usage of the [npm publish tag](https://docs.npmjs.com/cli/publish) there necessary, so you'll be sure you're not publishing preview version of your package as a release version.
+ - Get release summary and publishing confirmation.
+ - Configure publishing using built-in configuration wizard.
 
-## Install
-### As CLI tool:
-```
-npm install -g publish-please
-```
-
-### As Gulp plugin:
-```
+## Getting started
+Setup process of *publish-please* is quite trivial - just run
+```shell
 npm install --save-dev publish-please
 ```
+in your project's directory.
 
+Once it finish installing, *publish-please* will automatically run it's configuration wizard, which will guide you
+through some simple steps to setup [features](#options) you want to use:
 
-## Usage
-### As CLI tool
+![config](https://raw.githubusercontent.com/inikulin/publish-please/master/media/config.png)
+
+If you forgot to configure something or just changed your mind and want to change configuration, just run
+```shell
+npm run publish-please config
 ```
-cd to_your_project_dir
-publish-please
-```
-That's it. You can change publish configuration using [.publishrc file](#publishrc-file).
+to return to wizard.
 
-### As Gulp plugin
-```js
-const gulp    = require('gulp');
-const publish = require('publish-please');
+So, once you've done with wizard from now on `npm publish` for your package is disabled (Muahahaha :smiling_imp:):
 
-...
+![guard](https://raw.githubusercontent.com/inikulin/publish-please/master/media/guard.png)
 
-// NOTE: you can setup prepublish actions as the dependency for the task
-gulp.task('publish', ['test'], () => publish(options));
+But don't worry it's done for the good reason to prevent you or your co-workers run unsafe publishing process. Use awesome version
+instead:
+```shell
+npm run publish-please
 ```
 
-`options` will override options specified in the `.publishrc` file.
 
 ## Options
 
+ - **prePublishScript** - Specifies command that will be run before publish (e.g. `npm test`). Use it for builds and tests. Default: `npm test`.
+ - **publishTag** - Specifies tag with which package will be published. See [npm publish docs](https://docs.npmjs.com/cli/publish) for more info. Default: `latest`.
  - **confirm** - Ask for the confirmation before publishing. Default: `true`.
- - **sensitiveDataAudit** - Perform audit for the sensitive data. Default: `true`.
- - **checkUncommitted** - Check that there are no uncommitted changes in the working tree. Default: `true`.
- - **checkUntracked** - Check that there are no untracked files in the working tree. Default: `true`.
- - **validateGitTag** - Check that git tag matches version specified in the `package.json`. Default: `true`.
- - **validateBranch** - Check that current branch matches the specified branch. Default: `master`.
- - **tag** - Specifies tag with which package will be published. See [npm publish docs](https://docs.npmjs.com/cli/publish) for more info. Default: `latest`.
- - **prepublishScript** - Specifies command that will be run before publish (e.g. `npm test`). Use it for builds and tests. Default: `null`.
 
-## .publishrc file
-You can specify publish options in the JSON form via `.publishrc` file in your project directory. E.g.:
-```json
-{
-    "validateGitTag":   false,
-    "validateBranch":   "master",
-    "tag":              "beta",
-    "prepublishScript": "mocha"
-}
-```
+### Validations
+ - **uncommittedChanges** - Check that there are no uncommitted changes in the working tree. Default: `true`.
+ - **untrackedFiles** - Check that there are no untracked files in the working tree. Default: `true`.
+ - **gitTag** - Check that git tag matches version specified in the `package.json`. Default: `true`.
+ - **branch** - Check that current branch matches the specified branch. Default: `master`.
+ - **sensitiveData** - Perform [audit for the sensitive data](#sensitive-information-audit). Default: `true`.
+ - **vulnerableDependencies** - Perform vulnerable dependencies check using [Node Security Project](https://nodesecurity.io/) data. Default: `true`.
+
 
 ## Sensitive information audit
 **Important note:** tool provides some very basic sensitive data check. Do not rely on it fully. Always perform manual checks for the
