@@ -1,7 +1,7 @@
 {
   "name": "publish-please",
   "version": "1.1.0",
-  "description": "Publish your npm modules safely and gracefully.",
+  "description": "Safe and highly functional replacement for `npm publish`.",
   "main": "./lib/index.js",
   "bin": {
     "publish-please": "./bin/publish-please.js"
