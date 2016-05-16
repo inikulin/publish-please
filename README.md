@@ -1,6 +1,7 @@
 # Publish, please!
 
-[![Build Status](https://api.travis-ci.org/inikulin/publish-please.svg)](https://travis-ci.org/inikulin/publish-please)
+[![Build Status](https://travis-ci.org/inikulin/publish-please.svg?branch=master)](https://travis-ci.org/inikulin/publish-please)
+[![Dependency Status](https://david-dm.org/inikulin/publish-please.svg)](https://david-dm.org/inikulin/publish-please)
 
 <p align="center">
 <i>Safe and highly functional replacement for `npm publish`.</i>
