@@ -1,4 +1,3 @@
 {
-    "prepublishScript": "mocha",
     "tag" : "v1"
 }
