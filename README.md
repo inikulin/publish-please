@@ -1,6 +1,7 @@
 # Publish, please!
 
 [![Build Status](https://travis-ci.org/inikulin/publish-please.svg?branch=master)](https://travis-ci.org/inikulin/publish-please)
+[![npm version](https://img.shields.io/npm/v/publish-please.svg)](https://www.npmjs.com/package/publish-please)
 [![Dependency Status](https://david-dm.org/inikulin/publish-please.svg)](https://david-dm.org/inikulin/publish-please)
 
 <p align="center">
@@ -125,6 +126,12 @@ Performed for the following items:
  - Potential MSBuild publish profile
  - PHP dotenv
 
+
+## Check out my other packages used by this tool
+- [cp-sugar](https://github.com/inikulin/cp-sugar) - Some sugar for child_process module.
+- [elegant-status](https://github.com/inikulin/elegant-status) - Create elegant task status for CLI.
+- [pkgd](https://github.com/inikulin/pkgd) - Get package publish info: package.json and file list.
+- [promisify-event](https://github.com/inikulin/promisify-event) - Promisify EventEmitter's event.
 
 ## Author
 [Ivan Nikulin](https://github.com/inikulin) (ifaaan@gmail.com)
