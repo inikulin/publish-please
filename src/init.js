@@ -7,7 +7,7 @@ const chalk     = require('chalk');
 
 function readCfg (projectDir) {
     try {
-        return readPkg.sync(projectDir);
+        return readPkg.sync(projectDir, { normalize: false });
     }
     catch (err) {
         return null;
