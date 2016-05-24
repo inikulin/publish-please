@@ -21,6 +21,14 @@ function reportNoConfig () {
     console.log(chalk.bgRed('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'));
 }
 
+function reportGlobalInstall () {
+    console.log(chalk.bgRed('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'));
+    console.log(chalk.bgRed("!! Starting from v2.0.0 publish-please can't be installed globally.      !!"));
+    console.log(chalk.bgRed('!! Use local installation instead.                                       !!'));
+    console.log(chalk.bgRed('!! (learn more: https://github.com/inikulin/publish-please#readme).      !!'));
+    console.log(chalk.bgRed('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'));
+}
+
 function reportHooksAdded () {
     console.log(chalk.bgGreen('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'));
     console.log(chalk.bgGreen('!! publish-please hooks were successfully setup for the project. !!'));
@@ -62,8 +70,14 @@ function addConfigHooks (cfg, projectDir) {
         const getNpmArgs = require('./utils/get-npm-args');
         const npmArgs    = getNpmArgs();
 
-        if (!npmArgs || !npmArgs.some(arg => /^publish-please(@\d+\.\d+.\d+)?$/.test(arg)))
+
+        if (!npmArgs || !npmArgs.some(arg => /^publish-please(@\S+)?$/.test(arg)))
             return;
+
+        if (npmArgs.indexOf('--global') > -1) {
+            reportGlobalInstall();
+            process.exit(1);
+        }
     }
 
     // NOTE: <projectDir>/node_modules/publish-please/lib
