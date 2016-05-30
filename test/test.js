@@ -4,15 +4,19 @@ const assert     = require('assert');
 const del        = require('del');
 const writeFile  = require('fs').writeFileSync;
 const readFile   = require('fs').readFileSync;
-const mkdir      = require('mkdir-promise');
 const sep        = require('path').sep;
 const defaults   = require('lodash/defaultsDeep');
 const unset      = require('lodash/unset');
 const exec       = require('cp-sugar').exec;
 const pkgd       = require('pkgd');
+const mkdirp     = require('mkdirp');
+const Promise    = require('pinkie-promise');
 const publish    = require('../lib/publish');
 const getOptions = require('../lib/publish').getOptions;
 
+function mkdir (path) {
+    return new Promise((resolve, reject) => mkdirp(path, null, err => err ? reject(err) : resolve()));
+}
 
 function getTestOptions (settings) {
     const disabled = {
@@ -334,7 +338,7 @@ describe('Publish tag', () => {
 });
 
 describe('Guard', () => {
-    const GUARD_ERROR = "Failed at the testing-repo@1.3.77 prepublish script 'node ../lib/guard.js'";
+    const GUARD_ERROR = 'node ../lib/guard.js';
 
     beforeEach(() => {
         const pkg = JSON.parse(readFile('package.json').toString());
@@ -371,21 +375,9 @@ describe('Guard', () => {
 
 describe('Init', () => {
     beforeEach(() => {
-        const initJs = readFile('../lib/init.js');
-
         return mkdir('node_modules/publish-please/lib'.replace(/\\|\//g, sep))
-            .then(() => writeFile('node_modules/publish-please/lib/init.js', initJs));
+            .then(() => exec('cp -r ../lib/* node_modules/publish-please/lib'));
     });
-
-    it('Should add hooks to package.json', () =>
-        exec('node node_modules/publish-please/lib/init.js --test-mode')
-            .then(() => {
-                const cfg = JSON.parse(readFile('package.json').toString());
-
-                assert.strictEqual(cfg.scripts['publish-please'], 'publish-please');
-                assert.strictEqual(cfg.scripts['prepublish'], 'publish-please guard');
-            })
-    );
 
     it('Should add hooks to package.json', () =>
         exec('node node_modules/publish-please/lib/init.js --test-mode')

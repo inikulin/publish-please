@@ -1,4 +1,6 @@
 const inquirer = require('inquirer');
+const Promise  = require('pinkie-promise');
+
 
 function ask (type, question, defaultAnswer) {
     return new Promise(resolve => {

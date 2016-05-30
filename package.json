@@ -1,13 +1,19 @@
 {
   "name": "publish-please",
-  "version": "2.1.3",
+  "version": "2.1.4",
   "description": "Safe and highly functional replacement for `npm publish`.",
   "main": "./lib/index.js",
   "bin": {
     "publish-please": "./bin/publish-please.js"
   },
   "scripts": {
-    "test": "eslint bin src test && rm -rf lib && babel src -d lib &&  mocha",
+    "lint": "eslint bin src test",
+    "clean": "rm -rf lib",
+    "clean-test": "rm test/__test-compiled__.js",
+    "compile": "babel src -d lib",
+    "compile-test": "babel test/test.js --out-file test/__test-compiled__.js",
+    "build": "npm run clean && npm run compile",
+    "test": "npm run lint && npm run build && npm run compile-test && mocha test/__test-compiled__.js && npm run clean-test",
     "postinstall": "node lib/init.js"
   },
   "repository": {
@@ -32,7 +38,6 @@
     "bin"
   ],
   "dependencies": {
-    "babel-runtime": "^6.9.0",
     "ban-sensitive-files": "^1.7.2",
     "chalk": "^1.1.1",
     "cp-sugar": "^1.0.0",
@@ -42,7 +47,8 @@
     "lodash": "^4.7.0",
     "node-emoji": "^1.0.4",
     "nsp": "^2.2.0",
-    "pkgd": "^1.1.0",
+    "pinkie-promise": "^2.0.1",
+    "pkgd": "^1.1.2",
     "promisify-event": "^1.0.0",
     "read-pkg": "^1.1.0"
   },
@@ -54,7 +60,7 @@
     "del": "^2.2.0",
     "eslint": "^1.10.3",
     "eslint-plugin-babel": "^3.0.0",
-    "mkdir-promise": "^1.0.0",
+    "mkdirp": "^0.5.1",
     "mocha": "^2.3.4"
   }
 }

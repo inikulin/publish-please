@@ -7,6 +7,7 @@ const pkgd            = require('pkgd');
 const exec            = require('cp-sugar').exec;
 const spawn           = require('cp-sugar').spawn;
 const emoji           = require('node-emoji').emoji;
+const Promise         = require('pinkie-promise');
 const validate        = require('./validations').validate;
 const confirm         = require('./utils/inquires').confirm;
 const DEFAULT_OPTIONS = require('./default-options');

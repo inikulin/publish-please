@@ -3,7 +3,7 @@
 const pathJoin = require('path').join;
 const nsp      = require('nsp');
 const confirm  = require('../utils/inquires').confirm;
-
+const Promise  = require('pinkie-promise');
 
 module.exports = {
     option:       'vulnerableDependencies',

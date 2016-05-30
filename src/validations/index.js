@@ -2,6 +2,7 @@ const noop          = require('lodash/noop');
 const chalk         = require('chalk');
 const elegantStatus = require('elegant-status');
 const emoji         = require('node-emoji').emoji;
+const Promise       = require('pinkie-promise');
 
 const validations = [
     require('./vulnerable-dependencies'),

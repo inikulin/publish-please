@@ -3,3 +3,5 @@ node_modules
 testing-repo
 lib
 !lib/init.js
+test/__test-compiled__.js
+

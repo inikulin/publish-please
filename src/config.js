@@ -5,6 +5,7 @@ const writeFile               = require('fs').writeFileSync;
 const pathJoin                = require('path').join;
 const chalk                   = require('chalk');
 const defaults                = require('lodash/defaultsDeep');
+const Promise                 = require('pinkie-promise');
 const DEFAULT_OPTIONS         = require('./default-options');
 const inputWithConfirmation   = require('./utils/inquires').inputWithConfirmation;
 const input                   = require('./utils/inquires').input;
