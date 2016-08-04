@@ -55,7 +55,7 @@ function colorGitOutput () {
         'git config color.status.untracked blue'
     ];
 
-    return Promise.all(gitColorCommands.map(s => exec(s)));
+    return gitColorCommands.reduce((p, c) => p.then(() => exec(c)), Promise.resolve());
 }
 
 before(() => {

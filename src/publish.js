@@ -2,12 +2,12 @@
 
 const readFile        = require('fs').readFileSync;
 const chalk           = require('chalk');
+const semver          = require('semver');
 const defaults        = require('lodash/defaultsDeep');
 const pkgd            = require('pkgd');
 const exec            = require('cp-sugar').exec;
 const spawn           = require('cp-sugar').spawn;
 const emoji           = require('node-emoji').emoji;
-const Promise         = require('pinkie-promise');
 const validate        = require('./validations').validate;
 const confirm         = require('./utils/inquires').confirm;
 const DEFAULT_OPTIONS = require('./default-options');
@@ -84,12 +84,26 @@ function getOptions (opts) {
     return defaults({}, opts, DEFAULT_OPTIONS);
 }
 
+// NOTE: adopted from https://github.com/sindresorhus/np/blob/master/index.js#L78
+function assertNode6PublishingPrerequisites () {
+    return exec('npm version --json')
+        .then(out => {
+            const npmVersion       = JSON.parse(out).npm;
+            const isNode6          = semver.gte(process.version, '6.0.0');
+            const isSafeNpmVersion = semver.satisfies(npmVersion, '>=2.15.8 <3.0.0 || >=3.10.1');
+
+            if (isNode6 && !isSafeNpmVersion)
+                throw new Error(`npm@${npmVersion} has known issues publishing when running Node.js 6. Please upgrade npm or downgrade Node and publish again. See: https://github.com/npm/npm/issues/5082`);
+        });
+
+}
+
 module.exports = function (opts) {
     let pkgInfo = null;
 
     opts = getOptions(opts);
 
-    return Promise.resolve()
+    return assertNode6PublishingPrerequisites()
         .then(() => opts.prePublishScript && runPrePublishScript(opts.prePublishScript))
         .then(() => pkgd())
         .then(info => pkgInfo = info)
