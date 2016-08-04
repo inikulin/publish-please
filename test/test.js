@@ -41,19 +41,39 @@ function getTestOptions (settings) {
     return defaults({}, settings && settings.set, disabled);
 }
 
+function colorGitOutput () {
+    const gitColorCommands = [
+        'git config color.branch.current blue',
+        'git config color.branch.local blue',
+        'git config color.branch.remote blue',
+        'git config color.diff.meta blue',
+        'git config color.diff.frag blue',
+        'git config color.diff.old blue',
+        'git config color.diff.new blue',
+        'git config color.status.added blue',
+        'git config color.status.changed blue',
+        'git config color.status.untracked blue'
+    ];
+
+    return Promise.all(gitColorCommands.map(s => exec(s)));
+}
+
 before(() => {
     require('../lib/publish').testMode     = true;
     require('../lib/validations').testMode = true;
 
     return del('testing-repo')
-        .then(() => exec('git clone https://github.com/inikulin/testing-repo.git'))
+        .then(() => exec('git clone https://github.com/inikulin/testing-repo.git testing-repo'))
         .then(() => process.chdir('testing-repo'));
 });
 
 after(() => {
     process.chdir('../');
-    return del('testing-repo');
+    return exec('sed -i\'\' \'/= blue/d\' .git/config')
+        .then(() => del('testing-repo'));
 });
+
+beforeEach(() => colorGitOutput());
 
 afterEach(() => exec('git reset --hard HEAD').then(exec('git clean -f -d')));
 
