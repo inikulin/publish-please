@@ -29,9 +29,10 @@ function getTestOptions (settings) {
             vulnerableDependencies: false
         },
 
-        confirm:          false,
-        publishTag:       null,
-        prePublishScript: null
+        confirm:           false,
+        publishTag:        null,
+        prePublishScript:  null,
+        postPublishScript: null
     };
 
     if (settings && settings.remove)
@@ -109,6 +110,7 @@ describe('.publishrc', () => {
 
         assert(!opts.confirm);
         assert.strictEqual(opts.prePublishScript, 'npm test');
+        assert.strictEqual(opts.postPublishScript, '');
         assert.strictEqual(opts.publishTag, 'latest');
         assert.strictEqual(opts.validations.branch, 'master');
         assert(!opts.validations.uncommittedChanges);
@@ -343,6 +345,31 @@ describe('Prepublish script', () => {
         exec('git checkout master')
             .then(() => publish(getTestOptions({ set: { prePublishScript: 'git mv README.md test-file' } })))
             .then(() => assert(readFile('test-file'))));
+});
+
+describe('Postpublish script', () => {
+    it('Should fail if postpublish script fail', () =>
+        exec('git checkout master')
+            .then(() => publish(getTestOptions({ set: { postPublishScript: 'git' } })))
+            .then(() => {
+                throw new Error('Promise rejection expected');
+            })
+            .catch(err => assert.strictEqual(err.message, 'Command `git` exited with code 1.')));
+
+    it('Should run postpublish script', () =>
+        exec('git checkout master')
+            .then(() => publish(getTestOptions({ set: { postPublishScript: 'git mv README.md test-file' } })))
+            .then(() => assert(readFile('test-file'))));
+
+    it('Should not run postpublish script if publishing was failed', () =>
+        exec('git checkout master')
+            .then(() => publish(getTestOptions({ set: { prePublishScript: 'git', postPublishScript: 'git mv README.md test-file' } })))
+            .then(() => {
+                throw new Error('Promise rejection expected');
+            })
+            .catch(err => assert.strictEqual(err.message, 'Command `git` exited with code 1.'))
+            .catch(() => assert.throws(readFile('test-file'))));
+
 });
 
 describe('Publish tag', () => {

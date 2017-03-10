@@ -12,6 +12,10 @@ const validate        = require('./validations').validate;
 const confirm         = require('./utils/inquires').confirm;
 const DEFAULT_OPTIONS = require('./default-options');
 
+const SCRIPT_TYPE = {
+    prePublish:  'pre-publish',
+    postPublish: 'post-publish'
+};
 
 function printReleaseInfo (pkgVersion, publishTag) {
     let commitInfo = null;
@@ -34,9 +38,9 @@ function printReleaseInfo (pkgVersion, publishTag) {
         });
 }
 
-function runPrePublishScript (command) {
+function runScript (command, scriptType) {
     if (!module.exports.testMode) {
-        console.log(chalk.yellow('Running pre-publish script'));
+        console.log(chalk.yellow('Running ' + (scriptType ? scriptType + ' ' : '') + 'script'));
         console.log(chalk.yellow('-------------------------'));
     }
 
@@ -104,13 +108,20 @@ module.exports = function (opts) {
     opts = getOptions(opts);
 
     return assertNode6PublishingPrerequisites()
-        .then(() => opts.prePublishScript && runPrePublishScript(opts.prePublishScript))
+        .then(() => opts.prePublishScript && runScript(opts.prePublishScript, SCRIPT_TYPE.prePublish))
         .then(() => pkgd())
         .then(info => pkgInfo = info)
         .then(() => validate(opts.validations, pkgInfo))
         .then(() => !module.exports.testMode && printReleaseInfo(pkgInfo.cfg.version, opts.publishTag))
         .then(() => opts.confirm ? confirm('Are you sure you want to publish this version to npm?', false) : true)
-        .then(ok => ok && publish(opts.publishTag));
+        .then(ok => ok && publish(opts.publishTag))
+        .then(command => {
+            if (!opts.postPublishScript)
+                return command;
+
+            return runScript(opts.postPublishScript, SCRIPT_TYPE.postPublish)
+                .then(() => command);
+        });
 };
 
 // Exports for the testing purposes

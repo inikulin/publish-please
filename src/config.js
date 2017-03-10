@@ -21,6 +21,13 @@ const optionsConfigurators = {
         currentVal
     ),
 
+    postPublishScript: currentVal => inputWithConfirmation(
+        'Do you want to run any scripts after succesful publishing (e.g. release announcements, binary uploading)?',
+        false,
+        'Input post-publish script',
+        currentVal
+    ),
+
     publishTag: currentVal => input(
         'Specify release tag with which you package will be published',
         currentVal
