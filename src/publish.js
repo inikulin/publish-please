@@ -114,9 +114,9 @@ module.exports = function (opts) {
         .then(() => validate(opts.validations, pkgInfo))
         .then(() => !module.exports.testMode && printReleaseInfo(pkgInfo.cfg.version, opts.publishTag))
         .then(() => opts.confirm ? confirm('Are you sure you want to publish this version to npm?', false) : true)
-        .then(ok => ok && publish(opts.publishTag))
+        .then(ok => ok && publish(opts.publishTag) || '')
         .then(command => {
-            if (!opts.postPublishScript)
+            if (!command || !opts.postPublishScript)
                 return command;
 
             return runScript(opts.postPublishScript, SCRIPT_TYPE.postPublish)

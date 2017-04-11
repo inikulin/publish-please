@@ -11,6 +11,13 @@ const exec       = require('cp-sugar').exec;
 const pkgd       = require('pkgd');
 const mkdirp     = require('mkdirp');
 const Promise    = require('pinkie-promise');
+
+// NOTE: mocking confirm function
+let mockConfirm = () => {};
+
+require('../lib/utils/inquires').confirm = (...args) => mockConfirm(...args);
+
+// NOTE: loading tested code
 const publish    = require('../lib/publish');
 const getOptions = require('../lib/publish').getOptions;
 
@@ -368,7 +375,7 @@ describe('Postpublish script', () => {
                 throw new Error('Promise rejection expected');
             })
             .catch(err => assert.strictEqual(err.message, 'Command `git` exited with code 1.'))
-            .catch(() => assert.throws(readFile('test-file'))));
+            .catch(() => assert.throws(() => readFile('test-file'))));
 
 });
 
@@ -473,5 +480,51 @@ describe('Init', () => {
                 assert.strictEqual(err.code, 1);
             })
     );
+
+});
+
+describe('Confirmation', () => {
+    describe('Passed', () => {
+        let confirmCalled = false;
+
+        before(() => {
+            mockConfirm = () => {
+                confirmCalled = true;
+
+                return Promise.resolve(true);
+            };
+        });
+
+        beforeEach(() => confirmCalled = false);
+
+        after(() => mockConfirm = () => {});
+
+        it('Should call confirmation if opts.confirm is true', () =>
+            exec('git checkout master')
+                .then(() => publish(getTestOptions({ set: { confirm: true } })))
+                .then(npmCmd => {
+                    assert.ok(confirmCalled);
+                    assert.strictEqual(npmCmd, 'npm publish --tag null --with-publish-please');
+                }));
+    });
+
+    describe('Failed', () => {
+        before(() => mockConfirm = () => Promise.resolve(false));
+
+        after(() => mockConfirm = () => {});
+
+        it('Should return empty string if publish was not confirmed', () =>
+            exec('git checkout master')
+                .then(() => publish(getTestOptions({ set: { confirm: true } })))
+                .then(npmCmd => assert.strictEqual(npmCmd, '')));
+
+        it('Should not run postpublish script if publishing was not confirmed', () =>
+            exec('git checkout master')
+                .then(() => publish(getTestOptions({ set: { confirm: true, postPublishScript: 'git mv README.md test-file' } })))
+                .then(npmCmd => {
+                    assert.strictEqual(npmCmd, '');
+                    assert.throws(() => readFile('test-file'));
+                }));
+    });
 
 });
