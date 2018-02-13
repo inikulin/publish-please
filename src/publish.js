@@ -60,7 +60,10 @@ function publish (publishCommand, publishTag) {
 
     const spawnPromise = module.exports.testMode ?
         Promise.resolve() :
-        spawn(command).then(() => console.log('\n', emoji.tada, emoji.tada, emoji.tada));
+        spawn(command).then(res => {
+            console.log('\n', emoji.tada, emoji.tada, emoji.tada);
+            return res || true;
+        });
 
     return spawnPromise.then(() => command);
 }
