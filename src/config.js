@@ -28,6 +28,11 @@ const optionsConfigurators = {
         currentVal
     ),
 
+    publishCommand: currentVal => input(
+        'Specify publishing command which will be used to publish your package',
+        currentVal
+    ),
+
     publishTag: currentVal => input(
         'Specify release tag with which you package will be published',
         currentVal

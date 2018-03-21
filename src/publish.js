@@ -54,13 +54,14 @@ function runScript (command, scriptType) {
         });
 }
 
-function publish (publishTag) {
-    const command = `npm publish --tag ${publishTag} --with-publish-please`;
+function publish (publishCommand, publishTag) {
+    const command = `${publishCommand} --tag ${publishTag} --with-publish-please`;
 
-    if (!module.exports.testMode)
-        return spawn(command).then(() => console.log('\n', emoji.tada, emoji.tada, emoji.tada));
+    const spawnPromise = module.exports.testMode ?
+        Promise.resolve() :
+        spawn(command).then(() => console.log('\n', emoji.tada, emoji.tada, emoji.tada));
 
-    return command;
+    return spawnPromise.then(() => command);
 }
 
 function getOptions (opts) {
@@ -114,7 +115,7 @@ module.exports = function (opts) {
         .then(() => validate(opts.validations, pkgInfo))
         .then(() => !module.exports.testMode && printReleaseInfo(pkgInfo.cfg.version, opts.publishTag))
         .then(() => opts.confirm ? confirm('Are you sure you want to publish this version to npm?', false) : true)
-        .then(ok => ok && publish(opts.publishTag) || '')
+        .then(ok => ok && publish(opts.publishCommand, opts.publishTag) || '')
         .then(command => {
             if (!command || !opts.postPublishScript)
                 return command;
