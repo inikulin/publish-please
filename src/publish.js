@@ -1,6 +1,7 @@
 'use strict';
 
 const readFile        = require('fs').readFileSync;
+const Promise         = require('pinkie-promise');
 const chalk           = require('chalk');
 const semver          = require('semver');
 const defaults        = require('lodash/defaultsDeep');
