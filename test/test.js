@@ -118,6 +118,7 @@ describe('.publishrc', () => {
         assert(!opts.confirm);
         assert.strictEqual(opts.prePublishScript, 'npm test');
         assert.strictEqual(opts.postPublishScript, '');
+        assert.strictEqual(opts.publishCommand, 'npm publish');
         assert.strictEqual(opts.publishTag, 'latest');
         assert.strictEqual(opts.validations.branch, 'master');
         assert(!opts.validations.uncommittedChanges);
@@ -377,6 +378,18 @@ describe('Postpublish script', () => {
             .catch(err => assert.strictEqual(err.message, 'Command `git` exited with code 1.'))
             .catch(() => assert.throws(() => readFile('test-file'))));
 
+});
+
+describe('Custom publish command', () => {
+    it('Should execute a custom publish command if it is specified', () =>
+        exec('git checkout master')
+            .then(() => publish(getTestOptions({ set: { publishCommand: 'gulp publish' }, remove: 'publishTag' })))
+            .then(npmCmd => assert.strictEqual(npmCmd, 'gulp publish --tag latest --with-publish-please')));
+
+    it('Should execute a custom publish command with a custom tag', () =>
+            exec('git checkout master')
+                .then(() => publish(getTestOptions({ set: { publishCommand: 'gulp publish', publishTag: 'alpha' } })))
+                .then(npmCmd => assert.strictEqual(npmCmd, 'gulp publish --tag alpha --with-publish-please')));
 });
 
 describe('Publish tag', () => {

@@ -58,6 +58,7 @@ npm run publish-please
 
  - **prePublishScript** - Specifies command that will be run before publish (e.g. `npm test`). Use it for builds and tests. Default: `npm test`.
  - **postPublishScript** - Specifies command that will be run after successful publishing. Use it for release announcements, creating a GitHub release, uploading binaries, etc. Default: `` (no command).
+ - **publishCommand** - Specifies publishing command which will be used to publish the package. Default: `npm publish`.
  - **publishTag** - Specifies tag with which package will be published. See [npm publish docs](https://docs.npmjs.com/cli/publish) for more info. Default: `latest`.
  - **confirm** - Ask for the confirmation before publishing. Default: `true`.
 
