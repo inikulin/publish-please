@@ -20,6 +20,7 @@ module.exports = {
     run (expected) {
         return exec("git branch --no-color | sed -n '/\\* /s///p'")
             .then(branch => {
+                branch = (branch.match(/^\*\s(.*)$/gm) || [''])[0].replace('* ', '');
                 if (branch !== expected)
                     throw 'Expected branch to be `' + expected + '`, but it was `' + branch + '`.';
             });
