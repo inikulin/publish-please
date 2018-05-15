@@ -43,7 +43,7 @@
     "cp-sugar": "^1.0.0",
     "elegant-status": "1.1.0",
     "globby": "8.0.1",
-    "inquirer": "4.0.0",
+    "inquirer": "4.0.2",
     "lodash": "4.17.10",
     "node-emoji": "^1.0.4",
     "nsp": "3.2.1",
