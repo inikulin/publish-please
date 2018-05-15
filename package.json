@@ -63,5 +63,8 @@
     "eslint-plugin-babel": "^3.0.0",
     "mkdirp": "^0.5.1",
     "mocha": "5.1.1"
+  },
+  "engines": {
+    "node": ">=6.0.0"
   }
 }
