@@ -317,7 +317,7 @@ describe('Node security project audit', () => {
                 throw new Error('Promise rejection expected');
             })
             .catch(err => {
-                assert(err.toString().indexOf('vulnerability found in ms@0.7.0') > -1);
+                assert(err.message.indexOf('Vulnerability found in ms@0.7.0') > -1);
             })
     );
 
@@ -333,7 +333,7 @@ describe('Node security project audit', () => {
                 throw new Error('Promise rejection expected');
             })
             .catch(err => {
-                assert(err.toString().indexOf('vulnerability found in lodash@4.16.4') > -1);
+                assert(err.message.indexOf('Vulnerability found in lodash@4.16.4') > -1);
             })
     );
 
