@@ -20,7 +20,9 @@ function runValidation (validation, param, pkgInfo, errs) {
         .run(param, pkgInfo)
         .then(() => done(true))
         .catch(err => {
-            errs.push(err);
+            (err && err.length && err.length > 0 && err.push)
+                ? errs.push(...err)
+                : errs.push(err);
             done(false);
         });
 }
@@ -58,7 +60,6 @@ module.exports = {
             .then(() => {
                 if (errs.length) {
                     const msg = errs.map(err => '  * ' + err).join('\n');
-
                     throw new Error(msg);
                 }
                 else if (!module.exports.testMode) {

@@ -41,8 +41,7 @@ module.exports = {
                     }
                     if (result && result.data && result.data.length > 0) {
                         const err = result.data
-                                .map( item => `vulnerability found in ${item.module || 'undefined'}@${item.version || '?.?.?'}. ${item.recommendation || ''} Advisory: ${item.advisory || ''}`)
-                                .join('\n');
+                                .map( item => `vulnerability found in ${item.module || 'undefined'}@${item.version || '?.?.?'}. ${item.recommendation || ''} Advisory: ${item.advisory || ''}`);
                         reject(err);
                         return;
                     }

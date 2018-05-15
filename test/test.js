@@ -140,7 +140,6 @@ describe('Branch validation', () => {
             })
             .catch(err => assert.strictEqual(err.message, '  * Expected branch to be `master`, but it was `some-branch`.')));
 
-
     it('Should validate branch passed via parameter', () =>
         exec('git checkout master')
             .then(() => publish(getTestOptions({ set: { validations: { branch: 'no-package-json' } } })))
@@ -322,6 +321,32 @@ describe('Node security project audit', () => {
             })
     );
 
+    it('Should fail on lodash@4.16.4 dependency', () =>
+        exec('git checkout master')
+            .then(() => pkgd())
+            .then(pkgInfo => {
+                pkgInfo.cfg.dependencies = { 'lodash': '4.16.4' };
+                writeFile('package.json', JSON.stringify(pkgInfo.cfg));
+            })
+            .then(() => publish(getTestOptions({ set: { validations: { vulnerableDependencies: true } } })))
+            .then(() => {
+                throw new Error('Promise rejection expected');
+            })
+            .catch(err => {
+                assert(err.toString().indexOf('vulnerability found in lodash@4.16.4') > -1);
+            })
+    );
+
+    it('Should not fail on lodash@4.17.5 dependency', () =>
+        exec('git checkout master')
+            .then(() => pkgd())
+            .then(pkgInfo => {
+                pkgInfo.cfg.dependencies = { 'lodash': '4.17.5' };
+                writeFile('package.json', JSON.stringify(pkgInfo.cfg));
+            })
+            .then(() => publish(getTestOptions({ set: { validations: { vulnerableDependencies: true } } })))
+    );
+
     it('Should not fail if there is no vulnerable dependency', () =>
         exec('git checkout master')
             .then(() => pkgd())
@@ -331,6 +356,27 @@ describe('Node security project audit', () => {
             })
             .then(() => publish(getTestOptions({ set: { validations: { vulnerableDependencies: true } } })))
     );
+
+    it('Should fail with two errors on lodash@4.16.4 and ms@0.7.0', () =>
+        exec('git checkout master')
+            .then(() => pkgd())
+            .then(pkgInfo => {
+                pkgInfo.cfg.dependencies = { 'ms': '0.7.0', 'lodash': '0.7.0' };
+                writeFile('package.json', JSON.stringify(pkgInfo.cfg));
+            })
+            .then(() => publish(getTestOptions({ set: { validations: { vulnerableDependencies: true } } })))
+            .then(() => {
+                throw new Error('Promise rejection expected');
+            })
+            .catch(err => {
+                const errors = err.message
+                    .split('\n')
+                    .filter( msg => msg.startsWith('  * '));
+                assert(errors.length === 2);
+            })
+    );
+
+    
 
     it('Should not perform check if option is disabled', () =>
         exec('git checkout master')
