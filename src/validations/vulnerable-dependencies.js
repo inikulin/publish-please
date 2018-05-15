@@ -4,6 +4,7 @@ const pathJoin = require('path').join;
 const nsp      = require('nsp');
 const confirm  = require('../utils/inquires').confirm;
 const Promise  = require('pinkie-promise');
+const readPkg  = require('read-pkg');
 
 module.exports = {
     option:       'vulnerableDependencies',
@@ -19,14 +20,37 @@ module.exports = {
 
     run () {
         return new Promise((resolve, reject) => {
-            const pkg = pathJoin(process.cwd(), 'package.json');
+            const projectDir = pathJoin(process.cwd());
+            const defaultArgs = nsp.sanitizeParameters({});
+            const args = {
+                baseUrl:     defaultArgs.baseUrl,
+                proxy:       defaultArgs.proxy,
+                reporter:    'summary',
+                'warn-only': false,
+                path:        projectDir,
+                pkg:         readPkg.sync(projectDir, { normalize: false }),
+                offline:     false,
+                exceptions:  []
+            };
 
-            nsp.check({ package: pkg }, (err, data) => {
-                if (err || data.length > 0)
-                    reject(nsp.formatters.summary(err, data));
-                else
-                    resolve();
-            });
+            nsp.check(args)
+                .then(result => {
+                    if (result && result.data && result.data.length === 0) {
+                        resolve();
+                        return;
+                    }
+                    if (result && result.data && result.data.length > 0) {
+                        const err = result.data
+                                .map( item => `vulnerability found in ${item.module || 'undefined'}@${item.version || '?.?.?'}. ${item.recommendation || ''} Advisory: ${item.advisory || ''}`)
+                                .join('\n');
+                        reject(err);
+                        return;
+                    }
+                    resolve(result);
+                })
+                .catch(err => {
+                    reject(err);
+                });
         });
     }
 };

@@ -75,12 +75,6 @@ before(() => {
         .then(() => process.chdir('testing-repo'));
 });
 
-after(() => {
-    process.chdir('../');
-    return exec('sed -i\'\' \'/= blue/d\' .git/config')
-        .then(() => del('testing-repo'));
-});
-
 beforeEach(() => colorGitOutput());
 
 afterEach(() => exec('git reset --hard HEAD').then(exec('git clean -f -d')));
@@ -317,7 +311,6 @@ describe('Node security project audit', () => {
             .then(() => pkgd())
             .then(pkgInfo => {
                 pkgInfo.cfg.dependencies = { 'ms': '0.7.0' };
-
                 writeFile('package.json', JSON.stringify(pkgInfo.cfg));
             })
             .then(() => publish(getTestOptions({ set: { validations: { vulnerableDependencies: true } } })))
@@ -325,9 +318,19 @@ describe('Node security project audit', () => {
                 throw new Error('Promise rejection expected');
             })
             .catch(err => {
-                assert(err.message.indexOf('1 vulnerabilities found') > -1);
-                assert(err.message.indexOf('ms@0.7.0') > -1);
-            }));
+                assert(err.toString().indexOf('vulnerability found in ms@0.7.0') > -1);
+            })
+    );
+
+    it('Should not fail if there is no vulnerable dependency', () =>
+        exec('git checkout master')
+            .then(() => pkgd())
+            .then(pkgInfo => {
+                pkgInfo.cfg.dependencies = { 'ms': '0.7.1' };
+                writeFile('package.json', JSON.stringify(pkgInfo.cfg));
+            })
+            .then(() => publish(getTestOptions({ set: { validations: { vulnerableDependencies: true } } })))
+    );
 
     it('Should not perform check if option is disabled', () =>
         exec('git checkout master')
@@ -337,7 +340,8 @@ describe('Node security project audit', () => {
 
                 writeFile('package.json', JSON.stringify(pkgInfo.cfg));
             })
-            .then(() => publish(getTestOptions({ set: { validations: { vulnerableDependencies: false } } }))));
+            .then(() => publish(getTestOptions({ set: { validations: { vulnerableDependencies: false } } })))
+    );
 });
 
 describe('Prepublish script', () => {
