@@ -3,6 +3,7 @@ sudo: false
 node_js:
   - '6.0'
   - '7'
+  - '8'
 
 before_install:
   - npm install -g npm
