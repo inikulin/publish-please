@@ -361,7 +361,7 @@ describe('Node security project audit', () => {
         exec('git checkout master')
             .then(() => pkgd())
             .then(pkgInfo => {
-                pkgInfo.cfg.dependencies = { 'ms': '0.7.0', 'lodash': '0.7.0' };
+                pkgInfo.cfg.dependencies = { 'ms': '0.7.0', 'lodash': '4.16.4' };
                 writeFile('package.json', JSON.stringify(pkgInfo.cfg));
             })
             .then(() => publish(getTestOptions({ set: { validations: { vulnerableDependencies: true } } })))
