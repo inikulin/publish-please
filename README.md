@@ -1,5 +1,3 @@
-# ⚠️LOOKING FOR MAINTAINERS ⚠️ Unfortunately I don't have enough time and interest in supporting this project anymore. If someone would like to step in as a maintainer for this project, please, drop a mail to ifaaan@gmail.com
-
 # Publish, please!
 
 [![Build Status](https://travis-ci.org/inikulin/publish-please.svg?branch=master)](https://travis-ci.org/inikulin/publish-please)
