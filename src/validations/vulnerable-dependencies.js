@@ -5,6 +5,7 @@ const nsp      = require('nsp');
 const confirm  = require('../utils/inquires').confirm;
 const Promise  = require('pinkie-promise');
 const readPkg  = require('read-pkg');
+const chalk    = require('chalk');
 
 module.exports = {
     option:       'vulnerableDependencies',
@@ -35,17 +36,14 @@ module.exports = {
 
             nsp.check(args)
                 .then(result => {
-                    if (result && result.data && result.data.length === 0) {
-                        resolve();
+                    if (vulnerabilitiesFoundIn(result)) {
+                        const errs = result.data
+                            .map(vulnerability => summaryOf(vulnerability))
+                            .sort();
+                        reject(errs);
                         return;
                     }
-                    if (result && result.data && result.data.length > 0) {
-                        const err = result.data
-                                .map( item => `Vulnerability found in ${item.module || 'undefined'}@${item.version || '?.?.?'}. ${item.recommendation || ''} Advisory: ${item.advisory || ''}`);
-                        reject(err);
-                        return;
-                    }
-                    resolve(result);
+                    resolve();
                 })
                 .catch(err => {
                     reject(err);
@@ -53,3 +51,51 @@ module.exports = {
         });
     }
 };
+
+const vulnerabilitiesFoundIn = (result) => {
+    return result && result.data && result.data.length > 0;
+};
+
+const summaryOf = (vulnerability) => {
+    const vulnerablePackageName = `${vulnerability.module || 'undefined'}@${vulnerability.version || '?.?.?'}`;
+    const vulnerablePackagePath = vulnerability.path && vulnerability.path.length >= 2
+            ? vulnerability.path.slice(1)
+            : [];
+
+    const rootPackageName = vulnerablePackagePath.length >= 1
+            ? vulnerablePackagePath[0]
+            : vulnerablePackageName;
+    
+    const recommendation = vulnerability.recommendation
+            ? vulnerability.recommendation.replace('\n','\n\t')
+            : '';
+    
+    const vulnerabilityIsDirectDependency = vulnerablePackageName === rootPackageName;
+    const summary = vulnerabilityIsDirectDependency
+            ? `Vulnerability found in ${elegant(rootPackageName)}\n\t${recommendation}\n\tAdvisory: ${vulnerability.advisory || ''}`
+            : `Vulnerability found in ${chalk.bold(rootPackageName)}\n\tinside ${elegant(vulnerablePackagePath)}\n\t${vulnerability.recommendation || ''}\n\tAdvisory: ${vulnerability.advisory || ''}`
+    return summary;
+};
+
+const elegant = (pathOrName) => {
+    return Array.isArray(pathOrName)
+        ? elegantPath(pathOrName)
+        : elegantName(pathOrName);
+}
+
+const elegantPath = (path) => {
+    const lastIndex = path && path.length
+            ? path.length -1
+            : -1;
+    const result = path
+        .map((item, index) => { 
+            return index === lastIndex
+                ? chalk.red.bold(item)
+                : item;})
+        .join(' -> ');
+    return result;
+}
+
+const elegantName = (name) => {
+    return chalk.red.bold(name);
+}
