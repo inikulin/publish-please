@@ -20,7 +20,7 @@ function runValidation (validation, param, pkgInfo, errs) {
         .run(param, pkgInfo)
         .then(() => done(true))
         .catch(err => {
-            (err && err.length && err.length > 0 && err.push)
+            Array.isArray(err)
                 ? errs.push(...err)
                 : errs.push(err);
             done(false);
