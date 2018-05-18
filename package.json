@@ -7,6 +7,7 @@
     "publish-please": "./bin/publish-please.js"
   },
   "scripts": {
+    "format": "prettier --write \"src/**/*.{js,ts}\"",
     "lint": "eslint bin src test",
     "clean": "rm -rf lib",
     "clean-test": "rm test/__test-compiled__.js",
@@ -60,9 +61,12 @@
     "babel-preset-env": "1.7.0",
     "del": "3.0.0",
     "eslint": "4.19.1",
+    "eslint-config-prettier": "2.9.0",
     "eslint-plugin-babel": "5.1.0",
+    "lint-staged": "7.1.0",
     "mkdirp": "0.5.1",
-    "mocha": "5.1.1"
+    "mocha": "5.1.1",
+    "prettier": "1.12.1"
   },
   "engines": {
     "node": ">=6.0.0"
