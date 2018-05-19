@@ -17,7 +17,8 @@
     "compile": "babel src -d lib",
     "build": "npm run clean && npm run compile",
     "mocha-with-coverage": "istanbul cover -x test/test.js _mocha test/test.js",
-    "test": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage",
+    "check-coverage": "istanbul check-coverage --statements 79 --lines 79 --branches 67 --functions 50",
+    "test": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage && npm run check-coverage",
     "postinstall": "node lib/init.js"
   },
   "lint-staged": {
