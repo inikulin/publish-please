@@ -1,0 +1,37 @@
+{
+    "env": {
+        "es6": true,
+        "node": true,
+        "mocha": true
+    },
+    "parserOptions": {
+        "sourceType": "module"
+    },
+    "rules": {
+        "eol-last":"error",
+        "indent": [
+            "error",
+            4
+        ],
+        "linebreak-style": [
+            "error",
+            "unix"
+        ],
+        "no-console": 0,
+        "no-trailing-spaces": "error",
+        "no-unreachable": "error",
+        "no-var": "error",
+        "quotes": [
+            "error",
+            "single"
+        ],
+        "semi": [
+            "error",
+            "always"
+        ]
+    },
+    "extends": [
+        "eslint:recommended",
+        "prettier"
+    ]
+}

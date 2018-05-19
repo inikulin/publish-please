@@ -7,15 +7,25 @@
     "publish-please": "./bin/publish-please.js"
   },
   "scripts": {
-    "format": "prettier --write \"src/**/*.{js,ts}\"",
+    "precommit": "lint-staged",
+    "prettier-format": "prettier --write \"{bin,src,test}/**/*.js\"",
+    "prettier-check": "prettier --list-different \"{bin,src,test}/**/*.js\"",
+    "eslint-check-config": "eslint --print-config .eslintrc.json | eslint-config-prettier-check",
+    "eslint-init": "eslint --init",
     "lint": "eslint bin src test",
     "clean": "rm -rf lib",
     "clean-test": "rm test/__test-compiled__.js",
     "compile": "babel src -d lib",
     "compile-test": "babel test/test.js --out-file test/__test-compiled__.js",
     "build": "npm run clean && npm run compile",
-    "test": "npm run lint && npm run build && npm run compile-test && mocha test/__test-compiled__.js && npm run clean-test",
+    "test": "npm run lint && npm run prettier-check && npm run build && npm run compile-test && mocha test/__test-compiled__.js && npm run clean-test",
     "postinstall": "node lib/init.js"
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write",
+      "git add"
+    ]
   },
   "repository": {
     "type": "git",
@@ -56,13 +66,12 @@
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
-    "babel-eslint": "8.2.3",
     "babel-plugin-transform-runtime": "6.23.0",
     "babel-preset-env": "1.7.0",
     "del": "3.0.0",
     "eslint": "4.19.1",
     "eslint-config-prettier": "2.9.0",
-    "eslint-plugin-babel": "5.1.0",
+    "husky": "0.14.3",
     "lint-staged": "7.1.0",
     "mkdirp": "0.5.1",
     "mocha": "5.1.1",
