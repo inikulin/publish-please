@@ -18,13 +18,12 @@
     "compile": "babel src -d lib",
     "compile-test": "babel test/test.js --out-file test/__test-compiled__.js",
     "build": "npm run clean && npm run compile",
-    "test": "npm run lint && npm run build && npm run compile-test && mocha test/__test-compiled__.js && npm run clean-test",
+    "test": "npm run prettier-format && npm run lint && npm run build && npm run compile-test && mocha test/__test-compiled__.js && npm run clean-test",
     "postinstall": "node lib/init.js"
   },
   "lint-staged": {
     "*.js": [
-      "prettier --write",
-      "git add"
+      "prettier --write"
     ]
   },
   "repository": {

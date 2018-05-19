@@ -1,5 +1,36 @@
 'use strict';
 
+const noConfigMessage = `
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!! Unable to setup publish-please: project's package.json either missing !!
+!! or malformed. Run 'npm init' and then reinstall publish-please.       !!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+`;
+
+const globalInstallMessage = `
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!! Starting from v2.0.0 publish-please can't be installed globally.      !!
+!! Use local installation instead.                                       !!
+!! (learn more: https://github.com/inikulin/publish-please#readme).      !!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+`;
+
+const hooksAddedMessage = `
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!! publish-please hooks were successfully setup for the project. !!
+!! Now follow few simple steps to configure your publishing...   !!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+`;
+
+const completionMessage = `
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!! publish-please was successfully installed for the project. !!
+!! Use 'npm run publish-please' command for publishing.       !!
+!! Use 'npm run publish-please config' command to adjust      !!
+!! publishing configuration.                                  !!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+`;
+
 function onInstall(testMode, npmArgs) {
     const pathJoin = require('path').join;
     const writeFile = require('fs').writeFileSync;
@@ -15,110 +46,19 @@ function onInstall(testMode, npmArgs) {
     }
 
     function reportNoConfig() {
-        console.log(
-            chalk.bgRed(
-                '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',
-            ),
-        );
-        console.log(
-            chalk.bgRed(
-                "!! Unable to setup publish-please: project's package.json either missing !!",
-            ),
-        );
-        console.log(
-            chalk.bgRed(
-                '!! or malformed. Run `npm init` and then reinstall publish-please.       !!',
-            ),
-        );
-        console.log(
-            chalk.bgRed(
-                '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',
-            ),
-        );
+        console.log(chalk.bgRed(noConfigMessage));
     }
 
     function reportGlobalInstall() {
-        console.log(
-            chalk.bgRed(
-                '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',
-            ),
-        );
-        console.log(
-            chalk.bgRed(
-                "!! Starting from v2.0.0 publish-please can't be installed globally.      !!",
-            ),
-        );
-        console.log(
-            chalk.bgRed(
-                '!! Use local installation instead.                                       !!',
-            ),
-        );
-        console.log(
-            chalk.bgRed(
-                '!! (learn more: https://github.com/inikulin/publish-please#readme).      !!',
-            ),
-        );
-        console.log(
-            chalk.bgRed(
-                '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',
-            ),
-        );
+        console.log(chalk.bgRed(globalInstallMessage));
     }
 
     function reportHooksAdded() {
-        console.log(
-            chalk.bgGreen(
-                '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',
-            ),
-        );
-        console.log(
-            chalk.bgGreen(
-                '!! publish-please hooks were successfully setup for the project. !!',
-            ),
-        );
-        console.log(
-            chalk.bgGreen(
-                '!! Now follow few simple steps to configure your publishing...   !!',
-            ),
-        );
-        console.log(
-            chalk.bgGreen(
-                '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',
-            ),
-        );
+        console.log(chalk.bgGreen(hooksAddedMessage));
     }
 
     function reportCompletion() {
-        console.log(
-            chalk.bgGreen(
-                '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',
-            ),
-        );
-        console.log(
-            chalk.bgGreen(
-                '!! publish-please was successfully installed for the project. !!',
-            ),
-        );
-        console.log(
-            chalk.bgGreen(
-                '!! Use `npm run publish-please` command for publishing.       !!',
-            ),
-        );
-        console.log(
-            chalk.bgGreen(
-                '!! Use `npm run publish-please config` command to adjust      !!',
-            ),
-        );
-        console.log(
-            chalk.bgGreen(
-                '!! publishing configuration.                                  !!',
-            ),
-        );
-        console.log(
-            chalk.bgGreen(
-                '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',
-            ),
-        );
+        console.log(chalk.bgGreen(completionMessage));
     }
 
     function addConfigHooks(cfg, projectDir) {
@@ -133,7 +73,7 @@ function onInstall(testMode, npmArgs) {
 
         writeFile(
             pathJoin(projectDir, 'package.json'),
-            JSON.stringify(cfg, null, 2),
+            JSON.stringify(cfg, null, 2)
         );
 
         return true;
@@ -169,7 +109,8 @@ function onInstall(testMode, npmArgs) {
     // NOTE: don't run on dev installation (running `npm install` in this repo)
     if (
         !testMode &&
-        (!npmArgs || !npmArgs.some(arg => /^publish-please(@\S+)?$/.test(arg)))
+        (!npmArgs ||
+            !npmArgs.some((arg) => /^publish-please(@\S+)?$/.test(arg)))
     )
         return;
 

@@ -1,14 +1,15 @@
 'use strict';
 
-const exec                  = require('cp-sugar').exec;
-const inputWithConfirmation = require('../utils/inquires').inputWithConfirmation;
+const exec = require('cp-sugar').exec;
+const inputWithConfirmation = require('../utils/inquires')
+    .inputWithConfirmation;
 
 module.exports = {
-    option:       'branch',
-    statusText:   'Validating branch',
+    option: 'branch',
+    statusText: 'Validating branch',
     defaultParam: 'master',
 
-    configurator (currentVal) {
+    configurator(currentVal) {
         return inputWithConfirmation(
             'Would you like to verify that you are publishing from the correct git branch?',
             false,
@@ -17,11 +18,12 @@ module.exports = {
         );
     },
 
-    run (expected) {
-        return exec("git branch --no-color | sed -n '/\\* /s///p'")
-            .then(branch => {
+    run(expected) {
+        return exec("git branch --no-color | sed -n '/\\* /s///p'").then(
+            (branch) => {
                 if (branch !== expected)
-                    throw 'Expected branch to be `' + expected + '`, but it was `' + branch + '`.';
-            });
-    }
+                    throw `Expected branch to be '${expected}', but it was '${branch}'.`;
+            }
+        );
+    },
 };

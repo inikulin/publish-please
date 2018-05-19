@@ -24,7 +24,7 @@ const getOptions = require('../lib/publish').getOptions;
 
 function mkdir(path) {
     return new Promise((resolve, reject) =>
-        mkdirp(path, null, err => (err ? reject(err) : resolve())),
+        mkdirp(path, null, (err) => (err ? reject(err) : resolve()))
     );
 }
 
@@ -66,7 +66,7 @@ function colorGitOutput() {
 
     return gitColorCommands.reduce(
         (p, c) => p.then(() => exec(c)),
-        Promise.resolve(),
+        Promise.resolve()
     );
 }
 
@@ -77,8 +77,8 @@ before(() => {
     return del('testing-repo')
         .then(() =>
             exec(
-                'git clone https://github.com/inikulin/testing-repo.git testing-repo',
-            ),
+                'git clone https://github.com/inikulin/testing-repo.git testing-repo'
+            )
         )
         .then(() => process.chdir('testing-repo'));
 });
@@ -94,11 +94,11 @@ describe('package.json', () => {
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err =>
+            .catch((err) =>
                 assert.strictEqual(
                     err.message,
-                    "package.json file doesn't exist.",
-                ),
+                    "package.json file doesn't exist."
+                )
             ));
 });
 
@@ -113,7 +113,7 @@ describe('.publishrc', () => {
                     uncommittedChanges: true,
                     untrackedFiles: true,
                 },
-            }),
+            })
         );
 
         const opts = getOptions({
@@ -142,7 +142,7 @@ describe('.publishrc', () => {
         } catch (err) {
             assert.strictEqual(
                 err.message,
-                '.publishrc is not a valid JSON file.',
+                '.publishrc is not a valid JSON file.'
             );
         }
     });
@@ -152,16 +152,16 @@ describe('Branch validation', () => {
     it('Should expect `master` branch by default', () =>
         exec('git checkout some-branch')
             .then(() =>
-                publish(getTestOptions({ remove: 'validations.branch' })),
+                publish(getTestOptions({ remove: 'validations.branch' }))
             )
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err =>
+            .catch((err) =>
                 assert.strictEqual(
                     err.message,
-                    '  * Expected branch to be `master`, but it was `some-branch`.',
-                ),
+                    "  * Expected branch to be 'master', but it was 'some-branch'."
+                )
             ));
 
     it('Should validate branch passed via parameter', () =>
@@ -170,17 +170,17 @@ describe('Branch validation', () => {
                 publish(
                     getTestOptions({
                         set: { validations: { branch: 'no-package-json' } },
-                    }),
-                ),
+                    })
+                )
             )
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err =>
+            .catch((err) =>
                 assert.strictEqual(
                     err.message,
-                    '  * Expected branch to be `no-package-json`, but it was `master`.',
-                ),
+                    "  * Expected branch to be 'no-package-json', but it was 'master'."
+                )
             ));
 
     it('Should expect the latest commit in the branch', () =>
@@ -189,14 +189,14 @@ describe('Branch validation', () => {
                 publish(
                     getTestOptions({
                         set: { validations: { branch: 'master' } },
-                    }),
-                ),
+                    })
+                )
             )
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err => {
-                const msgRe = /^ {2}\* Expected branch to be `master`, but it was `\((?:HEAD )?detached (?:from|at) 15a1ef7\)`.$/;
+            .catch((err) => {
+                const msgRe = /^ {2}\* Expected branch to be 'master', but it was '\((?:HEAD )?detached (?:from|at) 15a1ef7\)'.$/;
 
                 assert(msgRe.test(err.message));
             }));
@@ -206,8 +206,8 @@ describe('Branch validation', () => {
             publish(
                 getTestOptions({
                     set: { validations: { branch: 'some-branch' } },
-                }),
-            ),
+                })
+            )
         ));
 
     it('Should not validate if option is disabled', () =>
@@ -222,34 +222,34 @@ describe('Git tag validation', () => {
             .then(() => exec('git tag v0.0.42'))
             .then(() =>
                 publish(
-                    getTestOptions({ set: { validations: { gitTag: true } } }),
-                ),
+                    getTestOptions({ set: { validations: { gitTag: true } } })
+                )
             )
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err =>
+            .catch((err) =>
                 assert.strictEqual(
                     err.message,
-                    "  * Expected git tag to be '1.3.77' or 'v1.3.77', but it was 'v0.0.42'.",
-                ),
+                    "  * Expected git tag to be '1.3.77' or 'v1.3.77', but it was 'v0.0.42'."
+                )
             ));
 
     it('Should expect git tag to exist', () =>
         exec('git checkout master')
             .then(() =>
                 publish(
-                    getTestOptions({ set: { validations: { gitTag: true } } }),
-                ),
+                    getTestOptions({ set: { validations: { gitTag: true } } })
+                )
             )
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err =>
+            .catch((err) =>
                 assert.strictEqual(
                     err.message,
-                    "  * Latest commit doesn't have git tag.",
-                ),
+                    "  * Latest commit doesn't have git tag."
+                )
             ));
 
     it('Should pass validation', () =>
@@ -257,8 +257,8 @@ describe('Git tag validation', () => {
             .then(() => exec('git tag v1.3.77'))
             .then(() =>
                 publish(
-                    getTestOptions({ set: { validations: { gitTag: true } } }),
-                ),
+                    getTestOptions({ set: { validations: { gitTag: true } } })
+                )
             ));
 
     it('Should not validate if option is disabled', () =>
@@ -276,17 +276,17 @@ describe('Uncommitted changes check', () => {
                 return publish(
                     getTestOptions({
                         set: { validations: { uncommittedChanges: true } },
-                    }),
+                    })
                 );
             })
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err =>
+            .catch((err) =>
                 assert.strictEqual(
                     err.message,
-                    '  * There are uncommitted changes in the working tree.',
-                ),
+                    '  * There are uncommitted changes in the working tree.'
+                )
             ));
 
     it('Should pass validation if option is disabled', () =>
@@ -301,8 +301,8 @@ describe('Uncommitted changes check', () => {
             publish(
                 getTestOptions({
                     set: { validations: { uncommittedChanges: true } },
-                }),
-            ),
+                })
+            )
         ));
 });
 
@@ -315,17 +315,17 @@ describe('Untracked files check', () => {
                 return publish(
                     getTestOptions({
                         set: { validations: { untrackedFiles: true } },
-                    }),
+                    })
                 );
             })
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err =>
+            .catch((err) =>
                 assert.strictEqual(
                     err.message,
-                    '  * There are untracked files in the working tree.',
-                ),
+                    '  * There are untracked files in the working tree.'
+                )
             ));
 
     it('Should pass validation if option is disabled', () =>
@@ -340,8 +340,8 @@ describe('Untracked files check', () => {
             publish(
                 getTestOptions({
                     set: { validations: { untrackedFiles: true } },
-                }),
-            ),
+                })
+            )
         ));
 });
 
@@ -358,13 +358,13 @@ describe('Sensitive information audit', () => {
                 publish(
                     getTestOptions({
                         set: { validations: { sensitiveData: true } },
-                    }),
-                ),
+                    })
+                )
             )
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err => {
+            .catch((err) => {
                 assert.strictEqual(
                     err.message,
                     '  * Sensitive data found in the working tree:\n' +
@@ -373,7 +373,7 @@ describe('Sensitive information audit', () => {
                         '     - Might contain database credentials.\n' +
                         '    invalid filename lib/schema.rb\n' +
                         '     - Ruby On Rails database schema file\n' +
-                        '     - Contains information on the database schema of a Ruby On Rails application.',
+                        '     - Contains information on the database schema of a Ruby On Rails application.'
                 );
             }));
 
@@ -395,8 +395,8 @@ describe('Sensitive information audit', () => {
                                 },
                             },
                         },
-                    }),
-                ),
+                    })
+                )
             ));
 
     it('Should not perform check if option is disabled', () =>
@@ -413,7 +413,7 @@ describe('Node security project audit', () => {
     it('Should fail if there are vulnerable dependencies', () =>
         exec('git checkout master')
             .then(() => pkgd())
-            .then(pkgInfo => {
+            .then((pkgInfo) => {
                 pkgInfo.cfg.dependencies = { ms: '0.7.0' };
                 writeFile('package.json', JSON.stringify(pkgInfo.cfg));
             })
@@ -421,13 +421,13 @@ describe('Node security project audit', () => {
                 publish(
                     getTestOptions({
                         set: { validations: { vulnerableDependencies: true } },
-                    }),
-                ),
+                    })
+                )
             )
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err => {
+            .catch((err) => {
                 assert(err.message.indexOf('Vulnerability found') > -1);
             }));
     ['publish-please@2.4.1', 'testcafe@0.19.2'].forEach(function(dependency) {
@@ -436,7 +436,7 @@ describe('Node security project audit', () => {
         it(`Should fail on transitive dependency inside ${dependency}`, () =>
             exec('git checkout master')
                 .then(() => pkgd())
-                .then(pkgInfo => {
+                .then((pkgInfo) => {
                     pkgInfo.cfg.dependencies = {};
                     pkgInfo.cfg.dependencies[`${name}`] = `${version}`;
                     writeFile('package.json', JSON.stringify(pkgInfo.cfg));
@@ -447,17 +447,16 @@ describe('Node security project audit', () => {
                             set: {
                                 validations: { vulnerableDependencies: true },
                             },
-                        }),
-                    ),
+                        })
+                    )
                 )
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch(err => {
+                .catch((err) => {
                     assert(
-                        err.message.indexOf(
-                            `Vulnerability found in ${chalk.bold(dependency)}`,
-                        ) > -1,
+                        // prettier-ignore
+                        err.message.indexOf(`Vulnerability found in ${chalk.bold(dependency)}`) > -1
                     );
                 }));
     });
@@ -468,7 +467,7 @@ describe('Node security project audit', () => {
         it(`Should fail on ${dependency} as a direct dependency`, () =>
             exec('git checkout master')
                 .then(() => pkgd())
-                .then(pkgInfo => {
+                .then((pkgInfo) => {
                     pkgInfo.cfg.dependencies = {};
                     pkgInfo.cfg.dependencies[`${name}`] = `${version}`;
                     writeFile('package.json', JSON.stringify(pkgInfo.cfg));
@@ -479,19 +478,16 @@ describe('Node security project audit', () => {
                             set: {
                                 validations: { vulnerableDependencies: true },
                             },
-                        }),
-                    ),
+                        })
+                    )
                 )
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch(err => {
+                .catch((err) => {
                     assert(
-                        err.message.indexOf(
-                            `Vulnerability found in ${chalk.red.bold(
-                                dependency,
-                            )}`,
-                        ) > -1,
+                        // prettier-ignore
+                        err.message.indexOf(`Vulnerability found in ${chalk.red.bold(dependency)}`) > -1
                     );
                 }));
     });
@@ -502,7 +498,7 @@ describe('Node security project audit', () => {
         it(`Should not fail on ${dependency} as a direct dependency`, () =>
             exec('git checkout master')
                 .then(() => pkgd())
-                .then(pkgInfo => {
+                .then((pkgInfo) => {
                     pkgInfo.cfg.dependencies = {};
                     pkgInfo.cfg.dependencies[`${name}`] = `${version}`;
                     writeFile('package.json', JSON.stringify(pkgInfo.cfg));
@@ -513,15 +509,15 @@ describe('Node security project audit', () => {
                             set: {
                                 validations: { vulnerableDependencies: true },
                             },
-                        }),
-                    ),
+                        })
+                    )
                 ));
     });
 
     it('Should not fail if there is no vulnerable dependency', () =>
         exec('git checkout master')
             .then(() => pkgd())
-            .then(pkgInfo => {
+            .then((pkgInfo) => {
                 pkgInfo.cfg.dependencies = { ms: '0.7.1' };
                 writeFile('package.json', JSON.stringify(pkgInfo.cfg));
             })
@@ -529,14 +525,14 @@ describe('Node security project audit', () => {
                 publish(
                     getTestOptions({
                         set: { validations: { vulnerableDependencies: true } },
-                    }),
-                ),
+                    })
+                )
             ));
 
     it.skip('Should not fail on transitive dependency inside publish-please vNext', () =>
         exec('git checkout master')
             .then(() => pkgd())
-            .then(pkgInfo => {
+            .then((pkgInfo) => {
                 pkgInfo.cfg.dependencies = {};
                 // TODO: resolve vulnerability on 'ban-sensitive-files' dependency
                 pkgInfo.cfg.dependencies['ban-sensitive-files'] = '1.9.2';
@@ -560,14 +556,14 @@ describe('Node security project audit', () => {
                 publish(
                     getTestOptions({
                         set: { validations: { vulnerableDependencies: true } },
-                    }),
-                ),
+                    })
+                )
             ));
 
     it('Should fail with two errors on lodash@4.16.4 and ms@0.7.0', () =>
         exec('git checkout master')
             .then(() => pkgd())
-            .then(pkgInfo => {
+            .then((pkgInfo) => {
                 pkgInfo.cfg.dependencies = { ms: '0.7.0', lodash: '4.16.4' };
                 writeFile('package.json', JSON.stringify(pkgInfo.cfg));
             })
@@ -575,23 +571,23 @@ describe('Node security project audit', () => {
                 publish(
                     getTestOptions({
                         set: { validations: { vulnerableDependencies: true } },
-                    }),
-                ),
+                    })
+                )
             )
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err => {
+            .catch((err) => {
                 const errors = err.message
                     .split('\n')
-                    .filter(msg => msg.startsWith('  * '));
+                    .filter((msg) => msg.startsWith('  * '));
                 assert(errors.length === 2);
             }));
 
     it('Should not perform check if option is disabled', () =>
         exec('git checkout master')
             .then(() => pkgd())
-            .then(pkgInfo => {
+            .then((pkgInfo) => {
                 pkgInfo.cfg.dependencies = { ms: '0.7.0' };
 
                 writeFile('package.json', JSON.stringify(pkgInfo.cfg));
@@ -600,8 +596,8 @@ describe('Node security project audit', () => {
                 publish(
                     getTestOptions({
                         set: { validations: { vulnerableDependencies: false } },
-                    }),
-                ),
+                    })
+                )
             ));
 });
 
@@ -609,16 +605,16 @@ describe('Prepublish script', () => {
     it('Should fail if prepublish script fail', () =>
         exec('git checkout master')
             .then(() =>
-                publish(getTestOptions({ set: { prePublishScript: 'git' } })),
+                publish(getTestOptions({ set: { prePublishScript: 'git' } }))
             )
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err =>
+            .catch((err) =>
                 assert.strictEqual(
                     err.message,
-                    'Command `git` exited with code 1.',
-                ),
+                    'Command `git` exited with code 1.'
+                )
             ));
 
     it('Should run prepublish script', () =>
@@ -627,8 +623,8 @@ describe('Prepublish script', () => {
                 publish(
                     getTestOptions({
                         set: { prePublishScript: 'git mv README.md test-file' },
-                    }),
-                ),
+                    })
+                )
             )
             .then(() => assert(readFile('test-file'))));
 });
@@ -637,16 +633,16 @@ describe('Postpublish script', () => {
     it('Should fail if postpublish script fail', () =>
         exec('git checkout master')
             .then(() =>
-                publish(getTestOptions({ set: { postPublishScript: 'git' } })),
+                publish(getTestOptions({ set: { postPublishScript: 'git' } }))
             )
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err =>
+            .catch((err) =>
                 assert.strictEqual(
                     err.message,
-                    'Command `git` exited with code 1.',
-                ),
+                    'Command `git` exited with code 1.'
+                )
             ));
 
     it('Should run postpublish script', () =>
@@ -657,8 +653,8 @@ describe('Postpublish script', () => {
                         set: {
                             postPublishScript: 'git mv README.md test-file',
                         },
-                    }),
-                ),
+                    })
+                )
             )
             .then(() => assert(readFile('test-file'))));
 
@@ -671,17 +667,17 @@ describe('Postpublish script', () => {
                             prePublishScript: 'git',
                             postPublishScript: 'git mv README.md test-file',
                         },
-                    }),
-                ),
+                    })
+                )
             )
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err =>
+            .catch((err) =>
                 assert.strictEqual(
                     err.message,
-                    'Command `git` exited with code 1.',
-                ),
+                    'Command `git` exited with code 1.'
+                )
             )
             .catch(() => assert.throws(() => readFile('test-file'))));
 });
@@ -694,14 +690,14 @@ describe('Custom publish command', () => {
                     getTestOptions({
                         set: { publishCommand: 'gulp publish' },
                         remove: 'publishTag',
-                    }),
-                ),
+                    })
+                )
             )
-            .then(npmCmd =>
+            .then((npmCmd) =>
                 assert.strictEqual(
                     npmCmd,
-                    'gulp publish --tag latest --with-publish-please',
-                ),
+                    'gulp publish --tag latest --with-publish-please'
+                )
             ));
 
     it('Should execute a custom publish command with a custom tag', () =>
@@ -713,14 +709,14 @@ describe('Custom publish command', () => {
                             publishCommand: 'gulp publish',
                             publishTag: 'alpha',
                         },
-                    }),
-                ),
+                    })
+                )
             )
-            .then(npmCmd =>
+            .then((npmCmd) =>
                 assert.strictEqual(
                     npmCmd,
-                    'gulp publish --tag alpha --with-publish-please',
-                ),
+                    'gulp publish --tag alpha --with-publish-please'
+                )
             ));
 });
 
@@ -728,23 +724,23 @@ describe('Publish tag', () => {
     it('Should publish with the given tag', () =>
         exec('git checkout master')
             .then(() =>
-                publish(getTestOptions({ set: { publishTag: 'alpha' } })),
+                publish(getTestOptions({ set: { publishTag: 'alpha' } }))
             )
-            .then(npmCmd =>
+            .then((npmCmd) =>
                 assert.strictEqual(
                     npmCmd,
-                    'npm publish --tag alpha --with-publish-please',
-                ),
+                    'npm publish --tag alpha --with-publish-please'
+                )
             ));
 
     it('Should publish with the `latest` tag by default', () =>
         exec('git checkout master')
             .then(() => publish(getTestOptions({ remove: 'publishTag' })))
-            .then(npmCmd =>
+            .then((npmCmd) =>
                 assert.strictEqual(
                     npmCmd,
-                    'npm publish --tag latest --with-publish-please',
-                ),
+                    'npm publish --tag latest --with-publish-please'
+                )
             ));
 });
 
@@ -764,7 +760,7 @@ describe('Guard', () => {
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err => {
+            .catch((err) => {
                 assert(err.message.indexOf(GUARD_ERROR) >= 0);
             }));
 
@@ -775,7 +771,7 @@ describe('Guard', () => {
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err => {
+            .catch((err) => {
                 assert(err.message.indexOf(GUARD_ERROR) < 0);
             }));
 
@@ -785,7 +781,7 @@ describe('Guard', () => {
 describe('Init', () => {
     beforeEach(() => {
         return mkdir(
-            'node_modules/publish-please/lib'.replace(/\\|\//g, sep),
+            'node_modules/publish-please/lib'.replace(/\\|\//g, sep)
         ).then(() => exec('cp -r ../lib/* node_modules/publish-please/lib'));
     });
 
@@ -796,13 +792,13 @@ describe('Init', () => {
 
                 assert.strictEqual(
                     cfg.scripts['publish-please'],
-                    'publish-please',
+                    'publish-please'
                 );
                 assert.strictEqual(
                     cfg.scripts['prepublish'],
-                    'publish-please guard',
+                    'publish-please guard'
                 );
-            },
+            }
         ));
 
     it('Should add guard gracefully', () => {
@@ -812,17 +808,17 @@ describe('Init', () => {
                 scripts: {
                     prepublish: 'yo',
                 },
-            }),
+            })
         );
 
         return exec(
-            'node node_modules/publish-please/lib/init.js --test-mode',
+            'node node_modules/publish-please/lib/init.js --test-mode'
         ).then(() => {
             const cfg = JSON.parse(readFile('package.json').toString());
 
             assert.strictEqual(
                 cfg.scripts['prepublish'],
-                'publish-please guard && yo',
+                'publish-please guard && yo'
             );
         });
     });
@@ -830,34 +826,30 @@ describe('Init', () => {
     it("Should not modify config if it's already modified", () =>
         exec('node node_modules/publish-please/lib/init.js --test-mode')
             .then(() =>
-                exec(
-                    'node node_modules/publish-please/lib/init.js --test-mode',
-                ),
+                exec('node node_modules/publish-please/lib/init.js --test-mode')
             )
             .then(() => {
                 const cfg = JSON.parse(readFile('package.json').toString());
 
                 assert.strictEqual(
                     cfg.scripts['publish-please'],
-                    'publish-please',
+                    'publish-please'
                 );
                 assert.strictEqual(
                     cfg.scripts['prepublish'],
-                    'publish-please guard',
+                    'publish-please guard'
                 );
             }));
 
     it("Should exit with error if package.json doesn't exists", () =>
         del('package.json')
             .then(() =>
-                exec(
-                    'node node_modules/publish-please/lib/init.js --test-mode',
-                ),
+                exec('node node_modules/publish-please/lib/init.js --test-mode')
             )
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
-            .catch(err => {
+            .catch((err) => {
                 assert.strictEqual(err.code, 1);
             }));
 });
@@ -881,11 +873,11 @@ describe('Confirmation', () => {
         it('Should call confirmation if opts.confirm is true', () =>
             exec('git checkout master')
                 .then(() => publish(getTestOptions({ set: { confirm: true } })))
-                .then(npmCmd => {
+                .then((npmCmd) => {
                     assert.ok(confirmCalled);
                     assert.strictEqual(
                         npmCmd,
-                        'npm publish --tag null --with-publish-please',
+                        'npm publish --tag null --with-publish-please'
                     );
                 }));
     });
@@ -898,7 +890,7 @@ describe('Confirmation', () => {
         it('Should return empty string if publish was not confirmed', () =>
             exec('git checkout master')
                 .then(() => publish(getTestOptions({ set: { confirm: true } })))
-                .then(npmCmd => assert.strictEqual(npmCmd, '')));
+                .then((npmCmd) => assert.strictEqual(npmCmd, '')));
 
         it('Should not run postpublish script if publishing was not confirmed', () =>
             exec('git checkout master')
@@ -909,10 +901,10 @@ describe('Confirmation', () => {
                                 confirm: true,
                                 postPublishScript: 'git mv README.md test-file',
                             },
-                        }),
-                    ),
+                        })
+                    )
                 )
-                .then(npmCmd => {
+                .then((npmCmd) => {
                     assert.strictEqual(npmCmd, '');
                     assert.throws(() => readFile('test-file'));
                 }));

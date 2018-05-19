@@ -8,6 +8,7 @@
         "sourceType": "module"
     },
     "rules": {
+        "comma-dangle": ["error", "always-multiline", {"functions": "never"}],
         "eol-last":"error",
         "indent": [
             "error",

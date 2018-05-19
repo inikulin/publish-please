@@ -1,34 +1,34 @@
 'use strict';
 
-const readFile        = require('fs').readFileSync;
-const Promise         = require('pinkie-promise');
-const chalk           = require('chalk');
-const semver          = require('semver');
-const defaults        = require('lodash/defaultsDeep');
-const pkgd            = require('pkgd');
-const exec            = require('cp-sugar').exec;
-const spawn           = require('cp-sugar').spawn;
-const emoji           = require('node-emoji').emoji;
-const validate        = require('./validations').validate;
-const confirm         = require('./utils/inquires').confirm;
+const readFile = require('fs').readFileSync;
+const Promise = require('pinkie-promise');
+const chalk = require('chalk');
+const semver = require('semver');
+const defaults = require('lodash/defaultsDeep');
+const pkgd = require('pkgd');
+const exec = require('cp-sugar').exec;
+const spawn = require('cp-sugar').spawn;
+const emoji = require('node-emoji').emoji;
+const validate = require('./validations').validate;
+const confirm = require('./utils/inquires').confirm;
 const DEFAULT_OPTIONS = require('./default-options');
 
 const SCRIPT_TYPE = {
-    prePublish:  'pre-publish',
-    postPublish: 'post-publish'
+    prePublish: 'pre-publish',
+    postPublish: 'post-publish',
 };
 
-function printReleaseInfo (pkgVersion, publishTag) {
+function printReleaseInfo(pkgVersion, publishTag) {
     let commitInfo = null;
 
     return exec('git log -1 --oneline')
-        .then(info => {
+        .then((info) => {
             commitInfo = info;
 
             return exec('npm whoami --silent');
         })
         .catch(() => chalk.red('<not logged in>'))
-        .then(publisher => {
+        .then((publisher) => {
             console.log(chalk.yellow('Release info'));
             console.log(chalk.yellow('------------'));
             console.log('  ' + chalk.magenta('Version:       ') + pkgVersion);
@@ -39,51 +39,53 @@ function printReleaseInfo (pkgVersion, publishTag) {
         });
 }
 
-function runScript (command, scriptType) {
+function runScript(command, scriptType) {
     if (!module.exports.testMode) {
-        console.log(chalk.yellow('Running ' + (scriptType ? scriptType + ' ' : '') + 'script'));
+        console.log(
+            chalk.yellow(
+                'Running ' + (scriptType ? scriptType + ' ' : '') + 'script'
+            )
+        );
         console.log(chalk.yellow('-------------------------'));
     }
 
-    return spawn(command, module.exports.testMode)
-        .then(() => {
-            if (!module.exports.testMode) {
-                console.log(chalk.yellow('-------------------------'));
-                console.log(emoji['+1'], emoji['+1'], emoji['+1']);
-                console.log();
-            }
-        });
+    return spawn(command, module.exports.testMode).then(() => {
+        if (!module.exports.testMode) {
+            console.log(chalk.yellow('-------------------------'));
+            console.log(emoji['+1'], emoji['+1'], emoji['+1']);
+            console.log();
+        }
+    });
 }
 
-function publish (publishCommand, publishTag) {
+/* eslint-disable indent */
+function publish(publishCommand, publishTag) {
     const command = `${publishCommand} --tag ${publishTag} --with-publish-please`;
-
-    const spawnPromise = module.exports.testMode ?
-        Promise.resolve() :
-        spawn(command).then(res => {
-            console.log('\n', emoji.tada, emoji.tada, emoji.tada);
-            return res || true;
-        });
+    const spawnPromise = module.exports.testMode
+        ? Promise.resolve()
+        : spawn(command).then((res) => {
+              console.log('\n', emoji.tada, emoji.tada, emoji.tada);
+              return res || true;
+          });
 
     return spawnPromise.then(() => command);
 }
+/* eslint-enable indent */
 
-function getOptions (opts) {
+function getOptions(opts) {
     let rcFileContent = null;
-    let rcOpts        = {};
+    let rcOpts = {};
 
     try {
         rcFileContent = readFile('.publishrc').toString();
-    }
-    catch (err) {
+    } catch (err) {
         // NOTE: we don't have .publishrc file, just ignore the error
     }
 
     if (rcFileContent) {
         try {
             rcOpts = JSON.parse(rcFileContent);
-        }
-        catch (err) {
+        } catch (err) {
             throw new Error('.publishrc is not a valid JSON file.');
         }
 
@@ -94,41 +96,65 @@ function getOptions (opts) {
 }
 
 // NOTE: adopted from https://github.com/sindresorhus/np/blob/master/index.js#L78
-function assertNode6PublishingPrerequisites () {
-    return exec('npm version --json')
-        .then(out => {
-            const npmVersion       = JSON.parse(out).npm;
-            const isNode6          = semver.gte(process.version, '6.0.0');
-            const isSafeNpmVersion = semver.satisfies(npmVersion, '>=2.15.8 <3.0.0 || >=3.10.1');
+function assertNode6PublishingPrerequisites() {
+    return exec('npm version --json').then((out) => {
+        const npmVersion = JSON.parse(out).npm;
+        const isNode6 = semver.gte(process.version, '6.0.0');
+        const isSafeNpmVersion = semver.satisfies(
+            npmVersion,
+            '>=2.15.8 <3.0.0 || >=3.10.1'
+        );
 
-            if (isNode6 && !isSafeNpmVersion)
-                throw new Error(`npm@${npmVersion} has known issues publishing when running Node.js 6. Please upgrade npm or downgrade Node and publish again. See: https://github.com/npm/npm/issues/5082`);
-        });
-
+        if (isNode6 && !isSafeNpmVersion)
+            throw new Error(
+                `npm@${npmVersion} has known issues publishing when running Node.js 6. Please upgrade npm or downgrade Node and publish again. See: https://github.com/npm/npm/issues/5082`
+            );
+    });
 }
 
-module.exports = function (opts) {
+module.exports = function(opts) {
     let pkgInfo = null;
 
     opts = getOptions(opts);
 
     return assertNode6PublishingPrerequisites()
-        .then(() => opts.prePublishScript && runScript(opts.prePublishScript, SCRIPT_TYPE.prePublish))
+        .then(
+            () =>
+                opts.prePublishScript &&
+                runScript(opts.prePublishScript, SCRIPT_TYPE.prePublish)
+        )
         .then(() => pkgd())
-        .then(info => pkgInfo = info)
+        .then((info) => (pkgInfo = info))
         .then(() => validate(opts.validations, pkgInfo))
-        .then(() => !module.exports.testMode && printReleaseInfo(pkgInfo.cfg.version, opts.publishTag))
-        .then(() => opts.confirm ? confirm('Are you sure you want to publish this version to npm?', false) : true)
-        .then(ok => ok && publish(opts.publishCommand, opts.publishTag) || '')
-        .then(command => {
-            if (!command || !opts.postPublishScript)
-                return command;
+        .then(
+            () =>
+                !module.exports.testMode &&
+                printReleaseInfo(pkgInfo.cfg.version, opts.publishTag)
+        )
+        .then(
+            () =>
+                /* eslint-disable indent */
+                opts.confirm
+                    ? confirm(
+                          'Are you sure you want to publish this version to npm?',
+                          false
+                      )
+                    : true
+            /* eslint-enable indent */
+        )
+        .then(
+            (ok) => (ok && publish(opts.publishCommand, opts.publishTag)) || ''
+        )
+        .then((command) => {
+            if (!command || !opts.postPublishScript) return command;
 
-            return runScript(opts.postPublishScript, SCRIPT_TYPE.postPublish)
-                .then(() => command);
+            return runScript(
+                opts.postPublishScript,
+                SCRIPT_TYPE.postPublish
+            ).then(() => command);
         });
 };
 
 // Exports for the testing purposes
-module.exports.testMode   = false;
+module.exports.testMode = false;
 module.exports.getOptions = getOptions;

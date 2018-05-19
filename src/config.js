@@ -1,64 +1,63 @@
 'use strict';
 
-const readFile                = require('fs').readFileSync;
-const writeFile               = require('fs').writeFileSync;
-const pathJoin                = require('path').join;
-const chalk                   = require('chalk');
-const defaults                = require('lodash/defaultsDeep');
-const Promise                 = require('pinkie-promise');
-const DEFAULT_OPTIONS         = require('./default-options');
-const inputWithConfirmation   = require('./utils/inquires').inputWithConfirmation;
-const input                   = require('./utils/inquires').input;
-const confirm                 = require('./utils/inquires').confirm;
+const readFile = require('fs').readFileSync;
+const writeFile = require('fs').writeFileSync;
+const pathJoin = require('path').join;
+const chalk = require('chalk');
+const defaults = require('lodash/defaultsDeep');
+const Promise = require('pinkie-promise');
+const DEFAULT_OPTIONS = require('./default-options');
+const inputWithConfirmation = require('./utils/inquires').inputWithConfirmation;
+const input = require('./utils/inquires').input;
+const confirm = require('./utils/inquires').confirm;
 const validationConfigurators = require('./validations').configurators;
 
-
 const optionsConfigurators = {
-    prePublishScript: currentVal => inputWithConfirmation(
-        'Do you want to run any scripts before publishing (e.g. build steps, tests)?',
-        false,
-        'Input pre-publish script',
-        currentVal
-    ),
+    prePublishScript: (currentVal) =>
+        inputWithConfirmation(
+            'Do you want to run any scripts before publishing (e.g. build steps, tests)?',
+            false,
+            'Input pre-publish script',
+            currentVal
+        ),
 
-    postPublishScript: currentVal => inputWithConfirmation(
-        'Do you want to run any scripts after succesful publishing (e.g. release announcements, binary uploading)?',
-        false,
-        'Input post-publish script',
-        currentVal
-    ),
+    postPublishScript: (currentVal) =>
+        inputWithConfirmation(
+            'Do you want to run any scripts after succesful publishing (e.g. release announcements, binary uploading)?',
+            false,
+            'Input post-publish script',
+            currentVal
+        ),
 
-    publishCommand: currentVal => input(
-        'Specify publishing command which will be used to publish your package',
-        currentVal
-    ),
+    publishCommand: (currentVal) =>
+        input(
+            'Specify publishing command which will be used to publish your package',
+            currentVal
+        ),
 
-    publishTag: currentVal => input(
-        'Specify release tag with which you package will be published',
-        currentVal
-    ),
+    publishTag: (currentVal) =>
+        input(
+            'Specify release tag with which you package will be published',
+            currentVal
+        ),
 
-    confirm: currentVal => confirm(
-        'Do you want manually confirm publishing?',
-        currentVal
-    )
+    confirm: (currentVal) =>
+        confirm('Do you want manually confirm publishing?', currentVal),
 };
 
-
-function getCurrentOpts (rcFile) {
+function getCurrentOpts(rcFile) {
     let optsFromFile = null;
 
     try {
         optsFromFile = JSON.parse(readFile(rcFile).toString());
-    }
-    catch (err) {
+    } catch (err) {
         optsFromFile = {};
     }
 
     return defaults({}, optsFromFile, DEFAULT_OPTIONS);
 }
 
-function configureOptsObject (obj, configurators, optType) {
+function configureOptsObject(obj, configurators, optType) {
     return Object.keys(configurators).reduce((chain, prop) => {
         return chain
             .then(() => {
@@ -66,7 +65,7 @@ function configureOptsObject (obj, configurators, optType) {
 
                 return configurators[prop](obj[prop]);
             })
-            .then(val => {
+            .then((val) => {
                 console.log();
 
                 obj[prop] = val;
@@ -74,11 +73,17 @@ function configureOptsObject (obj, configurators, optType) {
     }, Promise.resolve());
 }
 
-function configure (opts) {
+function configure(opts) {
     console.log();
 
     return configureOptsObject(opts, optionsConfigurators, 'option')
-        .then(() => configureOptsObject(opts.validations, validationConfigurators, 'validation'))
+        .then(() =>
+            configureOptsObject(
+                opts.validations,
+                validationConfigurators,
+                'validation'
+            )
+        )
         .then(() => {
             console.log(chalk.green('-- Current configuration:'));
             console.log();
@@ -87,15 +92,15 @@ function configure (opts) {
 
             return confirm('Is this OK?', true);
         })
-        .then(yes => !yes && configure(opts));
+        .then((yes) => !yes && configure(opts));
 }
 
-module.exports = function (projectDir) {
+module.exports = function(projectDir) {
     const rcFile = pathJoin(projectDir || process.cwd(), '.publishrc');
-    const opts   = getCurrentOpts(rcFile);
+    const opts = getCurrentOpts(rcFile);
 
     return configure(opts)
         .then(() => writeFile(rcFile, JSON.stringify(opts, null, 2)))
         .then(() => console.log('Configuration has been successfully saved.'))
-        .catch(err => console.log(chalk.red('ERROR: \n') + err.stack));
+        .catch((err) => console.log(chalk.red('ERROR: \n') + err.stack));
 };

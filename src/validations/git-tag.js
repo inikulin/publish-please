@@ -12,7 +12,7 @@ module.exports = {
         return confirm(
             'Would you like to verify that published commit has git tag that ' +
                 'is equal to the version specified in package.json?',
-            currentVal,
+            currentVal
         );
     },
 
@@ -21,7 +21,7 @@ module.exports = {
             .catch(() => {
                 throw "Latest commit doesn't have git tag.";
             })
-            .then(tag => {
+            .then((tag) => {
                 const version = pkgInfo.cfg.version;
 
                 if (tag !== version && tag !== 'v' + version)
