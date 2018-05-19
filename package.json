@@ -14,11 +14,10 @@
     "eslint-init": "eslint --init",
     "lint": "eslint bin src test",
     "clean": "rm -rf lib",
-    "clean-test": "rm test/__test-compiled__.js",
     "compile": "babel src -d lib",
-    "compile-test": "babel test/test.js --out-file test/__test-compiled__.js",
     "build": "npm run clean && npm run compile",
-    "test": "npm run prettier-format && npm run lint && npm run build && npm run compile-test && mocha test/__test-compiled__.js && npm run clean-test",
+    "mocha-with-coverage": "istanbul cover -x test/test.js _mocha test/test.js",
+    "test": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage",
     "postinstall": "node lib/init.js"
   },
   "lint-staged": {
@@ -71,6 +70,7 @@
     "eslint": "4.19.1",
     "eslint-config-prettier": "2.9.0",
     "husky": "0.14.3",
+    "istanbul": "0.4.5",
     "lint-staged": "7.1.0",
     "mkdirp": "0.5.1",
     "mocha": "5.1.1",

@@ -1,6 +1,7 @@
 .idea
 node_modules
 testing-repo
+coverage
 lib
 !lib/init.js
 test/__test-compiled__.js
