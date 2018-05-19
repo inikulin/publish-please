@@ -8,6 +8,7 @@
         "sourceType": "module"
     },
     "rules": {
+        "arrow-spacing": [2, { "before": true, "after": true }],
         "comma-dangle": ["error", "always-multiline", {"functions": "never"}],
         "eol-last":"error",
         "indent": [
@@ -19,6 +20,11 @@
             "unix"
         ],
         "no-console": 0,
+        "no-debugger": "error",
+        "no-extra-parens": "off",
+        "no-multiple-empty-lines": "error",
+        "no-nested-ternary": "error",
+        "no-shadow": "error",
         "no-trailing-spaces": "error",
         "no-unreachable": "error",
         "no-var": "error",
