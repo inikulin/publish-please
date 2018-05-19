@@ -1,40 +1,41 @@
 'use strict';
 
 const pathJoin = require('path').join;
-const nsp      = require('nsp');
-const confirm  = require('../utils/inquires').confirm;
-const Promise  = require('pinkie-promise');
-const readPkg  = require('read-pkg');
-const chalk    = require('chalk');
+const nsp = require('nsp');
+const confirm = require('../utils/inquires').confirm;
+const Promise = require('pinkie-promise');
+const readPkg = require('read-pkg');
+const chalk = require('chalk');
 
 module.exports = {
-    option:       'vulnerableDependencies',
-    statusText:   'Checking for the vulnerable dependencies',
+    option: 'vulnerableDependencies',
+    statusText: 'Checking for the vulnerable dependencies',
     defaultParam: true,
 
-    configurator (currentVal) {
+    configurator(currentVal) {
         return confirm(
             "Would you like to verify that your package doesn't have vulnerable dependencies before publishing?",
-            currentVal
+            currentVal,
         );
     },
 
-    run () {
+    run() {
         return new Promise((resolve, reject) => {
             const projectDir = pathJoin(process.cwd());
             const defaultArgs = nsp.sanitizeParameters({});
             const args = {
-                baseUrl:     defaultArgs.baseUrl,
-                proxy:       defaultArgs.proxy,
-                reporter:    'summary',
+                baseUrl: defaultArgs.baseUrl,
+                proxy: defaultArgs.proxy,
+                reporter: 'summary',
                 'warn-only': false,
-                path:        projectDir,
-                pkg:         readPkg.sync(projectDir, { normalize: false }),
-                offline:     false,
-                exceptions:  []
+                path: projectDir,
+                pkg: readPkg.sync(projectDir, { normalize: false }),
+                offline: false,
+                exceptions: [],
             };
 
-            nsp.check(args)
+            nsp
+                .check(args)
                 .then(result => {
                     if (vulnerabilitiesFoundIn(result)) {
                         const errs = result.data
@@ -49,53 +50,61 @@ module.exports = {
                     reject(err);
                 });
         });
-    }
+    },
 };
 
-const vulnerabilitiesFoundIn = (result) => {
+const vulnerabilitiesFoundIn = result => {
     return result && result.data && result.data.length > 0;
 };
 
-const summaryOf = (vulnerability) => {
-    const vulnerablePackageName = `${vulnerability.module || 'undefined'}@${vulnerability.version || '?.?.?'}`;
-    const vulnerablePackagePath = vulnerability.path && vulnerability.path.length >= 2
+const summaryOf = vulnerability => {
+    const vulnerablePackageName = `${vulnerability.module ||
+        'undefined'}@${vulnerability.version || '?.?.?'}`;
+    const vulnerablePackagePath =
+        vulnerability.path && vulnerability.path.length >= 2
             ? vulnerability.path.slice(1)
             : [];
 
-    const rootPackageName = vulnerablePackagePath.length >= 1
+    const rootPackageName =
+        vulnerablePackagePath.length >= 1
             ? vulnerablePackagePath[0]
             : vulnerablePackageName;
-    
+
     const recommendation = vulnerability.recommendation
-            ? vulnerability.recommendation.replace('\n','\n\t')
-            : '';
-    
-    const vulnerabilityIsDirectDependency = vulnerablePackageName === rootPackageName;
+        ? vulnerability.recommendation.replace('\n', '\n\t')
+        : '';
+
+    const vulnerabilityIsDirectDependency =
+        vulnerablePackageName === rootPackageName;
     const summary = vulnerabilityIsDirectDependency
-            ? `Vulnerability found in ${elegant(rootPackageName)}\n\t${recommendation}\n\tAdvisory: ${vulnerability.advisory || ''}`
-            : `Vulnerability found in ${chalk.bold(rootPackageName)}\n\tinside ${elegant(vulnerablePackagePath)}\n\t${vulnerability.recommendation || ''}\n\tAdvisory: ${vulnerability.advisory || ''}`
+        ? `Vulnerability found in ${elegant(
+              rootPackageName,
+          )}\n\t${recommendation}\n\tAdvisory: ${vulnerability.advisory || ''}`
+        : `Vulnerability found in ${chalk.bold(
+              rootPackageName,
+          )}\n\tinside ${elegant(
+              vulnerablePackagePath,
+          )}\n\t${vulnerability.recommendation ||
+              ''}\n\tAdvisory: ${vulnerability.advisory || ''}`;
     return summary;
 };
 
-const elegant = (pathOrName) => {
+const elegant = pathOrName => {
     return Array.isArray(pathOrName)
         ? elegantPath(pathOrName)
         : elegantName(pathOrName);
-}
+};
 
-const elegantPath = (path) => {
-    const lastIndex = path && path.length
-            ? path.length -1
-            : -1;
+const elegantPath = path => {
+    const lastIndex = path && path.length ? path.length - 1 : -1;
     const result = path
-        .map((item, index) => { 
-            return index === lastIndex
-                ? chalk.red.bold(item)
-                : item;})
+        .map((item, index) => {
+            return index === lastIndex ? chalk.red.bold(item) : item;
+        })
         .join(' -> ');
     return result;
-}
+};
 
-const elegantName = (name) => {
+const elegantName = name => {
     return chalk.red.bold(name);
-}
+};

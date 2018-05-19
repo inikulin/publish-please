@@ -23,7 +23,8 @@
         "no-var": "error",
         "quotes": [
             "error",
-            "single"
+            "single",
+            { "avoidEscape": true }
         ],
         "semi": [
             "error",
