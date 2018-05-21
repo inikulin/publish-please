@@ -3,6 +3,5 @@ node_modules
 testing-repo
 coverage
 lib
-!lib/init.js
 package
 *.tgz
