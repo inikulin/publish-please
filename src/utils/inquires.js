@@ -3,15 +3,16 @@ const Promise = require('pinkie-promise');
 
 function ask(type, question, defaultAnswer) {
     return new Promise((resolve) => {
-        inquirer.prompt(
-            {
+        inquirer
+            .prompt({
                 type: type,
                 name: 'prop',
                 message: question,
                 default: defaultAnswer,
-            },
-            (answer) => resolve(answer['prop'])
-        );
+            })
+            .then((answer) => {
+                resolve(answer['prop']);
+            });
     });
 }
 

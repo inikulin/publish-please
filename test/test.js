@@ -80,6 +80,7 @@ before(() => {
                 'git clone https://github.com/inikulin/testing-repo.git testing-repo'
             )
         )
+        .then(() => exec('npm run package'))
         .then(() => process.chdir('testing-repo'));
 });
 
@@ -750,7 +751,7 @@ describe('Guard', () => {
     beforeEach(() => {
         const pkg = JSON.parse(readFile('package.json').toString());
 
-        pkg.scripts = { prepublish: 'node ../lib/guard.js' };
+        pkg.scripts = { prepublishOnly: 'node ../lib/guard.js' };
 
         writeFile('package.json', JSON.stringify(pkg));
     });
@@ -795,7 +796,7 @@ describe('Init', () => {
                     'publish-please'
                 );
                 assert.strictEqual(
-                    cfg.scripts['prepublish'],
+                    cfg.scripts['prepublishOnly'],
                     'publish-please guard'
                 );
             }
@@ -806,7 +807,7 @@ describe('Init', () => {
             'package.json',
             JSON.stringify({
                 scripts: {
-                    prepublish: 'yo',
+                    prepublishOnly: 'yo',
                 },
             })
         );
@@ -817,7 +818,7 @@ describe('Init', () => {
             const cfg = JSON.parse(readFile('package.json').toString());
 
             assert.strictEqual(
-                cfg.scripts['prepublish'],
+                cfg.scripts['prepublishOnly'],
                 'publish-please guard && yo'
             );
         });
@@ -836,7 +837,7 @@ describe('Init', () => {
                     'publish-please'
                 );
                 assert.strictEqual(
-                    cfg.scripts['prepublish'],
+                    cfg.scripts['prepublishOnly'],
                     'publish-please guard'
                 );
             }));
@@ -908,5 +909,24 @@ describe('Confirmation', () => {
                     assert.strictEqual(npmCmd, '');
                     assert.throws(() => readFile('test-file'));
                 }));
+    });
+});
+
+describe('Package installation', () => {
+    const packageName = 'publish-please-2.5.0';
+    before(() => {
+        // do nothing
+    });
+
+    it(`Should not install ${packageName} globally`, () => {
+        return exec(`npm install -g ../${packageName}.tgz`)
+            .then(() => {
+                throw new Error('Promise rejection expected');
+            })
+            .catch((err) => {
+                assert(
+                    err.message.indexOf('node lib/prevent-global-install') > -1
+                );
+            });
     });
 });

@@ -16,10 +16,13 @@
     "clean": "rm -rf lib",
     "compile": "babel src -d lib",
     "build": "npm run clean && npm run compile",
-    "mocha-with-coverage": "istanbul cover -x test/test.js _mocha test/test.js",
+    "mocha-with-coverage": "istanbul cover -x test _mocha test",
     "check-coverage": "istanbul check-coverage --statements 79 --lines 79 --branches 67 --functions 50",
     "test": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage && npm run check-coverage",
-    "postinstall": "node lib/init.js"
+    "preinstall": "node lib/prevent-global-install",
+    "postinstall": "node lib/init.js",
+    "package": "npm run rimraf:package && rm -f publish-please*.tgz && npm pack",
+    "rimraf:package": "rimraf ./package"
   },
   "lint-staged": {
     "*.js": [
@@ -75,7 +78,8 @@
     "lint-staged": "7.1.0",
     "mkdirp": "0.5.1",
     "mocha": "5.1.1",
-    "prettier": "1.12.1"
+    "prettier": "1.12.1",
+    "should": "13.2.1"
   },
   "engines": {
     "node": ">=6.0.0"

@@ -13,18 +13,13 @@ function reportError() {
     console.log(chalk.bgRed(errorMessage));
 }
 
-(function guard() {
-    const npmArgs = getNpmArgs();
+(function guard(processEnv) {
+    const npmArgs = getNpmArgs(processEnv);
 
-    if (npmArgs) {
-        for (let arg = npmArgs.shift(); arg; arg = npmArgs.shift()) {
-            if (
-                /^pu(b(l(i(sh?)?)?)?)?$/.test(arg) &&
-                npmArgs.indexOf('--with-publish-please') < 0
-            ) {
-                reportError();
-                process.exit(1);
-            }
-        }
-    } else process.exit(1);
-})();
+    if (npmArgs && npmArgs.publish && !npmArgs['--with-publish-please']) {
+        reportError();
+        process.exit(1);
+    }
+
+    process.exit(0);
+})(process.env);

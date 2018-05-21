@@ -1,21 +1,60 @@
 'use strict';
 
 // NOTE: the following code was partially adopted from https://github.com/iarna/in-publish
-module.exports = function getNpmArgs() {
-    let npmArgv = null;
+module.exports = function getNpmArgs(processEnv) {
+    const npmArgs = {};
+    if (processEnv && processEnv['npm_config_argv']) {
+        try {
+            const args = JSON.parse(processEnv['npm_config_argv']);
 
-    try {
-        npmArgv = JSON.parse(process.env['npm_config_argv']);
-    } catch (err) {
-        return null;
+            // prettier-ignore
+            npmArgs['--save-dev'] = npmCommand(args).hasArg('--save-dev')
+                ? true
+                : false;
+
+            npmArgs['--save'] = npmCommand(args).hasArg('--save')
+                ? true
+                : false;
+
+            npmArgs['--global'] = npmCommand(args).hasArg('--global')
+                ? true
+                : false;
+
+            // prettier-ignore
+            npmArgs.install = npmCommand(args).hasArg('install')
+                ? true
+                : false;
+
+            // prettier-ignore
+            npmArgs.publish = npmCommand(args).hasArg('publish')
+                ? true
+                : false;
+
+            // prettier-ignore
+            npmArgs['--with-publish-please'] = npmCommand(args).hasArg('--with-publish-please')
+                ? true
+                : false;
+        } catch (err) {
+            console.warn(
+                "[Publish-please] Cannot parse property 'npm_config_argv' in process.env "
+            );
+            // prettier-ignore
+            console.warn(
+                `[Publish-please] process.env['npm_config_argv']= '${processEnv['npm_config_argv']}'`
+            );
+        }
     }
 
-    if (
-        typeof npmArgv !== 'object' ||
-        !npmArgv.cooked ||
-        !Array.isArray(npmArgv.cooked)
-    )
-        return null;
+    return npmArgs;
+};
 
-    return npmArgv.cooked;
+const npmCommand = (args) => {
+    const isValidArgs = args && args.cooked && Array.isArray(args.cooked);
+    return {
+        hasArg: (arg) => {
+            return isValidArgs
+                ? args.cooked.filter((a) => a === arg).length > 0
+                : false;
+        },
+    };
 };
