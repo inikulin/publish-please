@@ -19,8 +19,8 @@
     "mocha-with-coverage": "istanbul cover -x test _mocha test",
     "check-coverage": "istanbul check-coverage --statements 79 --lines 79 --branches 67 --functions 50",
     "test": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage && npm run check-coverage",
-    "preinstall": "node lib/prevent-global-install",
-    "postinstall": "node lib/init.js",
+    "preinstall": "if [ -e lib/prevent-global-install.js ]; then node lib/prevent-global-install.js ; fi",
+    "postinstall": "if [ -e lib/init.js ]; then node lib/init.js ; fi",
     "package": "npm run rimraf:package && rm -f publish-please*.tgz && npm pack",
     "rimraf:package": "rimraf ./package"
   },
@@ -79,6 +79,7 @@
     "mkdirp": "0.5.1",
     "mocha": "5.1.1",
     "prettier": "1.12.1",
+    "rimraf": "2.6.2",
     "should": "13.2.1"
   },
   "engines": {
