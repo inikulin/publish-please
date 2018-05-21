@@ -11,15 +11,16 @@ describe('npm args parser util', () => {
         // When
         const args = npmArgs(processEnv);
         // Then
-        args.should.be.empty;
+        args.should.be.empty();
     });
     it('Should return an empty object when the command is not an npm command', () => {
         // Given
+        process.env['npm_config_argv'] = undefined;
         const processEnv = process.env;
         // When
         const args = npmArgs(processEnv);
         // Then
-        args.should.be.empty;
+        args.should.be.empty();
     });
     it('Should parse the command `npm publish`', () => {
         // Given
@@ -28,6 +29,33 @@ describe('npm args parser util', () => {
         // When
         const args = npmArgs(process.env);
         // Then
-        args.publish.should.be.true;
+        args.publish.should.be.true();
+        args.install.should.be.false();
+    });
+    it('Should parse the command `npm install --save-dev publish-please@2.5.0`', () => {
+        // Given
+        process.env['npm_config_argv'] =
+            '{"remain":["publish-please@2.5.0"],"cooked":["install","--save-dev","publish-please@2.5.0"],"original":["install","--save-dev","publish-please@2.5.0"]}';
+        // When
+        const args = npmArgs(process.env);
+        // Then
+        args.install.should.be.true();
+        args.publish.should.be.false();
+        args['--save-dev'].should.be.true();
+        args['--save'].should.be.false();
+        args['--global'].should.be.false();
+    });
+    it('Should parse the command `npm install --global publish-please@2.5.0`', () => {
+        // Given
+        process.env['npm_config_argv'] =
+            '{"remain":["publish-please@2.5.0"],"cooked":["install","--global","publish-please@2.5.0"],"original":["install","-g","publish-please@2.5.0"]}';
+        // When
+        const args = npmArgs(process.env);
+        // Then
+        args.install.should.be.true();
+        args.publish.should.be.false();
+        args['--global'].should.be.true();
+        args['--save-dev'].should.be.false();
+        args['--save'].should.be.false();
     });
 });
