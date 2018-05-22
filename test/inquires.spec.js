@@ -3,10 +3,14 @@
 const requires = require('../lib/utils/inquires');
 /* eslint-disable no-unused-vars */
 const should = require('should');
-const stdin = require('mock-stdin').stdin();
+const stdinMock = require('mock-stdin');
 
 /* eslint-disable max-nested-callbacks */
 describe('Input with confirmation', () => {
+    let stdin;
+    before(() => {
+        stdin = stdinMock.stdin();
+    });
     after(() => {
         stdin.restore();
     });
@@ -63,6 +67,69 @@ describe('Input with confirmation', () => {
                 // Then
                 .then((response) => {
                     return response.should.equal(flow.defaultValue);
+                })
+        );
+    });
+});
+
+describe('Input list of files', () => {
+    let stdin;
+    before(() => {
+        stdin = stdinMock.stdin();
+    });
+    after(() => {
+        stdin.restore();
+    });
+
+    it('Should return the default list when pressing Enter', () => {
+        // Given
+        const flow = {
+            listQuestion:
+                'List files you want to exclude (comma-separated, you can use glob patterns)',
+            defaultList: ['lib/schema.rb', 'lib/*.keychain'],
+        };
+
+        // When
+        return (
+            Promise.resolve()
+                .then(() => {
+                    simulateUserInput(['\r']);
+                    return requires.inputList(
+                        flow.listQuestion,
+                        flow.defaultList
+                    );
+                })
+                // Then
+                .then((response) => {
+                    return response.should.equal(flow.defaultList);
+                })
+        );
+    });
+
+    it('Should return the custom list entered by the user', () => {
+        // Given
+        const flow = {
+            listQuestion:
+                'List files you want to exclude (comma-separated, you can use glob patterns)',
+            defaultList: ['lib/schema.rb', 'lib/*.keychain'],
+            listEnteredByUser: ['file1.dbx', 'dir/**/*.keychain'],
+        };
+
+        // When
+        return (
+            Promise.resolve()
+                .then(() => {
+                    simulateUserInput([
+                        flow.listEnteredByUser.join(', ') + '\r',
+                    ]);
+                    return requires.inputList(
+                        flow.listQuestion,
+                        flow.defaultList
+                    );
+                })
+                // Then
+                .then((response) => {
+                    return response.should.be.deepEqual(flow.listEnteredByUser);
                 })
         );
     });
