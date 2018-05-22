@@ -17,7 +17,7 @@
     "compile": "babel src -d lib",
     "build": "npm run clean && npm run compile",
     "mocha-with-coverage": "istanbul cover -x test _mocha test",
-    "check-coverage": "istanbul check-coverage --statements 79 --lines 79 --branches 67 --functions 50",
+    "check-coverage": "istanbul check-coverage --statements 83 --lines 83 --branches 70 --functions 60",
     "test": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage && npm run check-coverage",
     "preinstall": "if [ -e lib/prevent-global-install.js ]; then node lib/prevent-global-install.js ; fi",
     "postinstall": "if [ -e lib/init.js ]; then node lib/init.js ; fi",
