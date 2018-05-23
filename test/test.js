@@ -773,7 +773,11 @@ describe('Guard', () => {
                 throw new Error('Promise rejection expected');
             })
             .catch((err) => {
-                assert(err.message.indexOf(GUARD_ERROR) < 0);
+                assert(
+                    err.message.indexOf(
+                        'You do not have permission to publish'
+                    ) > -1
+                );
             }));
 
     it('Should not fail on `install`', () => exec('npm install'));
