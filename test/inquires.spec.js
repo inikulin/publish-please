@@ -73,13 +73,12 @@ describe('Input with confirmation', () => {
     });
 });
 
-describe('Input list of files', () => {
+describe.only('Input list of files', () => {
     let stdin;
     before(() => {
         stdin = stdinMock.stdin();
     });
     after(() => {
-        stdin.end();
         stdin.restore();
     });
 
@@ -114,16 +113,13 @@ describe('Input list of files', () => {
             listQuestion:
                 'List files you want to exclude (comma-separated, you can use glob patterns)',
             defaultList: ['lib/schema.rb', 'lib/*.keychain'],
-            listEnteredByUser: ['file1.dbx', 'dir/**/*.keychain'],
+            userInput: ['file1.dbx, dir/**/*.keychain\r'],
         };
-
         // When
         return (
             Promise.resolve()
                 .then(() => {
-                    simulateUserInput([
-                        flow.listEnteredByUser.join(', ') + '\r',
-                    ]);
+                    simulateUserInput(flow.userInput);
                     return requires.inputList(
                         flow.listQuestion,
                         flow.defaultList
@@ -131,7 +127,8 @@ describe('Input list of files', () => {
                 })
                 // Then
                 .then((response) => {
-                    return response.should.be.deepEqual(flow.listEnteredByUser);
+                    const expected = ['file1.dbx', 'dir/**/*.keychain'];
+                    return response.should.be.deepEqual(expected);
                 })
         );
     });
