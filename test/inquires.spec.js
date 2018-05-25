@@ -77,6 +77,9 @@ describe('Input list of files', () => {
     let stdin;
     before(() => {
         stdin = stdinMock.stdin();
+    });
+    beforeEach(() => {
+        stdin.end();
         stdin.reset();
     });
     after(() => {
@@ -120,7 +123,8 @@ describe('Input list of files', () => {
         return (
             Promise.resolve()
                 .then(() => {
-                    simulateUserInput(flow.userInput);
+                    setTimeout(() => simulateUserInput(flow.userInput), 2000);
+
                     return requires.inputList(
                         flow.listQuestion,
                         flow.defaultList
