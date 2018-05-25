@@ -73,7 +73,7 @@ describe('Input with confirmation', () => {
     });
 });
 
-describe.only('Input list of files', () => {
+describe('Input list of files', () => {
     let stdin;
     before(() => {
         stdin = stdinMock.stdin();
