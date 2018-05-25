@@ -77,6 +77,7 @@ describe('Input list of files', () => {
     let stdin;
     before(() => {
         stdin = stdinMock.stdin();
+        stdin.reset();
     });
     after(() => {
         stdin.restore();
@@ -113,7 +114,7 @@ describe('Input list of files', () => {
             listQuestion:
                 'List files you want to exclude (comma-separated, you can use glob patterns)',
             defaultList: ['lib/schema.rb', 'lib/*.keychain'],
-            userInput: ['file1.dbx, dir/**/*.keychain\r'],
+            userInput: ['file1.dbx, dir/**/*.keychain\n\r'],
         };
         // When
         return (
