@@ -79,8 +79,14 @@ function onInstall(testMode) {
         } else if (addConfigHooks(cfg, projectDir)) {
             reportHooksAdded();
 
-            if (!testMode)
-                require('./config')(projectDir).then(reportCompletion);
+            if (!testMode) {
+                const config = require('./config');
+                const opts = config.getCurrentOpts(projectDir);
+                config.configurePublishPlease
+                    .with(opts)
+                    .inProject(projectDir)
+                    .then(reportCompletion);
+            }
         }
     })();
 }

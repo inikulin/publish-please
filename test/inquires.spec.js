@@ -4,6 +4,7 @@ const requires = require('../lib/utils/inquires');
 /* eslint-disable no-unused-vars */
 const should = require('should');
 const stdinMock = require('mock-stdin');
+const simulateUserInput = require('./utils/simulate-user-input');
 
 /* eslint-disable max-nested-callbacks */
 describe('Input with confirmation', () => {
@@ -134,14 +135,3 @@ describe('Input list of files', () => {
         );
     });
 });
-
-const simulateUserInput = (inputs) => {
-    if (Array.isArray(inputs) && inputs.length === 0) {
-        return;
-    }
-    const input = inputs.shift();
-    setTimeout(() => {
-        process.stdin.send(input);
-        simulateUserInput(inputs);
-    }, 1000);
-};

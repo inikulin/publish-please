@@ -5,3 +5,4 @@ coverage
 lib
 package
 *.tgz
+test/tmp

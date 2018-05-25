@@ -19,9 +19,9 @@ describe('Guard Execution', () => {
             // nativeConsoleLog(val);
             if (exitCode === undefined) exitCode = val;
         };
-        console.log = (arg) => {
-            // nativeConsoleLog(arg);
-            output = output + arg;
+        console.log = (p1, p2) => {
+            p2 === undefined ? nativeConsoleLog(p1) : nativeConsoleLog(p1, p2);
+            output = output + p1;
         };
     });
     afterEach(() => {
