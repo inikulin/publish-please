@@ -79,6 +79,7 @@ describe('Input list of files', () => {
         stdin = stdinMock.stdin();
     });
     after(() => {
+        stdin.end();
         stdin.restore();
     });
 
