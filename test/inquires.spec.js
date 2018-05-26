@@ -73,17 +73,16 @@ describe('Input with confirmation', () => {
     });
 });
 
-describe('Input list of files', () => {
+describe.only('Input list of files', () => {
     let stdin;
     before(() => {
-        stdin = stdinMock.stdin();
+        Promise.resolve().then(() => (stdin = stdinMock.stdin()));
     });
     beforeEach(() => {
-        stdin.end();
-        stdin.reset();
+        Promise.resolve().then(() => stdin.reset());
     });
     after(() => {
-        stdin.restore();
+        Promise.resolve().then(() => stdin.restore());
     });
 
     it('Should return the default list when pressing Enter', () => {
@@ -117,7 +116,7 @@ describe('Input list of files', () => {
             listQuestion:
                 'List files you want to exclude (comma-separated, you can use glob patterns)',
             defaultList: ['lib/schema.rb', 'lib/*.keychain'],
-            userInput: ['file1.dbx, dir/**/*.keychain\n\r'],
+            userInput: ['file1.dbx, dir/**/*.keychain\r'],
         };
         // When
         return (
