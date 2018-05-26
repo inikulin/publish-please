@@ -73,16 +73,16 @@ describe('Input with confirmation', () => {
     });
 });
 
-describe.only('Input list of files', () => {
+describe('Input list of files', () => {
     let stdin;
     before(() => {
-        Promise.resolve().then(() => (stdin = stdinMock.stdin()));
+        return Promise.resolve().then(() => (stdin = stdinMock.stdin()));
     });
     beforeEach(() => {
-        Promise.resolve().then(() => stdin.reset());
+        return Promise.resolve().then(() => stdin.reset());
     });
     after(() => {
-        Promise.resolve().then(() => stdin.restore());
+        return Promise.resolve().then(() => stdin.restore());
     });
 
     it('Should return the default list when pressing Enter', () => {
