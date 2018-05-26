@@ -12,6 +12,7 @@ const pkgd = require('pkgd');
 const mkdirp = require('mkdirp');
 const Promise = require('pinkie-promise');
 const chalk = require('chalk');
+const requireUncached = require('import-fresh');
 
 // NOTE: mocking confirm function
 let mockConfirm = () => {};
@@ -19,7 +20,7 @@ let mockConfirm = () => {};
 require('../lib/utils/inquires').confirm = (...args) => mockConfirm(...args);
 
 // NOTE: loading tested code
-const publish = require('../lib/publish');
+const publish = requireUncached('../lib/publish');
 const getOptions = require('../lib/publish').getOptions;
 
 function mkdir(path) {
