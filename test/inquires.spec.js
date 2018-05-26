@@ -7,7 +7,7 @@ const stdinMock = require('mock-stdin');
 const simulateUserInput = require('./utils/simulate-user-input');
 
 /* eslint-disable max-nested-callbacks */
-describe.only('Input with confirmation', () => {
+describe('Input with confirmation', () => {
     let stdin;
     before(() => {
         return Promise.resolve().then(() => (stdin = stdinMock.stdin()));
@@ -76,7 +76,7 @@ describe.only('Input with confirmation', () => {
     });
 });
 
-describe.only('Input list of files', () => {
+describe('Input list of files', () => {
     let stdin;
     before(() => {
         return Promise.resolve().then(() => (stdin = stdinMock.stdin()));
@@ -116,8 +116,7 @@ describe.only('Input list of files', () => {
     it('Should return the custom list entered by the user', () => {
         // Given
         const flow = {
-            listQuestion:
-                'List files you want to exclude (comma-separated, you can use glob patterns)',
+            listQuestion: 'List files you want to exclude',
             defaultList: ['lib/schema.rb', 'lib/*.keychain'],
             userInput: ['file1.dbx, dir/**/*.keychain\r'],
         };
@@ -125,8 +124,7 @@ describe.only('Input list of files', () => {
         return (
             Promise.resolve()
                 .then(() => {
-                    setTimeout(() => simulateUserInput(flow.userInput), 2000);
-
+                    simulateUserInput(flow.userInput);
                     return requires.inputList(
                         flow.listQuestion,
                         flow.defaultList

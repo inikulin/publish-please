@@ -12,10 +12,13 @@ const config = require('../lib/config');
 describe('Config execution', () => {
     let stdin;
     before(() => {
-        stdin = stdinMock.stdin();
+        return Promise.resolve().then(() => (stdin = stdinMock.stdin()));
+    });
+    beforeEach(() => {
+        return Promise.resolve().then(() => stdin.reset());
     });
     after(() => {
-        stdin.restore();
+        return Promise.resolve().then(() => stdin.restore());
     });
 
     it('Should create a .publishrc file with specified values', () => {
@@ -35,7 +38,6 @@ describe('Config execution', () => {
             'y\r', // Would you like to verify that you are publishing from the correct git branch?
             'master\r', // Which branch should it be?
             'y\r', // Would you like to verify that published commit has git tag that is equal to the version specified in package.json?
-            'y\r', // Would you like to verify that you are publishing from the correct git branch?
             'y\r', // Is this OK?
         ];
         const projectDir = pathJoin(__dirname, 'tmp');
