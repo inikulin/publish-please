@@ -18,7 +18,7 @@
     "build": "npm run clean && npm run compile",
     "mocha-with-coverage": "istanbul cover -x test _mocha test",
     "check-coverage": "istanbul check-coverage --statements 83 --lines 83 --branches 70 --functions 60",
-    "test": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage && npm run check-coverage",
+    "test": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage",
     "preinstall": "if [ -e lib/prevent-global-install.js ]; then node lib/prevent-global-install.js ; fi",
     "postinstall": "if [ -e lib/init.js ]; then node lib/init.js ; fi",
     "package": "npm run rimraf:package && rm -f publish-please*.tgz && npm pack",
