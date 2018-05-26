@@ -531,13 +531,13 @@ describe('Node security project audit', () => {
                 )
             ));
 
-    it.skip('Should not fail on transitive dependency inside publish-please vNext', () =>
+    it('Should not fail on transitive dependency inside publish-please vNext', () =>
         exec('git checkout master')
             .then(() => pkgd())
             .then((pkgInfo) => {
                 pkgInfo.cfg.dependencies = {};
                 // TODO: resolve vulnerability on 'ban-sensitive-files' dependency
-                pkgInfo.cfg.dependencies['ban-sensitive-files'] = '1.9.2';
+                // pkgInfo.cfg.dependencies['ban-sensitive-files'] = '1.9.2';
                 pkgInfo.cfg.dependencies['chalk'] = '2.4.1';
                 pkgInfo.cfg.dependencies['cp-sugar'] = '^1.0.0';
                 pkgInfo.cfg.dependencies['elegant-status'] = '1.1.0';
@@ -546,7 +546,7 @@ describe('Node security project audit', () => {
                 pkgInfo.cfg.dependencies['lodash'] = '4.17.10';
                 pkgInfo.cfg.dependencies['node-emoji'] = '1.8.1';
                 // TODO: resolve vulnerability on 'nsp' dependency
-                pkgInfo.cfg.dependencies['nsp'] = '3.2.1';
+                // pkgInfo.cfg.dependencies['nsp'] = '3.2.1';
                 pkgInfo.cfg.dependencies['pinkie-promise'] = '^2.0.1';
                 pkgInfo.cfg.dependencies['pkgd'] = '^1.1.2';
                 pkgInfo.cfg.dependencies['promisify-event'] = '^1.0.0';
