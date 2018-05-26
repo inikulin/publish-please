@@ -7,13 +7,16 @@ const stdinMock = require('mock-stdin');
 const simulateUserInput = require('./utils/simulate-user-input');
 
 /* eslint-disable max-nested-callbacks */
-describe('Input with confirmation', () => {
+describe.only('Input with confirmation', () => {
     let stdin;
     before(() => {
-        stdin = stdinMock.stdin();
+        return Promise.resolve().then(() => (stdin = stdinMock.stdin()));
+    });
+    beforeEach(() => {
+        return Promise.resolve().then(() => stdin.reset());
     });
     after(() => {
-        stdin.restore();
+        return Promise.resolve().then(() => stdin.restore());
     });
 
     it('Should return the default value when pressing Enter on the Confirm Question and on the Input Question', () => {
