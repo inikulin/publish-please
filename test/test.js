@@ -918,7 +918,7 @@ describe('Confirmation', () => {
 });
 
 describe('Package installation', () => {
-    const packageName = 'publish-please-2.5.0';
+    const packageName = 'publish-please-3.0.0';
     before(() => {
         // do nothing
     });
