@@ -2,7 +2,7 @@
 
 const chalk = require('chalk');
 const getNpmArgs = require('./utils/get-npm-args');
-const errorMessage = `
+const ERROR_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !! 'npm publish' is forbidden for this package. !!
 !! Use 'npm run publish-please' instead.        !!
@@ -10,7 +10,7 @@ const errorMessage = `
 `;
 
 function reportError() {
-    console.log(chalk.bgRed(errorMessage));
+    console.log(chalk.bgRed(ERROR_MESSAGE));
 }
 
 (function guard(processEnv) {

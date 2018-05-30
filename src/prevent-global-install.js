@@ -1,6 +1,6 @@
 'use strict';
 
-const noGlobalInstallMessage = `
+const NO_GLOBAL_INSTALL_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !! Starting from v2.0.0 publish-please can't be installed globally.          !!
 !! Use local installation instead : 'npm install --save-dev publish-please'. !!
@@ -20,6 +20,6 @@ const noGlobalInstallMessage = `
     process.exit(0);
 
     function reportNoGlobalInstall() {
-        console.log(chalk.bgRed(noGlobalInstallMessage));
+        console.log(chalk.bgRed(NO_GLOBAL_INSTALL_MESSAGE));
     }
 })();

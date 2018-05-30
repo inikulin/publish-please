@@ -1,20 +1,20 @@
 'use strict';
 
-const noConfigMessage = `
+const NO_CONFIG_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !! Unable to setup publish-please: project's package.json either missing !!
 !! or malformed. Run 'npm init' and then reinstall publish-please.       !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 `;
 
-const hooksAddedMessage = `
+const HOOKS_ADDED_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !! publish-please hooks were successfully setup for the project. !!
 !! Now follow few simple steps to configure your publishing...   !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 `;
 
-const completionMessage = `
+const COMPLETION_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !! publish-please was successfully installed for the project. !!
 !! Use 'npm run publish-please' command for publishing.       !!
@@ -38,19 +38,18 @@ function onInstall(testMode) {
     }
 
     function reportNoConfig() {
-        console.log(chalk.bgRed(noConfigMessage));
+        console.log(chalk.bgRed(NO_CONFIG_MESSAGE));
     }
 
     function reportHooksAdded() {
-        console.log(chalk.bgGreen(hooksAddedMessage));
+        console.log(chalk.bgGreen(HOOKS_ADDED_MESSAGE));
     }
 
     function reportCompletion() {
-        console.log(chalk.bgGreen(completionMessage));
+        console.log(chalk.bgGreen(COMPLETION_MESSAGE));
     }
 
     function addConfigHooks(cfg, projectDir) {
-        console.log('addConfigHooks');
         if (!cfg.scripts) cfg.scripts = {};
 
         if (cfg.scripts['publish-please']) return false;

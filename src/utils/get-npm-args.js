@@ -6,7 +6,6 @@ module.exports = function getNpmArgs(processEnv) {
     if (processEnv && processEnv['npm_config_argv']) {
         try {
             const args = JSON.parse(processEnv['npm_config_argv']);
-            // console.log(processEnv['npm_config_argv']);
             npmArgs.install =
                 npmCommand(args).hasArg('install') ||
                 npmCommand(args).hasArg('i');
@@ -30,7 +29,7 @@ module.exports = function getNpmArgs(processEnv) {
     return npmArgs;
 };
 
-const npmCommand = (args) => {
+function npmCommand(args) {
     const isValidArgs = args && args.cooked && Array.isArray(args.cooked);
     return {
         hasArg: (arg) => {
@@ -39,4 +38,4 @@ const npmCommand = (args) => {
                 : false;
         },
     };
-};
+}

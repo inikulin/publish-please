@@ -53,11 +53,11 @@ module.exports = {
     },
 };
 
-const vulnerabilitiesFoundIn = (result) => {
+function vulnerabilitiesFoundIn(result) {
     return result && result.data && result.data.length > 0;
-};
+}
 
-const summaryOf = (vulnerability) => {
+function summaryOf(vulnerability) {
     const vulnerablePackageName = `${vulnerability.module ||
         'undefined'}@${vulnerability.version || '?.?.?'}`;
     const vulnerablePackagePath =
@@ -81,15 +81,15 @@ const summaryOf = (vulnerability) => {
         ? `Vulnerability found in ${elegant(rootPackageName)}\n\t${recommendation}\n\tAdvisory: ${vulnerability.advisory || ''}`
         : `Vulnerability found in ${chalk.bold(rootPackageName)}\n\tinside ${elegant(vulnerablePackagePath)}\n\t${vulnerability.recommendation || ''}\n\tAdvisory: ${vulnerability.advisory || ''}`;
     return summary;
-};
+}
 
-const elegant = (pathOrName) => {
+function elegant(pathOrName) {
     return Array.isArray(pathOrName)
         ? elegantPath(pathOrName)
         : elegantName(pathOrName);
-};
+}
 
-const elegantPath = (path) => {
+function elegantPath(path) {
     // prettier-ignore
     const lastIndex = path && path.length
         ? path.length - 1
@@ -104,8 +104,8 @@ const elegantPath = (path) => {
         })
         .join(' -> ');
     return result;
-};
+}
 
-const elegantName = (name) => {
+function elegantName(name) {
     return chalk.red.bold(name);
-};
+}
