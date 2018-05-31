@@ -1,8 +1,8 @@
-const noop          = require('lodash/noop');
-const chalk         = require('chalk');
+const noop = require('lodash/noop');
+const chalk = require('chalk');
 const elegantStatus = require('elegant-status');
-const emoji         = require('node-emoji').emoji;
-const Promise       = require('pinkie-promise');
+const emoji = require('node-emoji').emoji;
+const Promise = require('pinkie-promise');
 
 const validations = [
     require('./vulnerable-dependencies'),
@@ -10,17 +10,22 @@ const validations = [
     require('./untracked-files'),
     require('./sensitive-data'),
     require('./branch'),
-    require('./git-tag')
+    require('./git-tag'),
 ];
 
-function runValidation (validation, param, pkgInfo, errs) {
-    const done = module.exports.testMode ? noop : elegantStatus(validation.statusText);
+function runValidation(validation, param, pkgInfo, errs) {
+    const done = module.exports.testMode
+        ? noop
+        : elegantStatus(validation.statusText);
 
+    // prettier-ignore
     return validation
         .run(param, pkgInfo)
         .then(() => done(true))
-        .catch(err => {
-            errs.push(err);
+        .catch((err) => {
+            Array.isArray(err)
+                ? errs.push(...err)
+                : errs.push(err);
             done(false);
         });
 }
@@ -38,12 +43,13 @@ module.exports = {
         return opts;
     }, {}),
 
-    validate: function (opts, pkgInfo) {
-        const errs             = [];
-        const validationsToRun = validations.filter(validation => !!opts[validation.option]);
+    validate: function(opts, pkgInfo) {
+        const errs = [];
+        const validationsToRun = validations.filter(
+            (validation) => !!opts[validation.option]
+        );
 
-        if (!validationsToRun.length)
-            return Promise.resolve();
+        if (!validationsToRun.length) return Promise.resolve();
 
         if (!module.exports.testMode) {
             console.log(chalk.yellow('Running validations'));
@@ -53,19 +59,24 @@ module.exports = {
 
         return validationsToRun
             .reduce((validationChain, validation) => {
-                return validationChain.then(() => runValidation(validation, opts[validation.option], pkgInfo, errs));
+                return validationChain.then(() =>
+                    runValidation(
+                        validation,
+                        opts[validation.option],
+                        pkgInfo,
+                        errs
+                    )
+                );
             }, Promise.resolve())
             .then(() => {
                 if (errs.length) {
-                    const msg = errs.map(err => '  * ' + err).join('\n');
-
+                    const msg = errs.map((err) => '  * ' + err).join('\n');
                     throw new Error(msg);
-                }
-                else if (!module.exports.testMode) {
+                } else if (!module.exports.testMode) {
                     console.log(chalk.yellow('-------------------'));
                     console.log(emoji['+1'], emoji['+1'], emoji['+1']);
                     console.log();
                 }
             });
-    }
+    },
 };

@@ -1,20 +1,33 @@
 {
   "name": "publish-please",
-  "version": "2.4.1",
+  "version": "3.0.0",
   "description": "Safe and highly functional replacement for `npm publish`.",
   "main": "./lib/index.js",
   "bin": {
     "publish-please": "./bin/publish-please.js"
   },
   "scripts": {
+    "precommit": "lint-staged",
+    "prettier-format": "prettier --write \"{bin,src,test}/**/*.js\"",
+    "prettier-check": "prettier --list-different \"{bin,src,test}/**/*.js\"",
+    "eslint-check-config": "eslint --print-config .eslintrc.json | eslint-config-prettier-check",
+    "eslint-init": "eslint --init",
     "lint": "eslint bin src test",
     "clean": "rm -rf lib",
-    "clean-test": "rm test/__test-compiled__.js",
     "compile": "babel src -d lib",
-    "compile-test": "babel test/test.js --out-file test/__test-compiled__.js",
     "build": "npm run clean && npm run compile",
-    "test": "npm run lint && npm run build && npm run compile-test && mocha test/__test-compiled__.js && npm run clean-test",
-    "postinstall": "node lib/init.js"
+    "mocha-with-coverage": "istanbul cover -x test _mocha test",
+    "check-coverage": "istanbul check-coverage --statements 89 --lines 88 --branches 76 --functions 96",
+    "test": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage && npm run check-coverage",
+    "preinstall": "if [ -e lib/prevent-global-install.js ]; then node lib/prevent-global-install.js ; fi",
+    "postinstall": "if [ -e lib/init.js ]; then node lib/init.js ; fi",
+    "package": "npm run rimraf:package && rm -f publish-please*.tgz && npm pack",
+    "rimraf:package": "rimraf ./package"
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write"
+    ]
   },
   "repository": {
     "type": "git",
@@ -38,30 +51,40 @@
     "bin"
   ],
   "dependencies": {
-    "ban-sensitive-files": "^1.7.2",
-    "chalk": "^1.1.1",
+    "ban-sensitive-files": "1.9.2",
+    "chalk": "2.4.1",
     "cp-sugar": "^1.0.0",
-    "elegant-status": "^1.0.0",
-    "globby": "^4.0.0",
-    "inquirer": "^0.12.0",
-    "lodash": "^4.7.0",
-    "node-emoji": "^1.0.4",
-    "nsp": "^2.2.0",
+    "elegant-status": "1.1.0",
+    "globby": "8.0.1",
+    "inquirer": "4.0.2",
+    "lodash": "4.17.10",
+    "node-emoji": "1.8.1",
+    "nsp": "3.2.1",
     "pinkie-promise": "^2.0.1",
     "pkgd": "^1.1.2",
     "promisify-event": "^1.0.0",
-    "read-pkg": "^1.1.0",
-    "semver": "^5.3.0"
+    "read-pkg": "3.0.0",
+    "semver": "5.5.0"
   },
   "devDependencies": {
-    "babel-cli": "^6.9.0",
-    "babel-eslint": "^4.1.6",
-    "babel-plugin-transform-runtime": "^6.9.0",
-    "babel-preset-es2015": "^6.9.0",
-    "del": "^2.2.0",
-    "eslint": "^1.10.3",
-    "eslint-plugin-babel": "^3.0.0",
-    "mkdirp": "^0.5.1",
-    "mocha": "^2.3.4"
+    "babel-cli": "6.26.0",
+    "babel-plugin-transform-runtime": "6.23.0",
+    "babel-preset-env": "1.7.0",
+    "del": "3.0.0",
+    "eslint": "4.19.1",
+    "eslint-config-prettier": "2.9.0",
+    "husky": "0.14.3",
+    "import-fresh": "2.0.0",
+    "istanbul": "0.4.5",
+    "lint-staged": "7.1.0",
+    "mkdirp": "0.5.1",
+    "mocha": "5.1.1",
+    "mock-stdin": "0.3.1",
+    "prettier": "1.12.1",
+    "rimraf": "2.6.2",
+    "should": "13.2.1"
+  },
+  "engines": {
+    "node": ">=6.0.0"
   }
 }

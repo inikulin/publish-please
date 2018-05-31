@@ -1,0 +1,45 @@
+{
+    "env": {
+        "es6": true,
+        "node": true,
+        "mocha": true
+    },
+    "parserOptions": {
+        "sourceType": "module"
+    },
+    "rules": {
+        "arrow-spacing": [2, { "before": true, "after": true }],
+        "comma-dangle": ["error", "always-multiline", {"functions": "never"}],
+        "eol-last":"error",
+        "indent": [
+            "error",
+            4
+        ],
+        "linebreak-style": [
+            "error",
+            "unix"
+        ],
+        "no-console": 0,
+        "no-debugger": "error",
+        "no-extra-parens": "off",
+        "no-multiple-empty-lines": "error",
+        "no-nested-ternary": "error",
+        "no-shadow": "error",
+        "no-trailing-spaces": "error",
+        "no-unreachable": "error",
+        "no-var": "error",
+        "quotes": [
+            "error",
+            "single",
+            { "avoidEscape": true }
+        ],
+        "semi": [
+            "error",
+            "always"
+        ]
+    },
+    "extends": [
+        "eslint:recommended",
+        "prettier"
+    ]
+}

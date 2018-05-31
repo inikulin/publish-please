@@ -1,0 +1,6 @@
+*
+!bin/**/*
+!lib/**/*
+lib/**/*.spec.*
+!package.json
+!*.md
