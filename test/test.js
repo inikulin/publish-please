@@ -13,6 +13,7 @@ const mkdirp = require('mkdirp');
 const Promise = require('pinkie-promise');
 const chalk = require('chalk');
 const requireUncached = require('import-fresh');
+const packageName = require('./utils/publish-please-version-under-test');
 
 // NOTE: mocking confirm function
 let mockConfirm = () => {};
@@ -918,20 +919,17 @@ describe('Confirmation', () => {
 });
 
 describe('Package installation', () => {
-    const packageName = 'publish-please-3.0.0';
     before(() => {
         // do nothing
     });
 
     it(`Should not install ${packageName} globally`, () => {
-        return exec(`npm install -g ../${packageName}.tgz`)
+        return exec(`npm install -g ../${packageName.replace('@', '-')}.tgz`)
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
             .catch((err) => {
-                assert(
-                    err.message.indexOf('node lib/prevent-global-install') > -1
-                );
+                assert(err.message.indexOf('node lib/pre-install.js') > -1);
             });
     });
 });

@@ -1,3 +1,4 @@
+'use strict';
 module.exports = function simulateUserInput(inputs) {
     if (Array.isArray(inputs) && inputs.length === 0) {
         return;
