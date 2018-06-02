@@ -3,6 +3,7 @@
 const npmArgs = require('../lib/utils/get-npm-args');
 /* eslint-disable no-unused-vars */
 const should = require('should');
+const packageName = require('./utils/publish-please-version-under-test');
 
 describe('npm args parser util', () => {
     it('Should return an empty object when process.env does not exist', () => {
@@ -44,10 +45,11 @@ describe('npm args parser util', () => {
         args.install.should.be.false();
         args['--with-publish-please'].should.be.true();
     });
-    it('Should parse the command `npm install --save-dev publish-please@2.5.0`', () => {
+    it(`Should parse the command 'npm install --save-dev ${packageName}'`, () => {
         // Given
-        process.env['npm_config_argv'] =
-            '{"remain":["publish-please@2.5.0"],"cooked":["install","--save-dev","publish-please@2.5.0"],"original":["install","--save-dev","publish-please@2.5.0"]}';
+        process.env[
+            'npm_config_argv'
+        ] = `{"remain":["${packageName}"],"cooked":["install","--save-dev","${packageName}"],"original":["install","--save-dev","${packageName}"]}`;
         // When
         const args = npmArgs(process.env);
         // Then
@@ -57,10 +59,11 @@ describe('npm args parser util', () => {
         args['--save'].should.be.false();
         args['--global'].should.be.false();
     });
-    it('Should parse the command `npm i -D publish-please@2.5.0`', () => {
+    it(`Should parse the command 'npm i -D ${packageName}'`, () => {
         // Given
-        process.env['npm_config_argv'] =
-            '{"remain":["publish-please@2.5.0"],"cooked":["i","--save-dev","publish-please@2.5.0"],"original":["i","-D","publish-please@2.5.0"]}';
+        process.env[
+            'npm_config_argv'
+        ] = `{"remain":["${packageName}"],"cooked":["i","--save-dev","${packageName}"],"original":["i","-D","${packageName}"]}`;
         // When
         const args = npmArgs(process.env);
         // Then
@@ -70,10 +73,11 @@ describe('npm args parser util', () => {
         args['--save'].should.be.false();
         args['--global'].should.be.false();
     });
-    it('Should parse the command `npm install --global publish-please@2.5.0`', () => {
+    it(`Should parse the command 'npm install --global ${packageName}'`, () => {
         // Given
-        process.env['npm_config_argv'] =
-            '{"remain":["publish-please@2.5.0"],"cooked":["install","--global","publish-please@2.5.0"],"original":["install","-g","publish-please@2.5.0"]}';
+        process.env[
+            'npm_config_argv'
+        ] = `{"remain":["${packageName}"],"cooked":["install","--global","${packageName}"],"original":["install","-g","${packageName}"]}`;
         // When
         const args = npmArgs(process.env);
         // Then
@@ -83,10 +87,11 @@ describe('npm args parser util', () => {
         args['--save-dev'].should.be.false();
         args['--save'].should.be.false();
     });
-    it('Should parse the command `npm i -g publish-please@2.5.0`', () => {
+    it(`Should parse the command 'npm i -g ${packageName}'`, () => {
         // Given
-        process.env['npm_config_argv'] =
-            '{"remain":["publish-please@2.5.0"],"cooked":["i","--global","publish-please@2.5.0"],"original":["i","-g","publish-please@2.5.0"]}';
+        process.env[
+            'npm_config_argv'
+        ] = `{"remain":["${packageName}"],"cooked":["i","--global","${packageName}"],"original":["i","-g","${packageName}"]}`;
         // When
         const args = npmArgs(process.env);
         // Then
