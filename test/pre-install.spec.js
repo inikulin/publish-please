@@ -4,7 +4,7 @@
 const should = require('should');
 const requireUncached = require('import-fresh');
 const packageName = require('./utils/publish-please-version-under-test');
-const copy = require('fs').copyFileSync;
+const copy = require('./utils/copy-file-sync');
 const mkdirp = require('mkdirp');
 
 describe('Pre-Install Execution', () => {
