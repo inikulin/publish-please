@@ -4,7 +4,8 @@
 const should = require('should');
 const requireUncached = require('import-fresh');
 const packageName = require('./utils/publish-please-version-under-test');
-const pathJoin = require('path').join;
+const copy = require('fs').copyFileSync;
+const mkdirp = require('mkdirp');
 
 describe('Pre-Install Execution', () => {
     let nativeExit;
@@ -36,18 +37,38 @@ describe('Pre-Install Execution', () => {
         process.env[
             'npm_config_argv'
         ] = `{"remain":["${packageName}"],"cooked":["install","--global","${packageName}"],"original":["install","-g","${packageName}"]}`;
-        // NOTE: following hack enables to execute this test
-        //          with vscode debug an under normal npm test
-        const projectDir = process.cwd().includes('testing-repo')
-            ? pathJoin(process.cwd(), '..')
-            : process.cwd();
-
-        process.chdir(projectDir);
 
         // When
         requireUncached('../lib/pre-install');
         // Then
         exitCode.should.be.equal(1);
         output.should.containEql("publish-please can't be installed globally");
+    });
+
+    it(`Should not return an error message on 'npm install --save-dev ${packageName}'`, () => {
+        // Given
+        process.env[
+            'npm_config_argv'
+        ] = `{"remain":["${packageName}"],"cooked":["install","--save-dev","${packageName}"],"original":["install","--save-dev","${packageName}"]}`;
+
+        // When
+        requireUncached('../lib/pre-install');
+        // Then
+        (exitCode || 0).should.be.equal(0);
+        output.should.containEql('');
+    });
+    it(`Should not return an error message on 'npm install' after a fresh git clone of ${packageName}'`, () => {
+        // Given
+        process.env[
+            'npm_config_argv'
+        ] = `{"remain":["${packageName}"],"cooked":["install","--save-dev","${packageName}"],"original":["install","--save-dev","${packageName}"]}`;
+        mkdirp('test/tmp');
+        copy('lib/pre-install.js', 'test/tmp/pre-install.js');
+
+        // When
+        requireUncached('./tmp/pre-install');
+        // Then
+        (exitCode || 0).should.be.equal(0);
+        output.should.containEql('');
     });
 });

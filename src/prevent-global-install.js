@@ -1,4 +1,5 @@
 'use strict';
+const chalk = require('chalk');
 
 const NO_GLOBAL_INSTALL_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -8,19 +9,15 @@ const NO_GLOBAL_INSTALL_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 `;
 
-(function preInstallCheck() {
-    const chalk = require('chalk');
+module.exports = function preventGlobalInstall() {
     const getNpmArgs = require('./utils/get-npm-args');
     const npmArgs = getNpmArgs(process.env);
     if (npmArgs['--global']) {
         reportNoGlobalInstall();
         process.exit(1);
-        return;
     }
+};
 
-    process.exit(0);
-
-    function reportNoGlobalInstall() {
-        console.log(chalk.bgRed(NO_GLOBAL_INSTALL_MESSAGE));
-    }
-})();
+function reportNoGlobalInstall() {
+    console.log(chalk.bgRed(NO_GLOBAL_INSTALL_MESSAGE));
+}
