@@ -45,6 +45,48 @@ describe('npm args parser util', () => {
         args.install.should.be.false();
         args['--with-publish-please'].should.be.true();
     });
+    it('Should parse the command `npm run preinstall`', () => {
+        // Given
+        process.env['npm_config_argv'] =
+            '{"remain":[],"cooked":["run","preinstall"],"original":["run","preinstall"]}';
+        // When
+        const args = npmArgs(process.env);
+        // Then
+        args.publish.should.be.false();
+        args.install.should.be.false();
+        args['--save-dev'].should.be.false();
+        args['--save'].should.be.false();
+        args['--global'].should.be.false();
+        args['--with-publish-please'].should.be.false();
+    });
+    it('Should parse the command `npm run install`', () => {
+        // Given
+        process.env['npm_config_argv'] =
+            '{"remain":[],"cooked":["install"],"original":["install"]}';
+        // When
+        const args = npmArgs(process.env);
+        // Then
+        args.publish.should.be.false();
+        args.install.should.be.true();
+        args['--save-dev'].should.be.false();
+        args['--save'].should.be.false();
+        args['--global'].should.be.false();
+        args['--with-publish-please'].should.be.false();
+    });
+    it('Should parse the command `npm run i`', () => {
+        // Given
+        process.env['npm_config_argv'] =
+            '{"remain":[],"cooked":["i"],"original":["i"]}';
+        // When
+        const args = npmArgs(process.env);
+        // Then
+        args.publish.should.be.false();
+        args.install.should.be.true();
+        args['--save-dev'].should.be.false();
+        args['--save'].should.be.false();
+        args['--global'].should.be.false();
+        args['--with-publish-please'].should.be.false();
+    });
     it(`Should parse the command 'npm install --save-dev ${packageName}'`, () => {
         // Given
         process.env[
