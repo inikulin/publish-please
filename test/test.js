@@ -88,7 +88,14 @@ before(() => {
 
 beforeEach(() => colorGitOutput());
 
-afterEach(() => exec('git reset --hard HEAD').then(exec('git clean -f -d')));
+afterEach(() => {
+    const projectDir = process.cwd();
+    if (projectDir.includes('testing-repo')) {
+        return exec('git reset --hard HEAD').then(exec('git clean -f -d'));
+    }
+    console.log('protecting publish-please project against git reset');
+    return Promise.resolve();
+});
 
 describe('package.json', () => {
     it('Should validate package.json existence', () =>
