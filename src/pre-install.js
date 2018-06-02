@@ -8,7 +8,6 @@ const pathJoin = require('path').join;
         projectDir || process.cwd(),
         'lib/prevent-global-install.js'
     );
-    console.log(jsFile);
     if (fileExists(jsFile)) {
         require(jsFile);
     }
