@@ -15,6 +15,7 @@ const NO_GLOBAL_INSTALL_MESSAGE = `
     if (npmArgs['--global']) {
         reportNoGlobalInstall();
         process.exit(1);
+        return;
     }
 
     process.exit(0);
