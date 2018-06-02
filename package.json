@@ -13,7 +13,7 @@
     "eslint-check-config": "eslint --print-config .eslintrc.json | eslint-config-prettier-check",
     "eslint-init": "eslint --init",
     "lint": "eslint bin src test",
-    "clean": "rm -rf lib",
+    "clean": "rimraf lib",
     "compile": "babel src -d lib",
     "build": "npm run clean && npm run compile",
     "mocha-with-coverage": "istanbul cover -x test _mocha test",
@@ -21,8 +21,7 @@
     "test": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage && npm run check-coverage",
     "preinstall": "node lib/pre-install.js",
     "postinstall": "if [ -e lib/init.js ]; then node lib/init.js ; fi",
-    "package": "npm run rimraf:package && rm -f publish-please*.tgz && npm pack",
-    "rimraf:package": "rimraf ./package"
+    "package": "rimraf package && rimraf publish-please*.tgz && npm pack"
   },
   "lint-staged": {
     "*.js": [
