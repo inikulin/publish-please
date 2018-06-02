@@ -94,7 +94,7 @@ afterEach(() => {
         return exec('git reset --hard HEAD').then(exec('git clean -f -d'));
     }
     console.log('protecting publish-please project against git reset');
-    return Promise.resolve();
+    return Promise.resolve().then(process.chdir('testing-repo'));
 });
 
 describe('package.json', () => {
