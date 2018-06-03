@@ -7,7 +7,7 @@ const packageName = require('./utils/publish-please-version-under-test');
 const copy = require('./utils/copy-file-sync');
 const mkdirp = require('mkdirp');
 
-describe('Pre-Install Execution', () => {
+describe('Post-Install Execution', () => {
     let nativeExit;
     let nativeConsoleLog;
     let exitCode;
@@ -32,40 +32,15 @@ describe('Pre-Install Execution', () => {
         console.log = nativeConsoleLog;
     });
 
-    it(`Should return an error message on 'npm install -g ${packageName}'`, () => {
-        // Given
-        process.env[
-            'npm_config_argv'
-        ] = `{"remain":["${packageName}"],"cooked":["install","--global","${packageName}"],"original":["install","-g","${packageName}"]}`;
-
-        // When
-        requireUncached('../lib/pre-install');
-        // Then
-        exitCode.should.be.equal(1);
-        output.should.containEql("publish-please can't be installed globally");
-    });
-
-    it(`Should not return an error message on 'npm install --save-dev ${packageName}'`, () => {
-        // Given
-        process.env[
-            'npm_config_argv'
-        ] = `{"remain":["${packageName}"],"cooked":["install","--save-dev","${packageName}"],"original":["install","--save-dev","${packageName}"]}`;
-
-        // When
-        requireUncached('../lib/pre-install');
-        // Then
-        (exitCode || 0).should.be.equal(0);
-        output.should.be.equal('');
-    });
     it(`Should not return an error message on 'npm install' after a fresh git clone of ${packageName}'`, () => {
         // Given
         process.env['npm_config_argv'] =
             '{"remain":[],"cooked":["install"],"original":["install"]}';
         mkdirp('test/tmp');
-        copy('lib/pre-install.js', 'test/tmp/pre-install.js');
+        copy('lib/post-install.js', 'test/tmp/post-install.js');
 
         // When
-        requireUncached('./tmp/pre-install');
+        requireUncached('./tmp/post-install');
         // Then
         (exitCode || 0).should.be.equal(0);
         output.should.be.equal('');

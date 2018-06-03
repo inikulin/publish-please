@@ -1,4 +1,9 @@
 'use strict';
+const pathJoin = require('path').join;
+const writeFile = require('fs').writeFileSync;
+const readPkg = require('read-pkg');
+const chalk = require('chalk');
+const getProjectDir = require('./utils/get-project-dir');
 
 const NO_CONFIG_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -23,13 +28,15 @@ const COMPLETION_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 `;
 
-function onInstall(testMode) {
-    const pathJoin = require('path').join;
-    const writeFile = require('fs').writeFileSync;
-    const readPkg = require('read-pkg');
-    const chalk = require('chalk');
+const NO_HOOKS_CAN_BE_ADDED_ON_ITSELF = `
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!! publish-please hooks setup is canceled      !!
+!! You cannot do this on publish-please itself !!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+`;
 
-    function readCfg(projectDir) {
+function onInstall(projectDir, testMode) {
+    function readCfg() {
         try {
             return readPkg.sync(projectDir, { normalize: false });
         } catch (err) {
@@ -41,6 +48,10 @@ function onInstall(testMode) {
         console.log(chalk.bgRed(NO_CONFIG_MESSAGE));
     }
 
+    function reportNoHooksOnItself() {
+        console.log(chalk.bgYellow(NO_HOOKS_CAN_BE_ADDED_ON_ITSELF));
+    }
+
     function reportHooksAdded() {
         console.log(chalk.bgGreen(HOOKS_ADDED_MESSAGE));
     }
@@ -49,7 +60,7 @@ function onInstall(testMode) {
         console.log(chalk.bgGreen(COMPLETION_MESSAGE));
     }
 
-    function addConfigHooks(cfg, projectDir) {
+    function addConfigHooks(cfg) {
         if (!cfg.scripts) cfg.scripts = {};
 
         if (cfg.scripts['publish-please']) return false;
@@ -68,14 +79,19 @@ function onInstall(testMode) {
     }
 
     (function runInstallationSteps() {
-        // NOTE: <projectDir>/node_modules/publish-please/lib
-        const projectDir = pathJoin(__dirname, '../../../');
-        const cfg = readCfg(projectDir);
+        const cfg = readCfg();
 
         if (!cfg) {
             reportNoConfig();
             process.exit(1);
-        } else if (addConfigHooks(cfg, projectDir)) {
+            return;
+        }
+        if (cfg && cfg.name === 'publish-please') {
+            reportNoHooksOnItself();
+            process.exit(0);
+            return;
+        }
+        if (addConfigHooks(cfg, projectDir)) {
             reportHooksAdded();
 
             if (!testMode) {
@@ -87,10 +103,11 @@ function onInstall(testMode) {
                     .then(reportCompletion);
             }
         }
-    })();
+    })(projectDir);
 }
 
-module.exports = function init() {
+module.exports = function init(projectDir) {
+    projectDir = projectDir ? projectDir : getProjectDir();
     const testMode = process.argv.indexOf('--test-mode') > -1;
-    onInstall(testMode);
+    onInstall(projectDir, testMode);
 };
