@@ -8,6 +8,8 @@ const copy = require('./utils/copy-file-sync');
 const mkdirp = require('mkdirp');
 const init = require('../lib/init');
 const pathJoin = require('path').join;
+const writeFile = require('fs').writeFileSync;
+const del = require('del');
 
 describe('Post-Install Execution', () => {
     let nativeExit;
@@ -52,11 +54,37 @@ describe('Post-Install Execution', () => {
         ] = `{"remain":["${packageName}"],"cooked":["install","--save-dev","${packageName}"],"original":["install","--save-dev","${packageName}"]}`;
         mkdirp('test/tmp');
         const projectDir = pathJoin(__dirname, 'tmp');
+        del.sync(pathJoin(projectDir, 'package.json'));
 
         // When
         init(projectDir);
         // Then
         exitCode.should.be.equal(1);
         output.should.containEql("project's package.json either missing");
+    });
+    it(`Should add hooks in the package.json file on 'npm install --save-dev ${packageName}'`, () => {
+        // Given
+        process.env[
+            'npm_config_argv'
+        ] = `{"remain":["${packageName}"],"cooked":["install","--save-dev","${packageName}"],"original":["install","--save-dev","${packageName}"]}`;
+        process.argv.push('--test-mode');
+        mkdirp('test/tmp');
+        const pkg = {
+            name: 'testing-repo',
+            scripts: {},
+        };
+        const projectDir = pathJoin(__dirname, 'tmp');
+        writeFile(
+            pathJoin(projectDir, 'package.json'),
+            JSON.stringify(pkg, null, 2)
+        );
+
+        // When
+        init(projectDir);
+        // Then
+        (exitCode || 0).should.be.equal(0);
+        output.should.containEql(
+            'publish-please hooks were successfully setup for the project'
+        );
     });
 });
