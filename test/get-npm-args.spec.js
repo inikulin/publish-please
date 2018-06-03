@@ -59,7 +59,7 @@ describe('npm args parser util', () => {
         args['--global'].should.be.false();
         args['--with-publish-please'].should.be.false();
     });
-    it('Should parse the command `npm run install`', () => {
+    it('Should parse the command `npm install`', () => {
         // Given
         process.env['npm_config_argv'] =
             '{"remain":[],"cooked":["install"],"original":["install"]}';
@@ -73,7 +73,7 @@ describe('npm args parser util', () => {
         args['--global'].should.be.false();
         args['--with-publish-please'].should.be.false();
     });
-    it('Should parse the command `npm run i`', () => {
+    it('Should parse the command `npm i`', () => {
         // Given
         process.env['npm_config_argv'] =
             '{"remain":[],"cooked":["i"],"original":["i"]}';

@@ -59,9 +59,8 @@ describe('Pre-Install Execution', () => {
     });
     it(`Should not return an error message on 'npm install' after a fresh git clone of ${packageName}'`, () => {
         // Given
-        process.env[
-            'npm_config_argv'
-        ] = `{"remain":["${packageName}"],"cooked":["install","--save-dev","${packageName}"],"original":["install","--save-dev","${packageName}"]}`;
+        process.env['npm_config_argv'] =
+            '{"remain":[],"cooked":["install"],"original":["install"]}';
         mkdirp('test/tmp');
         copy('lib/pre-install.js', 'test/tmp/pre-install.js');
 
