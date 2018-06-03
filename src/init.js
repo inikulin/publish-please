@@ -28,11 +28,10 @@ const COMPLETION_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 `;
 
-const NO_HOOKS_CAN_BE_ADDED_ON_ITSELF = `
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!! publish-please hooks setup is canceled      !!
-!! You cannot do this on publish-please itself !!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+const POST_INSTALL_HOOKS_ARE_IGNORED = `
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!! post-install hooks are ignored in dev mode !!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 `;
 
 function onInstall(projectDir, testMode) {
@@ -49,7 +48,7 @@ function onInstall(projectDir, testMode) {
     }
 
     function reportNoHooksOnItself() {
-        console.log(chalk.bgYellow(NO_HOOKS_CAN_BE_ADDED_ON_ITSELF));
+        console.log(chalk.bgYellow(POST_INSTALL_HOOKS_ARE_IGNORED));
     }
 
     function reportHooksAdded() {
@@ -91,7 +90,7 @@ function onInstall(projectDir, testMode) {
             process.exit(0);
             return;
         }
-        if (addConfigHooks(cfg, projectDir)) {
+        if (addConfigHooks(cfg)) {
             reportHooksAdded();
 
             if (!testMode) {
@@ -103,7 +102,7 @@ function onInstall(projectDir, testMode) {
                     .then(reportCompletion);
             }
         }
-    })(projectDir);
+    })();
 }
 
 module.exports = function init(projectDir) {
