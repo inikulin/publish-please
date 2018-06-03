@@ -90,7 +90,7 @@ function onInstall(testMode) {
     })();
 }
 
-(function init() {
+module.exports = function init() {
     const testMode = process.argv.indexOf('--test-mode') > -1;
     onInstall(testMode);
-})();
+};

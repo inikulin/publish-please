@@ -843,7 +843,7 @@ describe('Integration tests', () => {
 
         it('Should add hooks to package.json', () =>
             exec(
-                'node node_modules/publish-please/lib/init.js --test-mode'
+                'node node_modules/publish-please/lib/post-install.js --test-mode'
             ).then(() => {
                 const cfg = JSON.parse(readFile('package.json').toString());
 
@@ -868,7 +868,7 @@ describe('Integration tests', () => {
             );
 
             return exec(
-                'node node_modules/publish-please/lib/init.js --test-mode'
+                'node node_modules/publish-please/lib/post-install.js --test-mode'
             ).then(() => {
                 const cfg = JSON.parse(readFile('package.json').toString());
 
@@ -880,30 +880,26 @@ describe('Integration tests', () => {
         });
 
         it("Should not modify config if it's already modified", () =>
-            exec('node node_modules/publish-please/lib/init.js --test-mode')
-                .then(() =>
-                    exec(
-                        'node node_modules/publish-please/lib/init.js --test-mode'
-                    )
-                )
-                .then(() => {
-                    const cfg = JSON.parse(readFile('package.json').toString());
+            exec(
+                'node node_modules/publish-please/lib/post-install.js --test-mode'
+            ).then(() => {
+                const cfg = JSON.parse(readFile('package.json').toString());
 
-                    assert.strictEqual(
-                        cfg.scripts['publish-please'],
-                        'publish-please'
-                    );
-                    assert.strictEqual(
-                        cfg.scripts['prepublishOnly'],
-                        'publish-please guard'
-                    );
-                }));
+                assert.strictEqual(
+                    cfg.scripts['publish-please'],
+                    'publish-please'
+                );
+                assert.strictEqual(
+                    cfg.scripts['prepublishOnly'],
+                    'publish-please guard'
+                );
+            }));
 
         it("Should exit with error if package.json doesn't exists", () =>
             del('package.json')
                 .then(() =>
                     exec(
-                        'node node_modules/publish-please/lib/init.js --test-mode'
+                        'node node_modules/publish-please/lib/post-install.js --test-mode'
                     )
                 )
                 .then(() => {
