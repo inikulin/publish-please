@@ -12,6 +12,7 @@ const emoji = require('node-emoji').emoji;
 const validate = require('./validations').validate;
 const confirm = require('./utils/inquires').confirm;
 const DEFAULT_OPTIONS = require('./default-options');
+const pathJoin = require('path').join;
 
 const SCRIPT_TYPE = {
     prePublish: 'pre-publish',
@@ -72,12 +73,14 @@ function publish(publishCommand, publishTag) {
 }
 /* eslint-enable indent */
 
-function getOptions(opts) {
+function getOptions(opts, projectDir) {
     let rcFileContent = null;
     let rcOpts = {};
 
     try {
-        rcFileContent = readFile('.publishrc').toString();
+        projectDir = projectDir ? projectDir : process.cwd();
+        const publishrcFilePath = pathJoin(projectDir, '.publishrc');
+        rcFileContent = readFile(publishrcFilePath).toString();
     } catch (err) {
         // NOTE: we don't have .publishrc file, just ignore the error
     }
@@ -112,10 +115,10 @@ function assertNode6PublishingPrerequisites() {
     });
 }
 
-module.exports = function(opts) {
+module.exports = function(opts, projectDir) {
     let pkgInfo = null;
 
-    opts = getOptions(opts);
+    opts = getOptions(opts, projectDir);
 
     return assertNode6PublishingPrerequisites()
         .then(
