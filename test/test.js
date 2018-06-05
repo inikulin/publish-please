@@ -822,6 +822,7 @@ describe('Integration tests', () => {
                     throw new Error('Promise rejection expected');
                 })
                 .catch((err) => {
+                    console.log(err.message);
                     // prettier-ignore
                     assert(
                         err.message.indexOf('You do not have permission to publish') > -1
