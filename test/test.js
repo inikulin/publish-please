@@ -822,11 +822,11 @@ describe('Integration tests', () => {
                     throw new Error('Promise rejection expected');
                 })
                 .catch((err) => {
-                    console.log(err.message);
                     // prettier-ignore
                     assert(
                         err.message.indexOf('You do not have permission to publish') > -1
                         || err.message.indexOf('auth required for publishing') > -1
+                        || err.meesage.indexOf('operation not permitted') > -1
                     );
                 }));
 
@@ -834,7 +834,6 @@ describe('Integration tests', () => {
     });
 
     describe('Init', () => {
-        // TODO: replace cp by a cross-platform solution
         beforeEach(() => {
             return mkdir(
                 'node_modules/publish-please/lib'.replace(/\\|\//g, sep)
