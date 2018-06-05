@@ -9,7 +9,7 @@ install:
   - set PATH=%APPDATA%\npm;%PATH%
   - npm install
 matrix:
-  fast_finish: true
+  fast_finish: false
 build: off
 shallow_clone: true
 test_script:
