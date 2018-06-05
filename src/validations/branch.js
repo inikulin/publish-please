@@ -19,11 +19,16 @@ module.exports = {
     },
 
     run(expected) {
-        return exec("git branch --no-color | sed -n '/\\* /s///p'").then(
-            (branch) => {
+        return exec('git branch --no-color')
+            .then((branches) =>
+                branches
+                    .split('\n')
+                    .filter((branch) => branch.includes('* '))[0]
+                    .replace('* ', '')
+            )
+            .then((branch) => {
                 if (branch !== expected)
                     throw `Expected branch to be '${expected}', but it was '${branch}'.`;
-            }
-        );
+            });
     },
 };
