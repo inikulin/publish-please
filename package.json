@@ -16,7 +16,7 @@
     "clean": "rimraf lib",
     "compile": "babel src -d lib",
     "build": "npm run clean && npm run compile && prettier --write \"lib/{pre,post}-install.js\" ",
-    "mocha-with-coverage": "istanbul cover -x test _mocha test",
+    "mocha-with-coverage": "istanbul cover -x test node_modules/mocha/bin/_mocha test",
     "check-coverage": "istanbul check-coverage --statements 90 --lines 90 --branches 75 --functions 96",
     "test": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage && npm run check-coverage",
     "preinstall": "node lib/pre-install.js",
