@@ -48,7 +48,7 @@ function onInstall(projectDir, testMode) {
     }
 
     function reportNoHooksOnItself() {
-        console.log(chalk.bgYellow(POST_INSTALL_HOOKS_ARE_IGNORED));
+        console.log(chalk.inverse(POST_INSTALL_HOOKS_ARE_IGNORED));
     }
 
     function reportHooksAdded() {
