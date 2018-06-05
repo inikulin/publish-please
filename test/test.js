@@ -826,7 +826,7 @@ describe('Integration tests', () => {
                     assert(
                         err.message.indexOf('You do not have permission to publish') > -1
                         || err.message.indexOf('auth required for publishing') > -1
-                        || err.meesage.indexOf('operation not permitted') > -1
+                        || err.message.indexOf('operation not permitted') > -1
                     );
                 }));
 
