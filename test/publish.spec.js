@@ -13,12 +13,13 @@ describe('Publish execution', () => {
     it('Should throw an error if .publishrc is a bad json', () => {
         // Given .publishrc is a bad formatted json file
         const opts = '<bad json>';
-        const rcFile = pathJoin(process.cwd(), '.publishrc');
+        const projectDir = pathJoin(__dirname, 'tmp');
+        const rcFile = pathJoin(projectDir, '.publishrc');
         writeFile(rcFile, opts);
 
         // When I run the 'npm run publish-please' command
         return Promise.resolve()
-            .then(() => publish.getOptions())
+            .then(() => publish.getOptions({}, projectDir))
             .then(() => {
                 throw new Error('Promise rejection expected');
             })

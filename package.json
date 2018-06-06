@@ -1,6 +1,6 @@
 {
   "name": "publish-please",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Safe and highly functional replacement for `npm publish`.",
   "main": "./lib/index.js",
   "bin": {
@@ -13,16 +13,15 @@
     "eslint-check-config": "eslint --print-config .eslintrc.json | eslint-config-prettier-check",
     "eslint-init": "eslint --init",
     "lint": "eslint bin src test",
-    "clean": "rm -rf lib",
+    "clean": "rimraf lib",
     "compile": "babel src -d lib",
-    "build": "npm run clean && npm run compile",
-    "mocha-with-coverage": "istanbul cover -x test _mocha test",
-    "check-coverage": "istanbul check-coverage --statements 89 --lines 88 --branches 76 --functions 96",
+    "build": "npm run clean && npm run compile && prettier --write \"lib/{pre,post}-install.js\" ",
+    "mocha-with-coverage": "istanbul cover -x test node_modules/mocha/bin/_mocha test",
+    "check-coverage": "istanbul check-coverage --statements 90 --lines 90 --branches 75 --functions 96",
     "test": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage && npm run check-coverage",
-    "preinstall": "if [ -e lib/prevent-global-install.js ]; then node lib/prevent-global-install.js ; fi",
-    "postinstall": "if [ -e lib/init.js ]; then node lib/init.js ; fi",
-    "package": "npm run rimraf:package && rm -f publish-please*.tgz && npm pack",
-    "rimraf:package": "rimraf ./package"
+    "preinstall": "node lib/pre-install.js",
+    "postinstall": "node lib/post-install.js",
+    "package": "rimraf package && rimraf publish-please*.tgz && npm pack"
   },
   "lint-staged": {
     "*.js": [

@@ -2,7 +2,9 @@
 node_modules
 testing-repo
 coverage
-lib
+lib/**/*.js
+!lib/pre-install.js
+!lib/post-install.js
 package
 *.tgz
 test/tmp
