@@ -6,10 +6,13 @@ const requireUncached = require('import-fresh');
 const packageName = require('./utils/publish-please-version-under-test');
 const copy = require('./utils/copy-file-sync');
 const mkdirp = require('mkdirp');
-const init = require('../lib/init');
+const nativeInit = require('../lib/init');
+const testMode = true;
+const init = (projectDir) => nativeInit(projectDir, testMode);
 const pathJoin = require('path').join;
 const writeFile = require('fs').writeFileSync;
 const del = require('del');
+const readPkg = require('read-pkg');
 
 describe('Post-Install Execution', () => {
     let nativeExit;
@@ -67,7 +70,6 @@ describe('Post-Install Execution', () => {
         process.env[
             'npm_config_argv'
         ] = `{"remain":["${packageName}"],"cooked":["install","--save-dev","${packageName}"],"original":["install","--save-dev","${packageName}"]}`;
-        process.argv.push('--test-mode');
         mkdirp('test/tmp');
         const pkg = {
             name: 'testing-repo',
@@ -86,5 +88,9 @@ describe('Post-Install Execution', () => {
         output.should.containEql(
             'publish-please hooks were successfully setup for the project'
         );
+        readPkg.sync(projectDir).scripts.should.containEql({
+            'publish-please': 'publish-please',
+            prepublishOnly: 'publish-please guard',
+        });
     });
 });

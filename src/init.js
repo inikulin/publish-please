@@ -105,8 +105,7 @@ function onInstall(projectDir, testMode) {
     })();
 }
 
-module.exports = function init(projectDir) {
+module.exports = function init(projectDir, testMode) {
     projectDir = projectDir ? projectDir : getProjectDir();
-    const testMode = process.argv.indexOf('--test-mode') > -1;
     onInstall(projectDir, testMode);
 };
