@@ -10,9 +10,11 @@ module.exports = function getNpmArgs(processEnv) {
                 npmCommand(args).hasArg('install') ||
                 npmCommand(args).hasArg('i');
             npmArgs.publish = npmCommand(args).hasArg('publish');
+            npmArgs.runScript = npmCommand(args).hasArg('run');
             npmArgs['--save-dev'] = npmCommand(args).hasArg('--save-dev');
             npmArgs['--save'] = npmCommand(args).hasArg('--save');
             npmArgs['--global'] = npmCommand(args).hasArg('--global');
+            npmArgs['--dry-run'] = npmCommand(args).hasArg('--dry-run');
             // prettier-ignore
             npmArgs['--with-publish-please'] = npmCommand(args).hasArg('--with-publish-please');
         } catch (err) {

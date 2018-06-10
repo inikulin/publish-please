@@ -32,7 +32,9 @@ describe('npm args parser util', () => {
         // Then
         args.publish.should.be.true();
         args.install.should.be.false();
+        args.runScript.should.be.false();
         args['--with-publish-please'].should.be.false();
+        args['--dry-run'].should.be.false();
     });
     it('Should parse the command `npm publish --with-publish-please`', () => {
         // Given
@@ -43,7 +45,9 @@ describe('npm args parser util', () => {
         // Then
         args.publish.should.be.true();
         args.install.should.be.false();
+        args.runScript.should.be.false();
         args['--with-publish-please'].should.be.true();
+        args['--dry-run'].should.be.false();
     });
     it('Should parse the command `npm run preinstall`', () => {
         // Given
@@ -54,10 +58,12 @@ describe('npm args parser util', () => {
         // Then
         args.publish.should.be.false();
         args.install.should.be.false();
+        args.runScript.should.be.true();
         args['--save-dev'].should.be.false();
         args['--save'].should.be.false();
         args['--global'].should.be.false();
         args['--with-publish-please'].should.be.false();
+        args['--dry-run'].should.be.false();
     });
     it('Should parse the command `npm install`', () => {
         // Given
@@ -68,10 +74,12 @@ describe('npm args parser util', () => {
         // Then
         args.publish.should.be.false();
         args.install.should.be.true();
+        args.runScript.should.be.false();
         args['--save-dev'].should.be.false();
         args['--save'].should.be.false();
         args['--global'].should.be.false();
         args['--with-publish-please'].should.be.false();
+        args['--dry-run'].should.be.false();
     });
     it('Should parse the command `npm i`', () => {
         // Given
@@ -82,10 +90,12 @@ describe('npm args parser util', () => {
         // Then
         args.publish.should.be.false();
         args.install.should.be.true();
+        args.runScript.should.be.false();
         args['--save-dev'].should.be.false();
         args['--save'].should.be.false();
         args['--global'].should.be.false();
         args['--with-publish-please'].should.be.false();
+        args['--dry-run'].should.be.false();
     });
     it(`Should parse the command 'npm install --save-dev ${packageName}'`, () => {
         // Given
@@ -97,9 +107,11 @@ describe('npm args parser util', () => {
         // Then
         args.install.should.be.true();
         args.publish.should.be.false();
+        args.runScript.should.be.false();
         args['--save-dev'].should.be.true();
         args['--save'].should.be.false();
         args['--global'].should.be.false();
+        args['--dry-run'].should.be.false();
     });
     it(`Should parse the command 'npm i -D ${packageName}'`, () => {
         // Given
@@ -111,9 +123,11 @@ describe('npm args parser util', () => {
         // Then
         args.install.should.be.true();
         args.publish.should.be.false();
+        args.runScript.should.be.false();
         args['--save-dev'].should.be.true();
         args['--save'].should.be.false();
         args['--global'].should.be.false();
+        args['--dry-run'].should.be.false();
     });
     it(`Should parse the command 'npm install --global ${packageName}'`, () => {
         // Given
@@ -125,9 +139,11 @@ describe('npm args parser util', () => {
         // Then
         args.install.should.be.true();
         args.publish.should.be.false();
+        args.runScript.should.be.false();
         args['--global'].should.be.true();
         args['--save-dev'].should.be.false();
         args['--save'].should.be.false();
+        args['--dry-run'].should.be.false();
     });
     it(`Should parse the command 'npm i -g ${packageName}'`, () => {
         // Given
@@ -139,8 +155,25 @@ describe('npm args parser util', () => {
         // Then
         args.install.should.be.true();
         args.publish.should.be.false();
+        args.runScript.should.be.false();
         args['--global'].should.be.true();
         args['--save-dev'].should.be.false();
         args['--save'].should.be.false();
+        args['--dry-run'].should.be.false();
+    });
+    it("Should parse the command 'npm run publish-please --dry-run'", () => {
+        // Given
+        process.env['npm_config_argv'] =
+            '{"remain":[],"cooked":["run","publish-please","--dry-run"],"original":["run","publish-please","--dry-run"]}';
+        // When
+        const args = npmArgs(process.env);
+        // Then
+        args.install.should.be.false();
+        args.publish.should.be.false();
+        args.runScript.should.be.true();
+        args['--global'].should.be.false();
+        args['--save-dev'].should.be.false();
+        args['--save'].should.be.false();
+        args['--dry-run'].should.be.true();
     });
 });
