@@ -85,8 +85,11 @@ describe('Integration tests', () => {
                 )
             )
             .then(() => exec('npm run package'))
-            .then(() => process.chdir('testing-repo'));
+            .then(() => process.chdir('testing-repo'))
+            .then(() => (process.env.PUBLISH_PLEASE_TEST_MODE = true));
     });
+
+    after(() => delete process.env.PUBLISH_PLEASE_TEST_MODE);
 
     beforeEach(() => colorGitOutput());
 
@@ -843,20 +846,20 @@ describe('Integration tests', () => {
         });
 
         it('Should add hooks to package.json', () =>
-            exec(
-                'node node_modules/publish-please/lib/post-install.js --test-mode'
-            ).then(() => {
-                const cfg = JSON.parse(readFile('package.json').toString());
+            exec('node node_modules/publish-please/lib/post-install.js').then(
+                () => {
+                    const cfg = JSON.parse(readFile('package.json').toString());
 
-                assert.strictEqual(
-                    cfg.scripts['publish-please'],
-                    'publish-please'
-                );
-                assert.strictEqual(
-                    cfg.scripts['prepublishOnly'],
-                    'publish-please guard'
-                );
-            }));
+                    assert.strictEqual(
+                        cfg.scripts['publish-please'],
+                        'publish-please'
+                    );
+                    assert.strictEqual(
+                        cfg.scripts['prepublishOnly'],
+                        'publish-please guard'
+                    );
+                }
+            ));
 
         it('Should add guard gracefully', () => {
             writeFile(
@@ -869,7 +872,7 @@ describe('Integration tests', () => {
             );
 
             return exec(
-                'node node_modules/publish-please/lib/post-install.js --test-mode'
+                'node node_modules/publish-please/lib/post-install.js'
             ).then(() => {
                 const cfg = JSON.parse(readFile('package.json').toString());
 
@@ -881,27 +884,25 @@ describe('Integration tests', () => {
         });
 
         it("Should not modify config if it's already modified", () =>
-            exec(
-                'node node_modules/publish-please/lib/post-install.js --test-mode'
-            ).then(() => {
-                const cfg = JSON.parse(readFile('package.json').toString());
+            exec('node node_modules/publish-please/lib/post-install.js').then(
+                () => {
+                    const cfg = JSON.parse(readFile('package.json').toString());
 
-                assert.strictEqual(
-                    cfg.scripts['publish-please'],
-                    'publish-please'
-                );
-                assert.strictEqual(
-                    cfg.scripts['prepublishOnly'],
-                    'publish-please guard'
-                );
-            }));
+                    assert.strictEqual(
+                        cfg.scripts['publish-please'],
+                        'publish-please'
+                    );
+                    assert.strictEqual(
+                        cfg.scripts['prepublishOnly'],
+                        'publish-please guard'
+                    );
+                }
+            ));
 
         it("Should exit with error if package.json doesn't exists", () =>
             del('package.json')
                 .then(() =>
-                    exec(
-                        'node node_modules/publish-please/lib/post-install.js --test-mode'
-                    )
+                    exec('node node_modules/publish-please/lib/post-install.js')
                 )
                 .then(() => {
                     throw new Error('Promise rejection expected');

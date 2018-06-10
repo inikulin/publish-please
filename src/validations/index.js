@@ -54,7 +54,7 @@ module.exports = {
         if (!module.exports.testMode) {
             console.log(chalk.yellow('Running validations'));
             console.log(chalk.yellow('-------------------'));
-            console.log();
+            console.log('');
         }
 
         return validationsToRun
@@ -75,7 +75,7 @@ module.exports = {
                 } else if (!module.exports.testMode) {
                     console.log(chalk.yellow('-------------------'));
                     console.log(emoji['+1'], emoji['+1'], emoji['+1']);
-                    console.log();
+                    console.log('');
                 }
             });
     },

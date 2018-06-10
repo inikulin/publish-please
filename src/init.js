@@ -4,6 +4,7 @@ const writeFile = require('fs').writeFileSync;
 const readPkg = require('read-pkg');
 const chalk = require('chalk');
 const getProjectDir = require('./utils/get-project-dir');
+const executionContext = require('./utils/execution-context');
 
 const NO_CONFIG_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -92,20 +93,19 @@ function onInstall(projectDir, testMode) {
         }
         if (addConfigHooks(cfg)) {
             reportHooksAdded();
-
-            if (!testMode) {
-                const config = require('./config');
-                const opts = config.getCurrentOpts(projectDir);
-                config.configurePublishPlease
-                    .with(opts)
-                    .inProject(projectDir)
-                    .then(reportCompletion);
-            }
+            const config = require('./config');
+            const opts = config.getCurrentOpts(projectDir);
+            opts.testMode = testMode;
+            config.configurePublishPlease
+                .with(opts)
+                .inProject(projectDir)
+                .then(reportCompletion);
         }
     })();
 }
 
 module.exports = function init(projectDir, testMode) {
+    testMode = testMode ? testMode : executionContext.isInTestMode();
     projectDir = projectDir ? projectDir : getProjectDir();
     onInstall(projectDir, testMode);
 };

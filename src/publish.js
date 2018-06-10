@@ -36,7 +36,7 @@ function printReleaseInfo(pkgVersion, publishTag) {
             console.log('  ' + chalk.magenta('Latest commit: ') + commitInfo);
             console.log('  ' + chalk.magenta('Publish tag:   ') + publishTag);
             console.log('  ' + chalk.magenta('Publisher:     ') + publisher);
-            console.log();
+            console.log('');
         });
 }
 
@@ -54,7 +54,7 @@ function runScript(command, scriptType) {
         if (!module.exports.testMode) {
             console.log(chalk.yellow('-------------------------'));
             console.log(emoji['+1'], emoji['+1'], emoji['+1']);
-            console.log();
+            console.log('');
         }
     });
 }
