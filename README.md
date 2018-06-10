@@ -70,6 +70,25 @@ npm run publish-please
  - **sensitiveData** - Perform [audit for the sensitive data](#sensitive-information-audit). Default: `true`.
  - **vulnerableDependencies** - Perform vulnerable dependencies check using [Node Security Project](https://nodesecurity.io/) data. Default: `true`.
 
+### Running in dry mode
+
+You can execute publish-please in dry mode by using the `--dry-run` option:
+
+```shell
+npm run publish-please --dry-run
+```
+
+Instead of publishing, this will create (after all validations) the tar file that will be sent to npm, so that you can inspect it to be sure everything is there.
+
+In this mode, the **postPublishScript** script will not run, since there is no publication to the registry.
+
+The tar file will be created in the root of your project directory. 
+
+It might be a good idea to add these two lines inside your .gitignore file:
+```sh
+package
+*.tgz
+```
 
 ## Sensitive information audit
 **Important note:** tool provides some very basic sensitive data check. Do not rely on it fully. Always perform manual checks for the
