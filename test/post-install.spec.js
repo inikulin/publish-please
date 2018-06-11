@@ -6,9 +6,7 @@ const requireUncached = require('import-fresh');
 const packageName = require('./utils/publish-please-version-under-test');
 const copy = require('./utils/copy-file-sync');
 const mkdirp = require('mkdirp');
-const nativeInit = require('../lib/init');
-const testMode = true;
-const init = (projectDir) => nativeInit(projectDir, testMode);
+const init = require('../lib/init');
 const pathJoin = require('path').join;
 const writeFile = require('fs').writeFileSync;
 const del = require('del');
@@ -19,6 +17,9 @@ describe('Post-Install Execution', () => {
     let nativeConsoleLog;
     let exitCode;
     let output;
+
+    before(() => (process.env.PUBLISH_PLEASE_TEST_MODE = true));
+    after(() => delete process.env.PUBLISH_PLEASE_TEST_MODE);
 
     beforeEach(() => {
         exitCode = undefined;
@@ -50,6 +51,7 @@ describe('Post-Install Execution', () => {
         (exitCode || 0).should.be.equal(0);
         output.should.containEql('post-install hooks are ignored in dev mode');
     });
+
     it(`Should return an error message when the package.json file is missing on 'npm install --save-dev ${packageName}'`, () => {
         // Given
         process.env[

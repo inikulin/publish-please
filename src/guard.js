@@ -19,6 +19,7 @@ function reportError() {
     if (npmArgs && npmArgs.publish && !npmArgs['--with-publish-please']) {
         reportError();
         process.exit(1);
+        return;
     }
 
     process.exit(0);

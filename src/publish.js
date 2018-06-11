@@ -1,7 +1,6 @@
 'use strict';
 
 const readFile = require('fs').readFileSync;
-const Promise = require('pinkie-promise');
 const chalk = require('chalk');
 const semver = require('semver');
 const defaults = require('lodash/defaultsDeep');
@@ -41,35 +40,29 @@ function printReleaseInfo(pkgVersion, publishTag) {
 }
 
 function runScript(command, scriptType) {
-    if (!module.exports.testMode) {
-        console.log(
-            chalk.yellow(
-                'Running ' + (scriptType ? scriptType + ' ' : '') + 'script'
-            )
-        );
-        console.log(chalk.yellow('-------------------------'));
-    }
+    console.log(
+        chalk.yellow(
+            'Running ' + (scriptType ? scriptType + ' ' : '') + 'script'
+        )
+    );
+    console.log(chalk.yellow('-------------------------'));
 
-    return spawn(command, module.exports.testMode).then(() => {
-        if (!module.exports.testMode) {
-            console.log(chalk.yellow('-------------------------'));
-            console.log(emoji['+1'], emoji['+1'], emoji['+1']);
-            console.log('');
-        }
+    return spawn(command).then(() => {
+        console.log(chalk.yellow('-------------------------'));
+        console.log(emoji['+1'], emoji['+1'], emoji['+1']);
+        console.log('');
     });
 }
 
 /* eslint-disable indent */
 function publish(publishCommand, publishTag) {
     const command = `${publishCommand} --tag ${publishTag} --with-publish-please`;
-    const spawnPromise = module.exports.testMode
-        ? Promise.resolve()
-        : spawn(command).then((res) => {
-              console.log('\n', emoji.tada, emoji.tada, emoji.tada);
-              return res || true;
-          });
-
-    return spawnPromise.then(() => command);
+    return spawn(command)
+        .then((res) => {
+            console.log('\n', emoji.tada, emoji.tada, emoji.tada);
+            return res || true;
+        })
+        .then(() => command);
 }
 /* eslint-enable indent */
 
@@ -129,11 +122,7 @@ module.exports = function(opts, projectDir) {
         .then(() => pkgd())
         .then((info) => (pkgInfo = info))
         .then(() => validate(opts.validations, pkgInfo))
-        .then(
-            () =>
-                !module.exports.testMode &&
-                printReleaseInfo(pkgInfo.cfg.version, opts.publishTag)
-        )
+        .then(() => printReleaseInfo(pkgInfo.cfg.version, opts.publishTag))
         .then(
             () =>
                 /* eslint-disable indent */
@@ -159,5 +148,4 @@ module.exports = function(opts, projectDir) {
 };
 
 // Exports for the testing purposes
-module.exports.testMode = false;
 module.exports.getOptions = getOptions;

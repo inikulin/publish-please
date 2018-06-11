@@ -1,4 +1,3 @@
-const noop = require('lodash/noop');
 const chalk = require('chalk');
 const elegantStatus = require('elegant-status');
 const emoji = require('node-emoji').emoji;
@@ -14,9 +13,7 @@ const validations = [
 ];
 
 function runValidation(validation, param, pkgInfo, errs) {
-    const done = module.exports.testMode
-        ? noop
-        : elegantStatus(validation.statusText);
+    const done = elegantStatus(validation.statusText);
 
     // prettier-ignore
     return validation
@@ -31,8 +28,6 @@ function runValidation(validation, param, pkgInfo, errs) {
 }
 
 module.exports = {
-    testMode: false,
-
     DEFAULT_OPTIONS: validations.reduce((opts, validation) => {
         opts[validation.option] = validation.defaultParam;
         return opts;
@@ -51,11 +46,9 @@ module.exports = {
 
         if (!validationsToRun.length) return Promise.resolve();
 
-        if (!module.exports.testMode) {
-            console.log(chalk.yellow('Running validations'));
-            console.log(chalk.yellow('-------------------'));
-            console.log('');
-        }
+        console.log(chalk.yellow('Running validations'));
+        console.log(chalk.yellow('-------------------'));
+        console.log('');
 
         return validationsToRun
             .reduce((validationChain, validation) => {
@@ -72,11 +65,10 @@ module.exports = {
                 if (errs.length) {
                     const msg = errs.map((err) => '  * ' + err).join('\n');
                     throw new Error(msg);
-                } else if (!module.exports.testMode) {
-                    console.log(chalk.yellow('-------------------'));
-                    console.log(emoji['+1'], emoji['+1'], emoji['+1']);
-                    console.log('');
                 }
+                console.log(chalk.yellow('-------------------'));
+                console.log(emoji['+1'], emoji['+1'], emoji['+1']);
+                console.log('');
             });
     },
 };

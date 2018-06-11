@@ -4,7 +4,6 @@ const writeFile = require('fs').writeFileSync;
 const readPkg = require('read-pkg');
 const chalk = require('chalk');
 const getProjectDir = require('./utils/get-project-dir');
-const executionContext = require('./utils/execution-context');
 
 const NO_CONFIG_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -35,7 +34,7 @@ const POST_INSTALL_HOOKS_ARE_IGNORED = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 `;
 
-function onInstall(projectDir, testMode) {
+function onInstall(projectDir) {
     function readCfg() {
         try {
             return readPkg.sync(projectDir, { normalize: false });
@@ -95,7 +94,6 @@ function onInstall(projectDir, testMode) {
             reportHooksAdded();
             const config = require('./config');
             const opts = config.getCurrentOpts(projectDir);
-            opts.testMode = testMode;
             config.configurePublishPlease
                 .with(opts)
                 .inProject(projectDir)
@@ -104,8 +102,7 @@ function onInstall(projectDir, testMode) {
     })();
 }
 
-module.exports = function init(projectDir, testMode) {
-    testMode = testMode ? testMode : executionContext.isInTestMode();
+module.exports = function init(projectDir) {
     projectDir = projectDir ? projectDir : getProjectDir();
-    onInstall(projectDir, testMode);
+    onInstall(projectDir);
 };

@@ -50,9 +50,6 @@ function configureOptsObject(obj, configurators, optType) {
         return chain
             .then(() => {
                 console.log(chalk.blue(`-- Configuring ${optType} "${prop}":`));
-                if (obj.testMode) {
-                    return obj[prop];
-                }
                 return configurators[prop](obj[prop]);
             })
             .then((val) => {
@@ -64,9 +61,6 @@ function configureOptsObject(obj, configurators, optType) {
 
 function configure(opts) {
     console.log('');
-    if (opts && opts.validations) {
-        opts.validations.testMode = opts.testMode;
-    }
     return configureOptsObject(opts, optionsConfigurators, 'option')
         .then(() =>
             configureOptsObject(
@@ -80,9 +74,6 @@ function configure(opts) {
             console.log('');
             console.log(JSON.stringify(opts, null, 2));
             console.log('');
-            if (opts.testMode) {
-                return true;
-            }
             return confirm('Is this OK?', true);
         })
         .then((yes) => !yes && configure(opts));
