@@ -523,7 +523,7 @@ describe('Integration tests', () => {
                     }));
         });
 
-        it('Should respect exceptions configured in .npmrc file', () =>
+        it('Should respect exceptions configured in .nsprc file', () =>
             exec('git checkout master')
                 .then(() => pkgd())
                 .then((pkgInfo) => {
@@ -548,6 +548,42 @@ describe('Integration tests', () => {
                                 },
                             },
                         })
+                    )
+                ));
+
+        it('Should skip exceptions configured in .nsprc file with bad format', () =>
+            exec('git checkout master')
+                .then(() => pkgd())
+                .then((pkgInfo) => {
+                    pkgInfo.cfg.dependencies = {};
+                    pkgInfo.cfg.dependencies['lodash'] = '4.16.4';
+                    writeFile('package.json', JSON.stringify(pkgInfo.cfg));
+                    writeFile(
+                        '.nsprc',
+                        JSON.stringify({
+                            exceptions:
+                                'https://nodesecurity.io/advisories/577',
+                        })
+                    );
+                })
+                .then(() =>
+                    publish(
+                        getTestOptions({
+                            set: {
+                                validations: {
+                                    vulnerableDependencies: true,
+                                },
+                            },
+                        })
+                    )
+                )
+                .then(() => {
+                    throw new Error('Promise rejection expected');
+                })
+                .catch((err) =>
+                    assert(
+                        // prettier-ignore
+                        err.message.indexOf(`Vulnerability found in ${chalk.red.bold('lodash@4.16.4')}`) > -1
                     )
                 ));
 
