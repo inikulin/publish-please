@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports.isInTestMode = isInTestMode;
 
 function isInTestMode() {
