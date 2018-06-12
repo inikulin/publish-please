@@ -31,7 +31,7 @@ module.exports = {
                 path: projectDir,
                 pkg: readPkg.sync(projectDir, { normalize: false }),
                 offline: false,
-                exceptions: [],
+                exceptions: defaultArgs.exceptions,
             };
 
             nsp
