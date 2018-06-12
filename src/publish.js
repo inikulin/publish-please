@@ -1,7 +1,6 @@
 'use strict';
 
 const readFile = require('fs').readFileSync;
-const chalk = require('chalk');
 const semver = require('semver');
 const defaults = require('lodash/defaultsDeep');
 const pkgd = require('pkgd');
@@ -13,26 +12,8 @@ const confirm = require('./utils/inquires').confirm;
 const DEFAULT_OPTIONS = require('./default-options');
 const pathJoin = require('path').join;
 const printReleaseInfo = require('./publish/print-release-info');
-
-const SCRIPT_TYPE = {
-    prePublish: 'pre-publish',
-    postPublish: 'post-publish',
-};
-
-function runScript(command, scriptType) {
-    console.log(
-        chalk.yellow(
-            'Running ' + (scriptType ? scriptType + ' ' : '') + 'script'
-        )
-    );
-    console.log(chalk.yellow('-------------------------'));
-
-    return spawn(command).then(() => {
-        console.log(chalk.yellow('-------------------------'));
-        console.log(emoji['+1'], emoji['+1'], emoji['+1']);
-        console.log('');
-    });
-}
+const runScript = require('./publish/run-script');
+const SCRIPT_TYPE = require('./publish/run-script').SCRIPT_TYPE;
 
 /* eslint-disable indent */
 function publish(publishCommand, publishTag) {
