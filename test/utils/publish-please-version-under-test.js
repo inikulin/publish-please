@@ -1,2 +1,2 @@
 'use strict';
-module.exports = 'publish-please@3.0.1';
+module.exports = 'publish-please@3.0.2';

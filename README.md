@@ -69,6 +69,8 @@ npm run publish-please
  - **branch** - Check that current branch matches the specified branch. Default: `master`.
  - **sensitiveData** - Perform [audit for the sensitive data](#sensitive-information-audit). Default: `true`.
  - **vulnerableDependencies** - Perform vulnerable dependencies check using [Node Security Project](https://nodesecurity.io/) data. Default: `true`.
+    - you may prevent specific vulnerabilities to be reported by publish-please by creating a [.nsprc file](https://github.com/nodesecurity/nsp#exceptions).
+ 
 
 
 ## Sensitive information audit
@@ -127,7 +129,6 @@ Performed for the following items:
  - Rubygems credentials file
  - Potential MSBuild publish profile
  - PHP dotenv
-
 
 ## Check out my other packages used by this tool
 - [cp-sugar](https://github.com/inikulin/cp-sugar) - Some sugar for child_process module.
