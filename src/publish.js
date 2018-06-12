@@ -12,32 +12,12 @@ const validate = require('./validations').validate;
 const confirm = require('./utils/inquires').confirm;
 const DEFAULT_OPTIONS = require('./default-options');
 const pathJoin = require('path').join;
+const printReleaseInfo = require('./publish/print-release-info');
 
 const SCRIPT_TYPE = {
     prePublish: 'pre-publish',
     postPublish: 'post-publish',
 };
-
-function printReleaseInfo(pkgVersion, publishTag) {
-    let commitInfo = null;
-
-    return exec('git log -1 --oneline')
-        .then((info) => {
-            commitInfo = info;
-
-            return exec('npm whoami --silent');
-        })
-        .catch(() => chalk.red('<not logged in>'))
-        .then((publisher) => {
-            console.log(chalk.yellow('Release info'));
-            console.log(chalk.yellow('------------'));
-            console.log('  ' + chalk.magenta('Version:       ') + pkgVersion);
-            console.log('  ' + chalk.magenta('Latest commit: ') + commitInfo);
-            console.log('  ' + chalk.magenta('Publish tag:   ') + publishTag);
-            console.log('  ' + chalk.magenta('Publisher:     ') + publisher);
-            console.log('');
-        });
-}
 
 function runScript(command, scriptType) {
     console.log(
