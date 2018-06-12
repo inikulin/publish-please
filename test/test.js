@@ -523,14 +523,21 @@ describe('Integration tests', () => {
                     }));
         });
 
-	it('Should respect exceptions configured in .npmrc file', () =>
+        it('Should respect exceptions configured in .npmrc file', () =>
             exec('git checkout master')
                 .then(() => pkgd())
                 .then((pkgInfo) => {
                     pkgInfo.cfg.dependencies = {};
                     pkgInfo.cfg.dependencies['lodash'] = '4.16.4';
                     writeFile('package.json', JSON.stringify(pkgInfo.cfg));
-                    writeFile('.nsprc', JSON.stringify({exceptions:['https://nodesecurity.io/advisories/577']}));
+                    writeFile(
+                        '.nsprc',
+                        JSON.stringify({
+                            exceptions: [
+                                'https://nodesecurity.io/advisories/577',
+                            ],
+                        })
+                    );
                 })
                 .then(() =>
                     publish(
@@ -542,8 +549,7 @@ describe('Integration tests', () => {
                             },
                         })
                     )
-                )
-        );
+                ));
 
         ['lodash@4.17.5', 'ms@0.7.1'].forEach(function(dependency) {
             const name = dependency.split('@')[0];
