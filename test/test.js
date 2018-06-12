@@ -830,7 +830,7 @@ describe('Integration tests', () => {
                 )
                 .catch(() => assert.throws(() => readFile('test-file'))));
 
-        it.only('Should not run postpublish script if pre-publish script was failed', () =>
+        it('Should not run postpublish script if pre-publish script was failed', () =>
             exec('git checkout master')
                 .then(() =>
                     publish(
