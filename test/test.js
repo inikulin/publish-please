@@ -737,7 +737,7 @@ describe('Integration tests', () => {
                     publish(
                         getTestOptions({
                             set: {
-                                prePublishScript: 'git',
+                                prePublishScript: 'npm run unknown',
                                 publishCommand: echoPublishCommand,
                             },
                         })
@@ -749,7 +749,7 @@ describe('Integration tests', () => {
                 .catch((err) =>
                     assert.strictEqual(
                         err.message,
-                        'Command `git` exited with code 1.'
+                        'Command `npm` exited with code 1.'
                     )
                 ));
 
@@ -776,7 +776,7 @@ describe('Integration tests', () => {
                         getTestOptions({
                             set: {
                                 publishCommand: echoPublishCommand,
-                                postPublishScript: 'git',
+                                postPublishScript: 'npm run unknown',
                             },
                         })
                     )
@@ -787,7 +787,7 @@ describe('Integration tests', () => {
                 .catch((err) =>
                     assert.strictEqual(
                         err.message,
-                        'Command `git` exited with code 1.'
+                        'Command `npm` exited with code 1.'
                     )
                 ));
 
@@ -812,7 +812,7 @@ describe('Integration tests', () => {
                         getTestOptions({
                             set: {
                                 prePublishScript: 'echo npm test',
-                                publishCommand: 'exit 1',
+                                publishCommand: 'npm run unknown',
                                 postPublishScript: 'git mv README.md test-file',
                             },
                         })
@@ -823,7 +823,34 @@ describe('Integration tests', () => {
                 })
                 .catch((err) =>
                     assert(
-                        err.message.indexOf('Command `exit` thrown error') > -1
+                        err.message.indexOf(
+                            'Command `npm` exited with code 1'
+                        ) > -1
+                    )
+                )
+                .catch(() => assert.throws(() => readFile('test-file'))));
+
+        it.only('Should not run postpublish script if pre-publish script was failed', () =>
+            exec('git checkout master')
+                .then(() =>
+                    publish(
+                        getTestOptions({
+                            set: {
+                                prePublishScript: 'npm run unknown',
+                                publishCommand: echoPublishCommand,
+                                postPublishScript: 'git mv README.md test-file',
+                            },
+                        })
+                    )
+                )
+                .then(() => {
+                    throw new Error('Promise rejection expected');
+                })
+                .catch((err) =>
+                    assert(
+                        err.message.indexOf(
+                            'Command `npm` exited with code 1'
+                        ) > -1
                     )
                 )
                 .catch(() => assert.throws(() => readFile('test-file'))));
