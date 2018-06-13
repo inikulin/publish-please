@@ -5,8 +5,6 @@ const semver = require('semver');
 const defaults = require('lodash/defaultsDeep');
 const pkgd = require('pkgd');
 const exec = require('cp-sugar').exec;
-const spawn = require('cp-sugar').spawn;
-const emoji = require('node-emoji').emoji;
 const validate = require('./validations').validate;
 const confirm = require('./utils/inquires').confirm;
 const DEFAULT_OPTIONS = require('./default-options');
@@ -14,18 +12,7 @@ const pathJoin = require('path').join;
 const printReleaseInfo = require('./publish/print-release-info');
 const runScript = require('./publish/run-script');
 const SCRIPT_TYPE = require('./publish/run-script').SCRIPT_TYPE;
-
-/* eslint-disable indent */
-function publish(publishCommand, publishTag) {
-    const command = `${publishCommand} --tag ${publishTag} --with-publish-please`;
-    return spawn(command)
-        .then((res) => {
-            console.log('\n', emoji.tada, emoji.tada, emoji.tada);
-            return res || true;
-        })
-        .then(() => command);
-}
-/* eslint-enable indent */
+const publish = require('./publish/publish-script');
 
 function getOptions(opts, projectDir) {
     let rcFileContent = null;
