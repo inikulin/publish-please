@@ -27,7 +27,7 @@ describe('Integration tests', () => {
 
     // NOTE: loading tested code
     const publish = requireUncached('../lib/publish');
-    const getOptions = require('../lib/publish').getOptions;
+    const getOptions = require('../lib/publish-options').getOptions;
     const echoPublishCommand = 'echo "npm publish"';
     const showError = (err) => {
         console.log(chalk.red.bold('ERRORS'));

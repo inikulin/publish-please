@@ -1,43 +1,15 @@
 'use strict';
 
-const readFile = require('fs').readFileSync;
 const semver = require('semver');
-const defaults = require('lodash/defaultsDeep');
 const pkgd = require('pkgd');
 const exec = require('cp-sugar').exec;
 const validate = require('./validations').validate;
 const confirm = require('./utils/inquires').confirm;
-const DEFAULT_OPTIONS = require('./default-options');
-const pathJoin = require('path').join;
 const printReleaseInfo = require('./publish/print-release-info');
 const runScript = require('./publish/run-script');
 const SCRIPT_TYPE = require('./publish/run-script').SCRIPT_TYPE;
 const publish = require('./publish/publish-script');
-
-function getOptions(opts, projectDir) {
-    let rcFileContent = null;
-    let rcOpts = {};
-
-    try {
-        projectDir = projectDir ? projectDir : process.cwd();
-        const publishrcFilePath = pathJoin(projectDir, '.publishrc');
-        rcFileContent = readFile(publishrcFilePath).toString();
-    } catch (err) {
-        // NOTE: we don't have .publishrc file, just ignore the error
-    }
-
-    if (rcFileContent) {
-        try {
-            rcOpts = JSON.parse(rcFileContent);
-        } catch (err) {
-            throw new Error('.publishrc is not a valid JSON file.');
-        }
-
-        opts = defaults({}, opts, rcOpts);
-    }
-
-    return defaults({}, opts, DEFAULT_OPTIONS);
-}
+const getOptions = require('./publish-options').getOptions;
 
 // NOTE: adopted from https://github.com/sindresorhus/np/blob/master/index.js#L78
 function assertNode6PublishingPrerequisites() {
@@ -94,6 +66,3 @@ module.exports = function(opts, projectDir) {
             ).then(() => command);
         });
 };
-
-// Exports for the testing purposes
-module.exports.getOptions = getOptions;

@@ -7,6 +7,7 @@ const stdinMock = require('mock-stdin');
 const simulateUserInput = require('./utils/simulate-user-input');
 const writeFile = require('fs').writeFileSync;
 const publish = require('../lib/publish');
+const getOptions = require('../lib/publish-options').getOptions;
 
 /* eslint-disable max-nested-callbacks */
 describe('Publish execution', () => {
@@ -19,7 +20,7 @@ describe('Publish execution', () => {
 
         // When I run the 'npm run publish-please' command
         return Promise.resolve()
-            .then(() => publish.getOptions({}, projectDir))
+            .then(() => getOptions({}, projectDir))
             .then(() => {
                 throw new Error('Promise rejection expected');
             })
