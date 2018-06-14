@@ -1253,17 +1253,17 @@ describe('Integration tests', () => {
                     /* prettier-ignore */
                     assert(publishLog.includes('Error: no test specified'));
                     /* prettier-ignore */
-                    assert(publishLog.includes('✓ Checking for the vulnerable dependencies'));
+                    assert(publishLog.includes('Checking for the vulnerable dependencies'));
                     /* prettier-ignore */
-                    assert(publishLog.includes('✖ Checking for the uncommitted changes'));
+                    assert(publishLog.includes('Checking for the uncommitted changes'));
                     /* prettier-ignore */
-                    assert(publishLog.includes('✖ Checking for the untracked files'));
+                    assert(publishLog.includes('Checking for the untracked files'));
                     /* prettier-ignore */
-                    assert(publishLog.includes('✓ Checking for the sensitive data in the working tree'));
+                    assert(publishLog.includes('Checking for the sensitive data in the working tree'));
                     /* prettier-ignore */
-                    assert(publishLog.includes('✓ Validating branch'));
+                    assert(publishLog.includes('Validating branch'));
                     /* prettier-ignore */
-                    assert(publishLog.includes('✖ Validating git tag'));
+                    assert(publishLog.includes('Validating git tag'));
                     /* prettier-ignore */
                     assert(publishLog.includes('ERRORS'));
                     /* prettier-ignore */
