@@ -1,17 +1,27 @@
 'use strict';
 
-const chalk = require('chalk');
 const pkgd = require('pkgd');
+const chalk = require('chalk');
 const validate = require('../validations').validate;
 const confirm = require('../utils/inquires').confirm;
 const printReleaseInfo = require('./print-release-info');
 const runScript = require('./run-script');
-const SCRIPT_TYPE = require('./run-script').SCRIPT_TYPE;
 const publish = require('./publish-script');
+const SCRIPT_TYPE = require('./run-script').SCRIPT_TYPE;
 const getOptions = require('../publish-options').getOptions;
 const assertNode6PublishingPrerequisite = require('./publish-prerequisites')
     .assertNode6PublishingPrerequisite;
 const executionContext = require('../utils/execution-context');
+
+const SUCCESS_MESSAGE = `
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!! run 'npm pack' to have more details on the package !!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+`;
+
+function reportSuccess() {
+    console.log(chalk.bgGreen(SUCCESS_MESSAGE));
+}
 
 module.exports = function(opts, projectDir) {
     let pkgInfo = null;
@@ -33,23 +43,14 @@ module.exports = function(opts, projectDir) {
                 /* eslint-disable indent */
                 opts.confirm
                     ? confirm(
-                          'Are you sure you want to publish this version to npm?',
+                          'Are you sure you want to publish this version to npm?\n(you are in dry mode: you will only see the package content. Nothing is sent to npm',
                           false
                       )
                     : true
             /* eslint-enable indent */
         )
-        .then(
-            (ok) => (ok && publish(opts.publishCommand, opts.publishTag)) || ''
-        )
-        .then((command) => {
-            if (!command || !opts.postPublishScript) return command;
-
-            return runScript(
-                opts.postPublishScript,
-                SCRIPT_TYPE.postPublish
-            ).then(() => command);
-        })
+        .then((ok) => ok && publish('npm pack'))
+        .then(() => reportSuccess())
         .catch((err) => {
             console.log(chalk.red.bold('ERRORS'));
             console.log(err.message);
