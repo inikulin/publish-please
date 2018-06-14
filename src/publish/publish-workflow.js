@@ -1,14 +1,14 @@
 'use strict';
 
 const pkgd = require('pkgd');
-const validate = require('./validations').validate;
-const confirm = require('./utils/inquires').confirm;
-const printReleaseInfo = require('./publish/print-release-info');
-const runScript = require('./publish/run-script');
-const SCRIPT_TYPE = require('./publish/run-script').SCRIPT_TYPE;
-const publish = require('./publish/publish-script');
-const getOptions = require('./publish-options').getOptions;
-const assertNode6PublishingPrerequisite = require('./publish/publish-prerequisites')
+const validate = require('../validations').validate;
+const confirm = require('../utils/inquires').confirm;
+const printReleaseInfo = require('./print-release-info');
+const runScript = require('./run-script');
+const SCRIPT_TYPE = require('./run-script').SCRIPT_TYPE;
+const publish = require('./publish-script');
+const getOptions = require('../publish-options').getOptions;
+const assertNode6PublishingPrerequisite = require('./publish-prerequisites')
     .assertNode6PublishingPrerequisite;
 
 module.exports = function(opts, projectDir) {

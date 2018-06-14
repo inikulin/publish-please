@@ -26,7 +26,7 @@ describe('Integration tests', () => {
         mockConfirm(...args);
 
     // NOTE: loading tested code
-    const publish = requireUncached('../lib/publish');
+    const publish = requireUncached('../lib/publish/publish-workflow');
     const getOptions = require('../lib/publish-options').getOptions;
     const echoPublishCommand = 'echo "npm publish"';
     const showError = (err) => {
@@ -603,6 +603,72 @@ describe('Integration tests', () => {
                     ));
         });
 
+        it('Should respect exceptions configured in .nsprc file', () =>
+            exec('git checkout master')
+                .then(() => pkgd())
+                .then((pkgInfo) => {
+                    pkgInfo.cfg.dependencies = {};
+                    pkgInfo.cfg.dependencies['lodash'] = '4.16.4';
+                    writeFile('package.json', JSON.stringify(pkgInfo.cfg));
+                    writeFile(
+                        '.nsprc',
+                        JSON.stringify({
+                            exceptions: [
+                                'https://nodesecurity.io/advisories/577',
+                            ],
+                        })
+                    );
+                })
+                .then(() =>
+                    publish(
+                        getTestOptions({
+                            set: {
+                                publishCommand: echoPublishCommand,
+                                validations: {
+                                    vulnerableDependencies: true,
+                                },
+                            },
+                        })
+                    )
+                ));
+
+        it('Should skip exceptions configured in .nsprc file with bad format', () =>
+            exec('git checkout master')
+                .then(() => pkgd())
+                .then((pkgInfo) => {
+                    pkgInfo.cfg.dependencies = {};
+                    pkgInfo.cfg.dependencies['lodash'] = '4.16.4';
+                    writeFile('package.json', JSON.stringify(pkgInfo.cfg));
+                    writeFile(
+                        '.nsprc',
+                        JSON.stringify({
+                            exceptions:
+                                'https://nodesecurity.io/advisories/577',
+                        })
+                    );
+                })
+                .then(() =>
+                    publish(
+                        getTestOptions({
+                            set: {
+                                validations: {
+                                    vulnerableDependencies: true,
+                                },
+                            },
+                        })
+                    )
+                )
+                .then(() => {
+                    throw new Error('Promise rejection expected');
+                })
+                .catch((err) => showError(err))
+                .catch((err) =>
+                    assert(
+                        // prettier-ignore
+                        err.message.indexOf(`Vulnerability found in ${chalk.red.bold('lodash@4.16.4')}`) > -1
+                    )
+                ));
+
         ['lodash@4.17.5', 'ms@0.7.1'].forEach(function(dependency) {
             const name = dependency.split('@')[0];
             const version = dependency.split('@')[1];
@@ -1169,6 +1235,44 @@ describe('Integration tests', () => {
                 assert(publishrc.validations.gitTag);
                 assert.strictEqual(publishrc.validations.branch, 'master');
             });
+        });
+
+        it(`Should be able to use publish-please just after installing ${packageName} locally`, () => {
+            return exec(
+                /* prettier-ignore */
+                `npm install --save-dev ../${packageName.replace('@','-')}.tgz`
+            )
+                .then(() => exec('npm run publish-please > ./publish.log'))
+                .then(() => {
+                    const publishLog = readFile('./publish.log').toString();
+                    console.log(publishLog);
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running pre-publish script'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running validations'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Error: no test specified'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('✓ Checking for the vulnerable dependencies'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('✖ Checking for the uncommitted changes'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('✖ Checking for the untracked files'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('✓ Checking for the sensitive data in the working tree'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('✓ Validating branch'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('✖ Validating git tag'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('ERRORS'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('* There are uncommitted changes in the working tree.'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('* There are untracked files in the working tree.'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes("* Latest commit doesn't have git tag."));
+                });
         });
     });
 });
