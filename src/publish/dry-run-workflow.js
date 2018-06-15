@@ -49,8 +49,7 @@ module.exports = function(opts, projectDir) {
                     : true
             /* eslint-enable indent */
         )
-        .then((ok) => ok && publish('npm pack')
-            .then(() => reportAdvisory()))
+        .then((ok) => ok && publish('npm pack').then(() => reportAdvisory()))
         .catch((err) => {
             console.log(chalk.red.bold('ERRORS'));
             console.log(err.message);
