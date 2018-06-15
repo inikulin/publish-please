@@ -54,6 +54,7 @@ module.exports = function(opts, projectDir) {
         .catch((err) => {
             console.log(chalk.red.bold('ERRORS'));
             console.log(err.message);
+            console.log('');
             if (executionContext && executionContext.isInTestMode()) {
                 return Promise.reject(err);
             }

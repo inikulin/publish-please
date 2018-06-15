@@ -29,11 +29,6 @@ describe('Integration tests', () => {
     const publish = requireUncached('../lib/publish/publish-workflow');
     const getOptions = require('../lib/publish-options').getOptions;
     const echoPublishCommand = 'echo "npm publish"';
-    const showError = (err) => {
-        console.log(chalk.red.bold('ERRORS'));
-        console.log(err.message);
-        console.log('');
-    };
     function mkdir(path) {
         return new Promise((resolve, reject) =>
             mkdirp(path, null, (err) => (err ? reject(err) : resolve()))
@@ -178,7 +173,6 @@ describe('Integration tests', () => {
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) => showError(err))
                 .catch((err) =>
                     assert.strictEqual(
                         err.message,
@@ -198,7 +192,6 @@ describe('Integration tests', () => {
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) => showError(err))
                 .catch((err) =>
                     assert.strictEqual(
                         err.message,
@@ -218,7 +211,6 @@ describe('Integration tests', () => {
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) => showError(err))
                 .catch((err) => {
                     const msgRe = /^ {2}\* Expected branch to be 'master', but it was '\((?:HEAD )?detached (?:from|at) 15a1ef7\)'.$/;
 
@@ -270,7 +262,6 @@ describe('Integration tests', () => {
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) => showError(err))
                 .catch((err) =>
                     assert.strictEqual(
                         err.message,
@@ -290,7 +281,6 @@ describe('Integration tests', () => {
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) => showError(err))
                 .catch((err) =>
                     assert.strictEqual(
                         err.message,
@@ -344,7 +334,6 @@ describe('Integration tests', () => {
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) => showError(err))
                 .catch((err) =>
                     assert.strictEqual(
                         err.message,
@@ -396,7 +385,6 @@ describe('Integration tests', () => {
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) => showError(err))
                 .catch((err) =>
                     assert.strictEqual(
                         err.message,
@@ -450,7 +438,6 @@ describe('Integration tests', () => {
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) => showError(err))
                 .catch((err) =>
                     assert.strictEqual(
                         err.message,
@@ -529,7 +516,6 @@ describe('Integration tests', () => {
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) => showError(err))
                 .catch((err) =>
                     assert(err.message.indexOf('Vulnerability found') > -1)
                 ));
@@ -560,7 +546,6 @@ describe('Integration tests', () => {
                     .then(() => {
                         throw new Error('Promise rejection expected');
                     })
-                    .catch((err) => showError(err))
                     .catch((err) =>
                         assert(
                             // prettier-ignore
@@ -594,7 +579,6 @@ describe('Integration tests', () => {
                     .then(() => {
                         throw new Error('Promise rejection expected');
                     })
-                    .catch((err) => showError(err))
                     .catch((err) =>
                         assert(
                             // prettier-ignore
@@ -661,7 +645,6 @@ describe('Integration tests', () => {
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) => showError(err))
                 .catch((err) =>
                     assert(
                         // prettier-ignore
@@ -768,7 +751,6 @@ describe('Integration tests', () => {
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) => showError(err))
                 .catch((err) => {
                     const errors = err.message
                         .split('\n')
