@@ -82,6 +82,8 @@ npm run publish-please --dry-run
 
 Instead of publishing, this will show (after all validations) the content of the package that will be sent to npm, so that you can inspect it to be sure everything is there.
 
+![dry-run-demo](media/dry-run-demo.gif)
+
 In this mode, the **postPublishScript** script will not run, since there is no publication to the registry. 
 
 It might be a good idea to add these two lines inside your .gitignore file:
