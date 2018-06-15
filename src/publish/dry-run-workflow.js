@@ -44,7 +44,7 @@ module.exports = function(opts, projectDir) {
                 opts.confirm
                     ? confirm(
                           'Are you sure you want to publish this version to npm?\n(you are in dry mode: you will only see the package content. Nothing is sent to npm)',
-                          false
+                          true
                       )
                     : true
             /* eslint-enable indent */
