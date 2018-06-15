@@ -14,8 +14,8 @@ module.exports = function() {
 
     const npmArgs = getNpmArgs(process.env);
     if (npmArgs && npmArgs['--dry-run']) {
-        return require('../lib/publish/dry-run-workflow')();
+        return require('./publish/dry-run-workflow')();
     }
 
-    return require('../lib/publish/publish-workflow')();
+    return require('./publish/publish-workflow')();
 };

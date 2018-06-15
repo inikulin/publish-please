@@ -29,6 +29,7 @@ module.exports = function(opts, projectDir) {
     opts = getOptions(opts, projectDir);
 
     return assertNode6PublishingPrerequisite()
+        .then(() => console.log(chalk.green.bold('dry mode activated')))
         .then(
             () =>
                 opts.prePublishScript &&
