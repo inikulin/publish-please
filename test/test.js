@@ -1274,5 +1274,39 @@ describe('Integration tests', () => {
                     assert(publishLog.includes("* Latest commit doesn't have git tag."));
                 });
         });
+
+        it(`Should be able to use publish-please in dry mode just after installing ${packageName} locally`, () => {
+            return exec(
+                /* prettier-ignore */
+                `npm install --save-dev ../${packageName.replace('@','-')}.tgz`
+            )
+                .then(() => {
+                    const publishrc = JSON.parse(
+                        readFile('.publishrc').toString()
+                    );
+                    publishrc.validations.uncommittedChanges = false;
+                    publishrc.validations.untrackedFiles = false;
+                    publishrc.validations.gitTag = false;
+                    writeFile('.publishrc', JSON.stringify(publishrc));
+                    return publishrc;
+                })
+                .then(() =>
+                    exec('npm run publish-please --dry-run > ./publish.log')
+                )
+                .then(() => {
+                    const publishLog = readFile('./publish.log').toString();
+                    console.log(publishLog);
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running pre-publish script'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running validations'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Release info'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('testing-repo-1.3.77.tgz'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes("run 'npm pack' to have more details on the package"));
+                });
+        });
     });
 });
