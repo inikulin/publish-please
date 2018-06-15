@@ -13,14 +13,14 @@ const assertNode6PublishingPrerequisite = require('./publish-prerequisites')
     .assertNode6PublishingPrerequisite;
 const executionContext = require('../utils/execution-context');
 
-const SUCCESS_MESSAGE = `
+const ADVISORY_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !! run 'npm pack' to have more details on the package !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 `;
 
-function reportSuccess() {
-    console.log(chalk.bgGreen(SUCCESS_MESSAGE));
+function reportAdvisory() {
+    console.log(chalk.bgGreen(ADVISORY_MESSAGE));
 }
 
 module.exports = function(opts, projectDir) {
@@ -49,8 +49,8 @@ module.exports = function(opts, projectDir) {
                     : true
             /* eslint-enable indent */
         )
-        .then((ok) => ok && publish('npm pack'))
-        .then(() => reportSuccess())
+        .then((ok) => ok && publish('npm pack')
+            .then(() => reportAdvisory()))
         .catch((err) => {
             console.log(chalk.red.bold('ERRORS'));
             console.log(err.message);
