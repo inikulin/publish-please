@@ -1171,10 +1171,6 @@ describe('Integration tests', () => {
     });
 
     describe('Package installation', () => {
-        before(() => {
-            // do nothing
-        });
-
         it(`Should not install ${packageName} globally`, () => {
             return exec(
                 `npm install -g ../${packageName.replace('@', '-')}.tgz`
