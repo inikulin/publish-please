@@ -15,6 +15,7 @@ module.exports = function getNpmArgs(processEnv) {
             npmArgs['--save'] = npmCommand(args).hasArg('--save');
             npmArgs['--global'] = npmCommand(args).hasArg('--global');
             npmArgs['--dry-run'] = npmCommand(args).hasArg('--dry-run');
+            npmArgs['config'] = npmCommand(args).hasArg('config');
             // prettier-ignore
             npmArgs['--with-publish-please'] = npmCommand(args).hasArg('--with-publish-please');
         } catch (err) {

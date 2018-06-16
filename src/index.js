@@ -6,13 +6,12 @@ module.exports = function() {
     if (process.argv.indexOf('guard') > -1) {
         return require('./guard')(process.env);
     }
-
-    if (process.argv.indexOf('config') > -1) {
+    const npmArgs = getNpmArgs(process.env);
+    if (npmArgs && npmArgs['config']) {
         const config = require('./config');
         return config.configurePublishPlease.inCurrentProject();
     }
 
-    const npmArgs = getNpmArgs(process.env);
     if (npmArgs && npmArgs['--dry-run']) {
         return require('./publish/dry-run-workflow')();
     }
