@@ -983,13 +983,13 @@ describe('Integration tests', () => {
     });
 
     describe('Guard', () => {
-        const GUARD_ERROR = 'node ../lib/guard.js';
+        const GUARD_ERROR = 'node ../bin/publish-please.js guard';
 
         beforeEach(() => {
             const pkg = JSON.parse(readFile('package.json').toString());
-
-            pkg.scripts = { prepublishOnly: 'node ../lib/guard.js' };
-
+            pkg.scripts = {
+                prepublishOnly: 'node ../bin/publish-please.js guard',
+            };
             writeFile('package.json', JSON.stringify(pkg));
         });
 
@@ -998,9 +998,7 @@ describe('Integration tests', () => {
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) => {
-                    assert(err.message.indexOf(GUARD_ERROR) >= 0);
-                }));
+                .catch((err) => assert(err.message.indexOf(GUARD_ERROR) >= 0)));
 
         it('Should allow publishing with special flag', () =>
             exec('npm publish --with-publish-please')

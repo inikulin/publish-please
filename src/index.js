@@ -4,7 +4,7 @@ const getNpmArgs = require('./utils/get-npm-args');
 
 module.exports = function() {
     if (process.argv.indexOf('guard') > -1) {
-        return require('./guard');
+        return require('./guard')(process.env);
     }
 
     if (process.argv.indexOf('config') > -1) {

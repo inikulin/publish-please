@@ -2,7 +2,7 @@
 
 /* eslint-disable no-unused-vars */
 const should = require('should');
-const requireUncached = require('import-fresh');
+const cli = require('../lib');
 
 describe('Publish-please CLI Options', () => {
     let nativeExit;
@@ -43,10 +43,22 @@ describe('Publish-please CLI Options', () => {
             '{"remain":[],"cooked":["run","publish-please","--dry-run"],"original":["run","publish-please","--dry-run"]}';
         // When
         return (
-            requireUncached('../lib')()
+            cli()
                 // Then
                 .catch((err) => err.message.should.containEql('ERRORS'))
                 .catch((err) => output.should.containEql('dry mode activated'))
         );
+    });
+
+    it('Should execute guard on `publish-please guard`', () => {
+        // Given
+        process.env['npm_config_argv'] =
+            '{"remain":[],"cooked":["publish"],"original":["publish"]}';
+        process.argv.push('guard');
+        // When
+        cli();
+        // Then
+        exitCode.should.be.equal(1);
+        output.should.containEql("'npm publish' is forbidden for this package");
     });
 });
