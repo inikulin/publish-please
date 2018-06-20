@@ -1,5 +1,4 @@
 'use strict';
-const chalk = require('chalk');
 
 const NO_GLOBAL_INSTALL_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -19,5 +18,10 @@ module.exports = function preventGlobalInstall() {
 };
 
 function reportNoGlobalInstall() {
-    console.log(chalk.bgRed(NO_GLOBAL_INSTALL_MESSAGE));
+    try {
+        const chalk = require('chalk');
+        console.log(chalk.bgRed(NO_GLOBAL_INSTALL_MESSAGE));
+    } catch (error) {
+        console.log(NO_GLOBAL_INSTALL_MESSAGE);
+    }
 }
