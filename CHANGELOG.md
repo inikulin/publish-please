@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [3.1.0] - 2018-06-21
 ### Added
-- run publish-please in dry mode
+- be able to run publish-please in dry mode
 
 ## [3.0.3] - 2018-06-20
 ### Fixed
