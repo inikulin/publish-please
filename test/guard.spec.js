@@ -2,7 +2,7 @@
 
 /* eslint-disable no-unused-vars */
 const should = require('should');
-const requireUncached = require('import-fresh');
+const guard = require('../lib/guard');
 
 describe('Guard Execution', () => {
     let nativeExit;
@@ -34,7 +34,7 @@ describe('Guard Execution', () => {
         process.env['npm_config_argv'] =
             '{"remain":[],"cooked":["publish"],"original":["publish"]}';
         // When
-        requireUncached('../lib/guard');
+        guard(process.env);
         // Then
         exitCode.should.be.equal(1);
         output.should.containEql("'npm publish' is forbidden for this package");
@@ -45,7 +45,7 @@ describe('Guard Execution', () => {
         process.env['npm_config_argv'] =
             '{"remain":[],"cooked":["publish","--with-publish-please"],"original":["publish","--with-publish-please"]}';
         // When
-        requireUncached('../lib/guard');
+        guard(process.env);
         // Then
         exitCode.should.be.equal(0);
         output.should.not.containEql(

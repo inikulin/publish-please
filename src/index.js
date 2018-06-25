@@ -1,13 +1,20 @@
-const chalk = require('chalk');
+'use strict';
 
-if (process.argv.indexOf('guard') > -1) require('./guard');
-else if (process.argv.indexOf('config') > -1) {
-    const config = require('./config');
-    config.configurePublishPlease.inCurrentProject();
-} else {
-    require('../lib/publish')().catch((err) => {
-        console.log(chalk.red.bold('ERRORS'));
-        console.log(err.message);
-        process.exit(1);
-    });
-}
+const getNpmArgs = require('./utils/get-npm-args');
+
+module.exports = function() {
+    if (process.argv.indexOf('guard') > -1) {
+        return require('./guard')(process.env);
+    }
+    const npmArgs = getNpmArgs(process.env);
+    if (npmArgs && npmArgs['config']) {
+        const config = require('./config');
+        return config.configurePublishPlease.inCurrentProject();
+    }
+
+    if (npmArgs && npmArgs['--dry-run']) {
+        return require('./publish/dry-run-workflow')();
+    }
+
+    return require('./publish/publish-workflow')();
+};

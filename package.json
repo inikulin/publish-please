@@ -1,6 +1,6 @@
 {
   "name": "publish-please",
-  "version": "3.0.3",
+  "version": "3.1.0",
   "description": "Safe and highly functional replacement for `npm publish`.",
   "main": "./lib/index.js",
   "bin": {
@@ -17,11 +17,12 @@
     "compile": "babel src -d lib",
     "build": "npm run clean && npm run compile && prettier --write \"lib/{pre,post}-install.js\" ",
     "mocha-with-coverage": "istanbul cover -x test node_modules/mocha/bin/_mocha test",
-    "check-coverage": "istanbul check-coverage --statements 90 --lines 90 --branches 75 --functions 96",
+    "check-coverage": "istanbul check-coverage --statements 95 --lines 95 --branches 80 --functions 98",
     "test": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage && npm run check-coverage",
     "preinstall": "node lib/pre-install.js",
     "postinstall": "node lib/post-install.js",
-    "package": "rimraf package && rimraf publish-please*.tgz && npm pack"
+    "package": "rimraf package && rimraf publish-please*.tgz && npm pack",
+    "publish-please": "node ./bin/publish-please.js"
   },
   "lint-staged": {
     "*.js": [

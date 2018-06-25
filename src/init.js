@@ -34,7 +34,7 @@ const POST_INSTALL_HOOKS_ARE_IGNORED = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 `;
 
-function onInstall(projectDir, testMode) {
+function onInstall(projectDir) {
     function readCfg() {
         try {
             return readPkg.sync(projectDir, { normalize: false });
@@ -92,21 +92,17 @@ function onInstall(projectDir, testMode) {
         }
         if (addConfigHooks(cfg)) {
             reportHooksAdded();
-
-            if (!testMode) {
-                const config = require('./config');
-                const opts = config.getCurrentOpts(projectDir);
-                config.configurePublishPlease
-                    .with(opts)
-                    .inProject(projectDir)
-                    .then(reportCompletion);
-            }
+            const config = require('./config');
+            const opts = config.getCurrentOpts(projectDir);
+            config.configurePublishPlease
+                .with(opts)
+                .inProject(projectDir)
+                .then(reportCompletion);
         }
     })();
 }
 
 module.exports = function init(projectDir) {
     projectDir = projectDir ? projectDir : getProjectDir();
-    const testMode = process.argv.indexOf('--test-mode') > -1;
-    onInstall(projectDir, testMode);
+    onInstall(projectDir);
 };

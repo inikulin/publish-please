@@ -50,20 +50,17 @@ function configureOptsObject(obj, configurators, optType) {
         return chain
             .then(() => {
                 console.log(chalk.blue(`-- Configuring ${optType} "${prop}":`));
-
                 return configurators[prop](obj[prop]);
             })
             .then((val) => {
-                console.log();
-
+                console.log('');
                 obj[prop] = val;
             });
     }, Promise.resolve());
 }
 
 function configure(opts) {
-    console.log();
-
+    console.log('');
     return configureOptsObject(opts, optionsConfigurators, 'option')
         .then(() =>
             configureOptsObject(
@@ -74,10 +71,9 @@ function configure(opts) {
         )
         .then(() => {
             console.log(chalk.green('-- Current configuration:'));
-            console.log();
+            console.log('');
             console.log(JSON.stringify(opts, null, 2));
-            console.log();
-
+            console.log('');
             return confirm('Is this OK?', true);
         })
         .then((yes) => !yes && configure(opts));

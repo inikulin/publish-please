@@ -14,6 +14,8 @@ const Promise = require('pinkie-promise');
 const chalk = require('chalk');
 const requireUncached = require('import-fresh');
 const packageName = require('./utils/publish-please-version-under-test');
+const lineSeparator =
+    '---------------------------------------------------------------------';
 
 /* eslint-disable max-nested-callbacks */
 describe('Integration tests', () => {
@@ -24,9 +26,9 @@ describe('Integration tests', () => {
         mockConfirm(...args);
 
     // NOTE: loading tested code
-    const publish = requireUncached('../lib/publish');
-    const getOptions = require('../lib/publish').getOptions;
-
+    const publish = requireUncached('../lib/publish/publish-workflow');
+    const getOptions = require('../lib/publish-options').getOptions;
+    const echoPublishCommand = 'echo "npm publish"';
     function mkdir(path) {
         return new Promise((resolve, reject) =>
             mkdirp(path, null, (err) => (err ? reject(err) : resolve()))
@@ -75,9 +77,6 @@ describe('Integration tests', () => {
         );
     }
     before(() => {
-        require('../lib/publish').testMode = true;
-        require('../lib/validations').testMode = true;
-
         return del('testing-repo')
             .then(() =>
                 exec(
@@ -85,15 +84,20 @@ describe('Integration tests', () => {
                 )
             )
             .then(() => exec('npm run package'))
-            .then(() => process.chdir('testing-repo'));
+            .then(() => process.chdir('testing-repo'))
+            .then(() => (process.env.PUBLISH_PLEASE_TEST_MODE = true));
     });
 
-    beforeEach(() => colorGitOutput());
+    after(() => delete process.env.PUBLISH_PLEASE_TEST_MODE);
+
+    beforeEach(() => colorGitOutput().then(console.log(lineSeparator)));
 
     afterEach(() => {
         const projectDir = process.cwd();
         if (projectDir.includes('testing-repo')) {
-            return exec('git reset --hard HEAD').then(exec('git clean -f -d'));
+            return exec('git reset --hard HEAD')
+                .then(exec('git clean -f -d'))
+                .then(console.log(lineSeparator));
         }
         console.log('protecting publish-please project against git reset');
         return Promise.resolve().then(process.chdir('testing-repo'));
@@ -176,7 +180,7 @@ describe('Integration tests', () => {
                     )
                 ));
 
-        it('Should validate branch passed via parameter', () =>
+        it('Should validate the branch set in the configuration file', () =>
             exec('git checkout master')
                 .then(() =>
                     publish(
@@ -213,18 +217,30 @@ describe('Integration tests', () => {
                     assert(msgRe.test(err.message));
                 }));
 
-        it('Should pass validation', () =>
+        it('Should pass branch validation', () =>
             exec('git checkout some-branch').then(() =>
                 publish(
                     getTestOptions({
-                        set: { validations: { branch: 'some-branch' } },
+                        set: {
+                            publishCommand: echoPublishCommand,
+                            validations: { branch: 'some-branch' },
+                        },
                     })
                 )
             ));
 
-        it('Should not validate if option is disabled', () =>
+        it('Should not validate if branch-validation is disabled', () =>
             exec('git checkout some-branch').then(() =>
-                publish(getTestOptions())
+                publish(
+                    getTestOptions({
+                        set: {
+                            publishCommand: echoPublishCommand,
+                            validations: {
+                                branch: false,
+                            },
+                        },
+                    })
+                )
             ));
     });
 
@@ -237,7 +253,9 @@ describe('Integration tests', () => {
                 .then(() =>
                     publish(
                         getTestOptions({
-                            set: { validations: { gitTag: true } },
+                            set: {
+                                validations: { gitTag: true },
+                            },
                         })
                     )
                 )
@@ -276,15 +294,29 @@ describe('Integration tests', () => {
                 .then(() =>
                     publish(
                         getTestOptions({
-                            set: { validations: { gitTag: true } },
+                            set: {
+                                publishCommand: echoPublishCommand,
+                                validations: { gitTag: true },
+                            },
                         })
                     )
                 ));
 
-        it('Should not validate if option is disabled', () =>
+        it('Should not validate if tag-validation is disabled', () =>
             exec('git checkout master')
                 .then(() => exec('git tag v0.0.42'))
-                .then(() => publish(getTestOptions())));
+                .then(() =>
+                    publish(
+                        getTestOptions({
+                            set: {
+                                publishCommand: echoPublishCommand,
+                                validations: {
+                                    tag: false,
+                                },
+                            },
+                        })
+                    )
+                ));
     });
 
     describe('Uncommitted changes check', () => {
@@ -309,18 +341,30 @@ describe('Integration tests', () => {
                     )
                 ));
 
-        it('Should pass validation if option is disabled', () =>
+        it('Should pass validation if uncommittedChanges-validation is disabled', () =>
             exec('git checkout master').then(() => {
                 writeFile('README.md', 'Yo!');
 
-                return publish(getTestOptions());
+                return publish(
+                    getTestOptions({
+                        set: {
+                            publishCommand: echoPublishCommand,
+                            validations: {
+                                uncommittedChanges: false,
+                            },
+                        },
+                    })
+                );
             }));
 
         it('Should pass validation', () =>
             exec('git checkout master').then(() =>
                 publish(
                     getTestOptions({
-                        set: { validations: { uncommittedChanges: true } },
+                        set: {
+                            publishCommand: echoPublishCommand,
+                            validations: { uncommittedChanges: true },
+                        },
                     })
                 )
             ));
@@ -348,18 +392,28 @@ describe('Integration tests', () => {
                     )
                 ));
 
-        it('Should pass validation if option is disabled', () =>
+        it('Should pass validation if untrackedFiles-validation is disabled', () =>
             exec('git checkout master').then(() => {
                 writeFile('test-file', 'Yo!');
 
-                return publish(getTestOptions());
+                return publish(
+                    getTestOptions({
+                        set: {
+                            publishCommand: echoPublishCommand,
+                            validations: { untrackedFiles: false },
+                        },
+                    })
+                );
             }));
 
         it('Should pass validation', () =>
             exec('git checkout master').then(() =>
                 publish(
                     getTestOptions({
-                        set: { validations: { untrackedFiles: true } },
+                        set: {
+                            publishCommand: echoPublishCommand,
+                            validations: { untrackedFiles: true },
+                        },
                     })
                 )
             ));
@@ -384,7 +438,7 @@ describe('Integration tests', () => {
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) => {
+                .catch((err) =>
                     assert.strictEqual(
                         err.message,
                         '  * Sensitive data found in the working tree:\n' +
@@ -394,8 +448,8 @@ describe('Integration tests', () => {
                             '    invalid filename lib/schema.rb\n' +
                             '     - Ruby On Rails database schema file\n' +
                             '     - Contains information on the database schema of a Ruby On Rails application.'
-                    );
-                }));
+                    )
+                ));
 
         it('Should not perform check for files specified in opts.ignore', () =>
             exec('git checkout master')
@@ -409,6 +463,7 @@ describe('Integration tests', () => {
                     publish(
                         getTestOptions({
                             set: {
+                                publishCommand: echoPublishCommand,
                                 validations: {
                                     sensitiveData: {
                                         ignore: [
@@ -422,14 +477,23 @@ describe('Integration tests', () => {
                     )
                 ));
 
-        it('Should not perform check if option is disabled', () =>
+        it('Should not perform check if sensitiveData-validation is disabled', () =>
             exec('git checkout master')
                 .then(() => mkdir('test'))
                 .then(() => {
                     writeFile('schema.rb', 'test');
                     writeFile('test/database.yml', 'test');
                 })
-                .then(() => publish(getTestOptions())));
+                .then(() =>
+                    publish(
+                        getTestOptions({
+                            set: {
+                                publishCommand: echoPublishCommand,
+                                validations: { sensitiveData: false },
+                            },
+                        })
+                    )
+                ));
     });
 
     describe('Node security project audit', () => {
@@ -452,9 +516,9 @@ describe('Integration tests', () => {
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) => {
-                    assert(err.message.indexOf('Vulnerability found') > -1);
-                }));
+                .catch((err) =>
+                    assert(err.message.indexOf('Vulnerability found') > -1)
+                ));
         ['publish-please@2.4.1', 'testcafe@0.19.2'].forEach(function(
             dependency
         ) {
@@ -482,12 +546,12 @@ describe('Integration tests', () => {
                     .then(() => {
                         throw new Error('Promise rejection expected');
                     })
-                    .catch((err) => {
+                    .catch((err) =>
                         assert(
                             // prettier-ignore
                             err.message.indexOf(`Vulnerability found in ${chalk.bold(dependency)}`) > -1
-                        );
-                    }));
+                        )
+                    ));
         });
 
         ['lodash@4.16.4', 'ms@0.7.0'].forEach(function(dependency) {
@@ -515,12 +579,12 @@ describe('Integration tests', () => {
                     .then(() => {
                         throw new Error('Promise rejection expected');
                     })
-                    .catch((err) => {
+                    .catch((err) =>
                         assert(
                             // prettier-ignore
                             err.message.indexOf(`Vulnerability found in ${chalk.red.bold(dependency)}`) > -1
-                        );
-                    }));
+                        )
+                    ));
         });
 
         it('Should respect exceptions configured in .nsprc file', () =>
@@ -543,6 +607,7 @@ describe('Integration tests', () => {
                     publish(
                         getTestOptions({
                             set: {
+                                publishCommand: echoPublishCommand,
                                 validations: {
                                     vulnerableDependencies: true,
                                 },
@@ -602,6 +667,7 @@ describe('Integration tests', () => {
                         publish(
                             getTestOptions({
                                 set: {
+                                    publishCommand: echoPublishCommand,
                                     validations: {
                                         vulnerableDependencies: true,
                                     },
@@ -622,13 +688,14 @@ describe('Integration tests', () => {
                     publish(
                         getTestOptions({
                             set: {
+                                publishCommand: echoPublishCommand,
                                 validations: { vulnerableDependencies: true },
                             },
                         })
                     )
                 ));
 
-        it('Should not fail on transitive dependency inside publish-please vNext', () =>
+        it(`Should not fail on transitive dependency inside ${packageName}`, () =>
             exec('git checkout master')
                 .then(() => pkgd())
                 .then((pkgInfo) => {
@@ -655,6 +722,7 @@ describe('Integration tests', () => {
                     publish(
                         getTestOptions({
                             set: {
+                                publishCommand: echoPublishCommand,
                                 validations: { vulnerableDependencies: true },
                             },
                         })
@@ -687,10 +755,10 @@ describe('Integration tests', () => {
                     const errors = err.message
                         .split('\n')
                         .filter((msg) => msg.startsWith('  * '));
-                    assert(errors.length === 2);
+                    return assert(errors.length === 2);
                 }));
 
-        it('Should not perform check if option is disabled', () =>
+        it('Should not perform check if vulnerableDependencies-validation is disabled', () =>
             exec('git checkout master')
                 .then(() => pkgd())
                 .then((pkgInfo) => {
@@ -702,6 +770,7 @@ describe('Integration tests', () => {
                     publish(
                         getTestOptions({
                             set: {
+                                publishCommand: echoPublishCommand,
                                 validations: { vulnerableDependencies: false },
                             },
                         })
@@ -714,7 +783,12 @@ describe('Integration tests', () => {
             exec('git checkout master')
                 .then(() =>
                     publish(
-                        getTestOptions({ set: { prePublishScript: 'git' } })
+                        getTestOptions({
+                            set: {
+                                prePublishScript: 'npm run unknown',
+                                publishCommand: echoPublishCommand,
+                            },
+                        })
                     )
                 )
                 .then(() => {
@@ -723,7 +797,7 @@ describe('Integration tests', () => {
                 .catch((err) =>
                     assert.strictEqual(
                         err.message,
-                        'Command `git` exited with code 1.'
+                        'Command `npm` exited with code 1.'
                     )
                 ));
 
@@ -733,6 +807,7 @@ describe('Integration tests', () => {
                     publish(
                         getTestOptions({
                             set: {
+                                publishCommand: echoPublishCommand,
                                 prePublishScript: 'git mv README.md test-file',
                             },
                         })
@@ -746,7 +821,12 @@ describe('Integration tests', () => {
             exec('git checkout master')
                 .then(() =>
                     publish(
-                        getTestOptions({ set: { postPublishScript: 'git' } })
+                        getTestOptions({
+                            set: {
+                                publishCommand: echoPublishCommand,
+                                postPublishScript: 'npm run unknown',
+                            },
+                        })
                     )
                 )
                 .then(() => {
@@ -755,7 +835,7 @@ describe('Integration tests', () => {
                 .catch((err) =>
                     assert.strictEqual(
                         err.message,
-                        'Command `git` exited with code 1.'
+                        'Command `npm` exited with code 1.'
                     )
                 ));
 
@@ -765,6 +845,7 @@ describe('Integration tests', () => {
                     publish(
                         getTestOptions({
                             set: {
+                                publishCommand: echoPublishCommand,
                                 postPublishScript: 'git mv README.md test-file',
                             },
                         })
@@ -778,7 +859,8 @@ describe('Integration tests', () => {
                     publish(
                         getTestOptions({
                             set: {
-                                prePublishScript: 'git',
+                                prePublishScript: 'echo npm test',
+                                publishCommand: 'npm run unknown',
                                 postPublishScript: 'git mv README.md test-file',
                             },
                         })
@@ -788,9 +870,35 @@ describe('Integration tests', () => {
                     throw new Error('Promise rejection expected');
                 })
                 .catch((err) =>
-                    assert.strictEqual(
-                        err.message,
-                        'Command `git` exited with code 1.'
+                    assert(
+                        err.message.indexOf(
+                            'Command `npm` exited with code 1'
+                        ) > -1
+                    )
+                )
+                .catch(() => assert.throws(() => readFile('test-file'))));
+
+        it('Should not run postpublish script if pre-publish script was failed', () =>
+            exec('git checkout master')
+                .then(() =>
+                    publish(
+                        getTestOptions({
+                            set: {
+                                prePublishScript: 'npm run unknown',
+                                publishCommand: echoPublishCommand,
+                                postPublishScript: 'git mv README.md test-file',
+                            },
+                        })
+                    )
+                )
+                .then(() => {
+                    throw new Error('Promise rejection expected');
+                })
+                .catch((err) =>
+                    assert(
+                        err.message.indexOf(
+                            'Command `npm` exited with code 1'
+                        ) > -1
                     )
                 )
                 .catch(() => assert.throws(() => readFile('test-file'))));
@@ -802,7 +910,7 @@ describe('Integration tests', () => {
                 .then(() =>
                     publish(
                         getTestOptions({
-                            set: { publishCommand: 'gulp publish' },
+                            set: { publishCommand: echoPublishCommand },
                             remove: 'publishTag',
                         })
                     )
@@ -810,7 +918,7 @@ describe('Integration tests', () => {
                 .then((npmCmd) =>
                     assert.strictEqual(
                         npmCmd,
-                        'gulp publish --tag latest --with-publish-please'
+                        `${echoPublishCommand} --tag latest --with-publish-please`
                     )
                 ));
 
@@ -820,7 +928,7 @@ describe('Integration tests', () => {
                     publish(
                         getTestOptions({
                             set: {
-                                publishCommand: 'gulp publish',
+                                publishCommand: echoPublishCommand,
                                 publishTag: 'alpha',
                             },
                         })
@@ -829,7 +937,7 @@ describe('Integration tests', () => {
                 .then((npmCmd) =>
                     assert.strictEqual(
                         npmCmd,
-                        'gulp publish --tag alpha --with-publish-please'
+                        `${echoPublishCommand} --tag alpha --with-publish-please`
                     )
                 ));
     });
@@ -838,34 +946,50 @@ describe('Integration tests', () => {
         it('Should publish with the given tag', () =>
             exec('git checkout master')
                 .then(() =>
-                    publish(getTestOptions({ set: { publishTag: 'alpha' } }))
+                    publish(
+                        getTestOptions({
+                            set: {
+                                publishCommand: echoPublishCommand,
+                                publishTag: 'alpha',
+                            },
+                        })
+                    )
                 )
                 .then((npmCmd) =>
                     assert.strictEqual(
                         npmCmd,
-                        'npm publish --tag alpha --with-publish-please'
+                        `${echoPublishCommand} --tag alpha --with-publish-please`
                     )
                 ));
 
         it('Should publish with the `latest` tag by default', () =>
             exec('git checkout master')
-                .then(() => publish(getTestOptions({ remove: 'publishTag' })))
+                .then(() =>
+                    publish(
+                        getTestOptions({
+                            set: {
+                                publishCommand: echoPublishCommand,
+                            },
+                            remove: 'publishTag',
+                        })
+                    )
+                )
                 .then((npmCmd) =>
                     assert.strictEqual(
                         npmCmd,
-                        'npm publish --tag latest --with-publish-please'
+                        `${echoPublishCommand} --tag latest --with-publish-please`
                     )
                 ));
     });
 
     describe('Guard', () => {
-        const GUARD_ERROR = 'node ../lib/guard.js';
+        const GUARD_ERROR = 'node ../bin/publish-please.js guard';
 
         beforeEach(() => {
             const pkg = JSON.parse(readFile('package.json').toString());
-
-            pkg.scripts = { prepublishOnly: 'node ../lib/guard.js' };
-
+            pkg.scripts = {
+                prepublishOnly: 'node ../bin/publish-please.js guard',
+            };
             writeFile('package.json', JSON.stringify(pkg));
         });
 
@@ -874,9 +998,7 @@ describe('Integration tests', () => {
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) => {
-                    assert(err.message.indexOf(GUARD_ERROR) >= 0);
-                }));
+                .catch((err) => assert(err.message.indexOf(GUARD_ERROR) >= 0)));
 
         it('Should allow publishing with special flag', () =>
             exec('npm publish --with-publish-please')
@@ -907,20 +1029,20 @@ describe('Integration tests', () => {
         });
 
         it('Should add hooks to package.json', () =>
-            exec(
-                'node node_modules/publish-please/lib/post-install.js --test-mode'
-            ).then(() => {
-                const cfg = JSON.parse(readFile('package.json').toString());
+            exec('node node_modules/publish-please/lib/post-install.js').then(
+                () => {
+                    const cfg = JSON.parse(readFile('package.json').toString());
 
-                assert.strictEqual(
-                    cfg.scripts['publish-please'],
-                    'publish-please'
-                );
-                assert.strictEqual(
-                    cfg.scripts['prepublishOnly'],
-                    'publish-please guard'
-                );
-            }));
+                    assert.strictEqual(
+                        cfg.scripts['publish-please'],
+                        'publish-please'
+                    );
+                    assert.strictEqual(
+                        cfg.scripts['prepublishOnly'],
+                        'publish-please guard'
+                    );
+                }
+            ));
 
         it('Should add guard gracefully', () => {
             writeFile(
@@ -933,7 +1055,7 @@ describe('Integration tests', () => {
             );
 
             return exec(
-                'node node_modules/publish-please/lib/post-install.js --test-mode'
+                'node node_modules/publish-please/lib/post-install.js'
             ).then(() => {
                 const cfg = JSON.parse(readFile('package.json').toString());
 
@@ -945,34 +1067,30 @@ describe('Integration tests', () => {
         });
 
         it("Should not modify config if it's already modified", () =>
-            exec(
-                'node node_modules/publish-please/lib/post-install.js --test-mode'
-            ).then(() => {
-                const cfg = JSON.parse(readFile('package.json').toString());
+            exec('node node_modules/publish-please/lib/post-install.js').then(
+                () => {
+                    const cfg = JSON.parse(readFile('package.json').toString());
 
-                assert.strictEqual(
-                    cfg.scripts['publish-please'],
-                    'publish-please'
-                );
-                assert.strictEqual(
-                    cfg.scripts['prepublishOnly'],
-                    'publish-please guard'
-                );
-            }));
+                    assert.strictEqual(
+                        cfg.scripts['publish-please'],
+                        'publish-please'
+                    );
+                    assert.strictEqual(
+                        cfg.scripts['prepublishOnly'],
+                        'publish-please guard'
+                    );
+                }
+            ));
 
         it("Should exit with error if package.json doesn't exists", () =>
             del('package.json')
                 .then(() =>
-                    exec(
-                        'node node_modules/publish-please/lib/post-install.js --test-mode'
-                    )
+                    exec('node node_modules/publish-please/lib/post-install.js')
                 )
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) => {
-                    assert.strictEqual(err.code, 1);
-                }));
+                .catch((err) => assert.strictEqual(err.code, 1)));
     });
 
     describe('Confirmation', () => {
@@ -994,13 +1112,20 @@ describe('Integration tests', () => {
             it('Should call confirmation if opts.confirm is true', () =>
                 exec('git checkout master')
                     .then(() =>
-                        publish(getTestOptions({ set: { confirm: true } }))
+                        publish(
+                            getTestOptions({
+                                set: {
+                                    publishCommand: echoPublishCommand,
+                                    confirm: true,
+                                },
+                            })
+                        )
                     )
                     .then((npmCmd) => {
                         assert.ok(confirmCalled);
                         assert.strictEqual(
                             npmCmd,
-                            'npm publish --tag null --with-publish-please'
+                            `${echoPublishCommand} --tag null --with-publish-please`
                         );
                     }));
         });
@@ -1013,7 +1138,14 @@ describe('Integration tests', () => {
             it('Should return empty string if publish was not confirmed', () =>
                 exec('git checkout master')
                     .then(() =>
-                        publish(getTestOptions({ set: { confirm: true } }))
+                        publish(
+                            getTestOptions({
+                                set: {
+                                    publishCommand: echoPublishCommand,
+                                    confirm: true,
+                                },
+                            })
+                        )
                     )
                     .then((npmCmd) => assert.strictEqual(npmCmd, '')));
 
@@ -1024,6 +1156,7 @@ describe('Integration tests', () => {
                             getTestOptions({
                                 set: {
                                     confirm: true,
+                                    publishCommand: echoPublishCommand,
                                     postPublishScript:
                                         'git mv README.md test-file',
                                 },
@@ -1038,10 +1171,6 @@ describe('Integration tests', () => {
     });
 
     describe('Package installation', () => {
-        before(() => {
-            // do nothing
-        });
-
         it(`Should not install ${packageName} globally`, () => {
             return exec(
                 `npm install -g ../${packageName.replace('@', '-')}.tgz`
@@ -1049,8 +1178,110 @@ describe('Integration tests', () => {
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) => {
-                    assert(err.message.indexOf('node lib/pre-install.js') > -1);
+                .catch((err) =>
+                    assert(err.message.indexOf('node lib/pre-install.js') > -1)
+                );
+        });
+
+        it(`Should install ${packageName} locally`, () => {
+            return exec(
+                `npm install --save-dev ../${packageName.replace('@', '-')}.tgz`
+            ).then(() => {
+                const cfg = JSON.parse(readFile('package.json').toString());
+
+                assert.strictEqual(
+                    cfg.scripts['publish-please'],
+                    'publish-please'
+                );
+                assert.strictEqual(
+                    cfg.scripts['prepublishOnly'],
+                    'publish-please guard'
+                );
+                const publishrc = JSON.parse(readFile('.publishrc').toString());
+                assert(publishrc.confirm);
+                assert.strictEqual(publishrc.prePublishScript, 'npm test');
+                assert.strictEqual(publishrc.postPublishScript, '');
+                assert.strictEqual(publishrc.publishCommand, 'npm publish');
+                assert.strictEqual(publishrc.publishTag, 'latest');
+                assert.strictEqual(publishrc.validations.branch, 'master');
+                assert(publishrc.validations.uncommittedChanges);
+                assert(publishrc.validations.untrackedFiles);
+                assert(publishrc.validations.vulnerableDependencies);
+                assert(publishrc.validations.sensitiveData);
+                assert(publishrc.validations.gitTag);
+                assert.strictEqual(publishrc.validations.branch, 'master');
+            });
+        });
+
+        it(`Should be able to use publish-please just after installing ${packageName} locally`, () => {
+            return exec(
+                /* prettier-ignore */
+                `npm install --save-dev ../${packageName.replace('@','-')}.tgz`
+            )
+                .then(() => exec('npm run publish-please > ./publish.log'))
+                .then(() => {
+                    const publishLog = readFile('./publish.log').toString();
+                    console.log(publishLog);
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running pre-publish script'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running validations'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Error: no test specified'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Checking for the vulnerable dependencies'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Checking for the uncommitted changes'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Checking for the untracked files'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Checking for the sensitive data in the working tree'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Validating branch'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Validating git tag'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('ERRORS'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('* There are uncommitted changes in the working tree.'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('* There are untracked files in the working tree.'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes("* Latest commit doesn't have git tag."));
+                });
+        });
+
+        it(`Should be able to use publish-please in dry mode just after installing ${packageName} locally`, () => {
+            return exec(
+                /* prettier-ignore */
+                `npm install --save-dev ../${packageName.replace('@','-')}.tgz`
+            )
+                .then(() => {
+                    const publishrc = JSON.parse(
+                        readFile('.publishrc').toString()
+                    );
+                    publishrc.validations.uncommittedChanges = false;
+                    publishrc.validations.untrackedFiles = false;
+                    publishrc.validations.gitTag = false;
+                    writeFile('.publishrc', JSON.stringify(publishrc));
+                    return publishrc;
+                })
+                .then(() =>
+                    exec('npm run publish-please --dry-run > ./publish.log')
+                )
+                .then(() => {
+                    const publishLog = readFile('./publish.log').toString();
+                    console.log(publishLog);
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running pre-publish script'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running validations'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Release info'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('testing-repo-1.3.77.tgz'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes("run 'npm pack' to have more details on the package"));
                 });
         });
     });

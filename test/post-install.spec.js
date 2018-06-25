@@ -10,12 +10,16 @@ const init = require('../lib/init');
 const pathJoin = require('path').join;
 const writeFile = require('fs').writeFileSync;
 const del = require('del');
+const readPkg = require('read-pkg');
 
 describe('Post-Install Execution', () => {
     let nativeExit;
     let nativeConsoleLog;
     let exitCode;
     let output;
+
+    before(() => (process.env.PUBLISH_PLEASE_TEST_MODE = true));
+    after(() => delete process.env.PUBLISH_PLEASE_TEST_MODE);
 
     beforeEach(() => {
         exitCode = undefined;
@@ -47,6 +51,7 @@ describe('Post-Install Execution', () => {
         (exitCode || 0).should.be.equal(0);
         output.should.containEql('post-install hooks are ignored in dev mode');
     });
+
     it(`Should return an error message when the package.json file is missing on 'npm install --save-dev ${packageName}'`, () => {
         // Given
         process.env[
@@ -67,7 +72,6 @@ describe('Post-Install Execution', () => {
         process.env[
             'npm_config_argv'
         ] = `{"remain":["${packageName}"],"cooked":["install","--save-dev","${packageName}"],"original":["install","--save-dev","${packageName}"]}`;
-        process.argv.push('--test-mode');
         mkdirp('test/tmp');
         const pkg = {
             name: 'testing-repo',
@@ -86,5 +90,9 @@ describe('Post-Install Execution', () => {
         output.should.containEql(
             'publish-please hooks were successfully setup for the project'
         );
+        readPkg.sync(projectDir).scripts.should.containEql({
+            'publish-please': 'publish-please',
+            prepublishOnly: 'publish-please guard',
+        });
     });
 });

@@ -13,13 +13,14 @@ function reportError() {
     console.log(chalk.bgRed(ERROR_MESSAGE));
 }
 
-(function guard(processEnv) {
+module.exports = function(processEnv) {
     const npmArgs = getNpmArgs(processEnv);
 
     if (npmArgs && npmArgs.publish && !npmArgs['--with-publish-please']) {
         reportError();
         process.exit(1);
+        return;
     }
 
     process.exit(0);
-})(process.env);
+};

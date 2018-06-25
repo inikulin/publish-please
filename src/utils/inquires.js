@@ -1,5 +1,6 @@
 const inquirer = require('inquirer');
 const Promise = require('pinkie-promise');
+const executionContext = require('./execution-context');
 
 function ask(type, question, defaultAnswer) {
     return new Promise((resolve) => {
@@ -17,10 +18,16 @@ function ask(type, question, defaultAnswer) {
 }
 
 const confirm = (exports.confirm = function(question, defaultAnswer) {
+    if (executionContext.isInTestMode()) {
+        return Promise.resolve(defaultAnswer);
+    }
     return ask('confirm', question, defaultAnswer);
 });
 
 const input = (exports.input = function(question, defaultAnswer) {
+    if (executionContext.isInTestMode()) {
+        return Promise.resolve(defaultAnswer);
+    }
     return ask('input', question, defaultAnswer);
 });
 

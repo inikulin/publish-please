@@ -1,3 +1,15 @@
 {
-    "prepublishScript": "npm test"
+  "prePublishScript": "echo 'npm test'",
+  "validations": {
+    "vulnerableDependencies": true,
+    "uncommittedChanges": true,
+    "untrackedFiles": true,
+    "sensitiveData": true,
+    "branch": "master",
+    "gitTag": true
+  },
+  "confirm": true,
+  "publishCommand": "npm publish",
+  "publishTag": "latest",
+  "postPublishScript": ""
 }

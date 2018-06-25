@@ -72,6 +72,25 @@ npm run publish-please
     - you may prevent specific vulnerabilities to be reported by publish-please by creating a [.nsprc file](https://github.com/nodesecurity/nsp#exceptions).
  
 
+### Running in dry mode
+
+You can execute publish-please in dry mode by using the `--dry-run` option:
+
+```shell
+npm run publish-please --dry-run
+```
+
+Instead of publishing, this will show (after all validations) the content of the package that will be sent to npm, so that you can inspect it to be sure everything is there.
+
+![dry-run-demo](media/dry-run-demo.gif)
+
+In this mode, the **postPublishScript** script will not run, since there is no publication to the registry. 
+
+It might be a good idea to add these two lines inside your .gitignore file:
+```sh
+package
+*.tgz
+```
 
 ## Sensitive information audit
 **Important note:** tool provides some very basic sensitive data check. Do not rely on it fully. Always perform manual checks for the
