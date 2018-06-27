@@ -993,11 +993,12 @@ describe('Integration tests', () => {
             writeFile('package.json', JSON.stringify(pkg));
         });
 
-        it('Should prevent publishing without special flag', () =>
+        it.only('Should prevent publishing without special flag', () =>
             exec('npm publish')
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
+                .catch((err) => console.log(err.message))
                 .catch((err) => assert(err.message.indexOf(GUARD_ERROR) >= 0)));
 
         it('Should allow publishing with special flag', () =>
