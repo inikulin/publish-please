@@ -149,6 +149,10 @@ Performed for the following items:
  - Potential MSBuild publish profile
  - PHP dotenv
 
+## Upgrading to latest publish-please version
+
+- if you are running node 8 or above and if you have in the `package.json` file an already existing `prepublish` script, you should rename that script to `prepublishOnly` after you have upgraded publish-please.
+
 ## Check out my other packages used by this tool
 - [cp-sugar](https://github.com/inikulin/cp-sugar) - Some sugar for child_process module.
 - [elegant-status](https://github.com/inikulin/elegant-status) - Create elegant task status for CLI.
