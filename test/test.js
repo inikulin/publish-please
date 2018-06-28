@@ -998,8 +998,10 @@ describe('Integration tests', () => {
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) => console.log(err.message))
-                .catch((err) => assert(err.message.indexOf(GUARD_ERROR) >= 0)));
+                .catch((err) => {
+                    console.log(err.message);
+                    return assert(err.message.indexOf(GUARD_ERROR) >= 0);
+                }));
 
         it('Should allow publishing with special flag', () =>
             exec('npm publish --with-publish-please')
