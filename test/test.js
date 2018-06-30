@@ -14,6 +14,8 @@ const Promise = require('pinkie-promise');
 const chalk = require('chalk');
 const requireUncached = require('import-fresh');
 const packageName = require('./utils/publish-please-version-under-test');
+const versions = require('../lib/utils/get-node-infos').getCurrentNodeAndNpmVersionsSync();
+const isPrePublishOnly = versions.isPrePublishOnly;
 const lineSeparator =
     '---------------------------------------------------------------------';
 
@@ -24,6 +26,8 @@ describe('Integration tests', () => {
 
     require('../lib/utils/inquires').confirm = (...args) =>
         mockConfirm(...args);
+
+    const prepublishKey = isPrePublishOnly ? 'prepublishOnly' : 'prepublish';
 
     // NOTE: loading tested code
     const publish = requireUncached('../lib/publish/publish-workflow');
@@ -987,9 +991,9 @@ describe('Integration tests', () => {
 
         beforeEach(() => {
             const pkg = JSON.parse(readFile('package.json').toString());
-            pkg.scripts = {
-                prepublishOnly: 'node ../bin/publish-please.js guard',
-            };
+
+            pkg.scripts = {};
+            pkg.scripts[prepublishKey] = 'node ../bin/publish-please.js guard';
             writeFile('package.json', JSON.stringify(pkg));
         });
 
@@ -1041,21 +1045,17 @@ describe('Integration tests', () => {
                         'publish-please'
                     );
                     assert.strictEqual(
-                        cfg.scripts['prepublishOnly'],
+                        cfg.scripts[prepublishKey],
                         'publish-please guard'
                     );
                 }
             ));
 
         it('Should add guard gracefully', () => {
-            writeFile(
-                'package.json',
-                JSON.stringify({
-                    scripts: {
-                        prepublishOnly: 'yo',
-                    },
-                })
-            );
+            const pkg = {};
+            pkg.scripts = {};
+            pkg.scripts[prepublishKey] = 'yo';
+            writeFile('package.json', JSON.stringify(pkg));
 
             return exec(
                 'node node_modules/publish-please/lib/post-install.js'
@@ -1063,27 +1063,27 @@ describe('Integration tests', () => {
                 const cfg = JSON.parse(readFile('package.json').toString());
 
                 assert.strictEqual(
-                    cfg.scripts['prepublishOnly'],
+                    cfg.scripts[prepublishKey],
                     'publish-please guard && yo'
                 );
             });
         });
 
         it("Should not modify config if it's already modified", () =>
-            exec('node node_modules/publish-please/lib/post-install.js').then(
-                () => {
-                    const cfg = JSON.parse(readFile('package.json').toString());
-
-                    assert.strictEqual(
-                        cfg.scripts['publish-please'],
-                        'publish-please'
-                    );
-                    assert.strictEqual(
-                        cfg.scripts['prepublishOnly'],
-                        'publish-please guard'
-                    );
-                }
-            ));
+            exec('node node_modules/publish-please/lib/post-install.js')
+                .then(() => {
+                    const pkg = JSON.parse(readFile('package.json').toString());
+                    pkg.scripts[prepublishKey] = 'yo';
+                    writeFile('package.json', JSON.stringify(pkg));
+                    return Promise.resolve();
+                })
+                .then(() =>
+                    exec('node node_modules/publish-please/lib/post-install.js')
+                )
+                .then(() => {
+                    const pkg = JSON.parse(readFile('package.json').toString());
+                    assert.strictEqual(pkg.scripts[prepublishKey], 'yo');
+                }));
 
         it("Should exit with error if package.json doesn't exists", () =>
             del('package.json')
@@ -1197,7 +1197,7 @@ describe('Integration tests', () => {
                     'publish-please'
                 );
                 assert.strictEqual(
-                    cfg.scripts['prepublishOnly'],
+                    cfg.scripts[prepublishKey],
                     'publish-please guard'
                 );
                 const publishrc = JSON.parse(readFile('.publishrc').toString());

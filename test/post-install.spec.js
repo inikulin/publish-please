@@ -92,10 +92,18 @@ describe('Post-Install Execution', () => {
         output.should.containEql(
             'publish-please hooks were successfully setup for the project'
         );
-        readPkg.sync(projectDir).scripts.should.containEql({
-            'publish-please': 'publish-please',
-            prepublishOnly: 'publish-please guard',
-        });
+        /* prettier-ignore  */
+        const expectedHooks = isPrePublishOnly
+            ? {
+                'publish-please': 'publish-please',
+                prepublishOnly: 'publish-please guard',
+            }
+            : {
+                'publish-please': 'publish-please',
+                prepublish: 'publish-please guard',
+            };
+
+        readPkg.sync(projectDir).scripts.should.containEql(expectedHooks);
     });
 
     it(`Should add hooks in the package.json file on 'npm install --save-dev ${packageName}', even if there is no script section in package.json`, () => {
@@ -120,10 +128,18 @@ describe('Post-Install Execution', () => {
         output.should.containEql(
             'publish-please hooks were successfully setup for the project'
         );
-        readPkg.sync(projectDir).scripts.should.containEql({
-            'publish-please': 'publish-please',
-            prepublishOnly: 'publish-please guard',
-        });
+        /* prettier-ignore  */
+        const expectedHooks = isPrePublishOnly
+            ? {
+                'publish-please': 'publish-please',
+                prepublishOnly: 'publish-please guard',
+            }
+            : {
+                'publish-please': 'publish-please',
+                prepublish: 'publish-please guard',
+            };
+
+        readPkg.sync(projectDir).scripts.should.containEql(expectedHooks);
     });
 
     it(`Should not add/modify hooks in the package.json file on 'npm install --save-dev ${packageName}' when publish-please has already been installed`, () => {
