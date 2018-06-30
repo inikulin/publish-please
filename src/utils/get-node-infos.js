@@ -1,46 +1,73 @@
 'use strict';
 const exec = require('cp-sugar').exec;
+const execSync = require('./exec-sync');
 const semver = require('semver');
-const executionContext = require('./execution-context');
 
 module.exports = {
-    getCurrentNpmVersion,
-    getCurrentNodeVersion,
     getCurrentNodeAndNpmVersions,
+    getCurrentNodeAndNpmVersionsSync,
 };
+
+function getCurrentNodeAndNpmVersionsSync() {
+    const npm = getCurrentNpmVersionSync();
+    const node = getCurrentNodeVersionSync();
+    const isNode6 = isVersion6(node);
+    const isSafeNpm = isSafeNpmVersion(npm);
+    const isPrePublishOnly = isPrePublishOnlyNpmVersion(npm);
+    return {
+        node,
+        npm,
+        isNode6,
+        isSafeNpm,
+        isPrePublishOnly,
+    };
+}
+
+function getCurrentNodeAndNpmVersions() {
+    return Promise.all([getCurrentNodeVersion(), getCurrentNpmVersion()]).then(
+        (results) => {
+            const node = results[0];
+            const npm = results[1];
+            const isNode6 = isVersion6(node);
+            const isSafeNpm = isSafeNpmVersion(npm);
+            const isPrePublishOnly = isPrePublishOnlyNpmVersion(npm);
+
+            return Promise.resolve({
+                node,
+                npm,
+                isNode6,
+                isSafeNpm,
+                isPrePublishOnly,
+            });
+        }
+    );
+}
 
 function getCurrentNpmVersion() {
     return exec('npm version --json').then((out) => JSON.parse(out).npm);
+}
+
+function getCurrentNpmVersionSync() {
+    const result = execSync('npm version --json');
+    return JSON.parse(result).npm;
 }
 
 function getCurrentNodeVersion() {
     return Promise.resolve(process.version);
 }
 
-function getCurrentNodeAndNpmVersions() {
-    return Promise.all([getCurrentNodeVersion(), getCurrentNpmVersion()]).then(
-        (results) => {
-            const versions = { node: results[0], npm: results[1] };
+function getCurrentNodeVersionSync() {
+    return process.version;
+}
 
-            const isNode6 = semver.gte(versions.node, '6.0.0');
-            versions.isNode6 = isNode6;
+function isVersion6(version) {
+    return semver.gte(version, '6.0.0');
+}
 
-            const isSafeNpmVersion = semver.satisfies(
-                versions.npm,
-                '>=2.15.8 <3.0.0 || >=3.10.1'
-            );
-            versions.isSafeNpmVersion = isSafeNpmVersion;
+function isSafeNpmVersion(version) {
+    return semver.satisfies(version, '>=2.15.8 <3.0.0 || >=3.10.1');
+}
 
-            const isPrePublishOnlyNpmVersion = semver.gte(
-                versions.npm,
-                '5.6.0'
-            );
-            versions.isPrePublishOnlyNpmVersion = isPrePublishOnlyNpmVersion;
-            if (executionContext.isInTestMode()) {
-                console.log('versions:');
-                console.log(versions);
-            }
-            return Promise.resolve(versions);
-        }
-    );
+function isPrePublishOnlyNpmVersion(version) {
+    return semver.gte(version, '5.6.0');
 }

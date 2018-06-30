@@ -11,6 +11,8 @@ const pathJoin = require('path').join;
 const writeFile = require('fs').writeFileSync;
 const del = require('del');
 const readPkg = require('read-pkg');
+const versions = require('../lib/utils/get-node-infos').getCurrentNodeAndNpmVersionsSync();
+const isPrePublishOnly = versions.isPrePublishOnly;
 
 describe('Post-Install Execution', () => {
     let nativeExit;
@@ -94,5 +96,137 @@ describe('Post-Install Execution', () => {
             'publish-please': 'publish-please',
             prepublishOnly: 'publish-please guard',
         });
+    });
+
+    it(`Should add hooks in the package.json file on 'npm install --save-dev ${packageName}', even if there is no script section in package.json`, () => {
+        // Given
+        process.env[
+            'npm_config_argv'
+        ] = `{"remain":["${packageName}"],"cooked":["install","--save-dev","${packageName}"],"original":["install","--save-dev","${packageName}"]}`;
+        mkdirp('test/tmp');
+        const pkg = {
+            name: 'testing-repo',
+        };
+        const projectDir = pathJoin(__dirname, 'tmp');
+        writeFile(
+            pathJoin(projectDir, 'package.json'),
+            JSON.stringify(pkg, null, 2)
+        );
+
+        // When
+        init(projectDir);
+        // Then
+        (exitCode || 0).should.be.equal(0);
+        output.should.containEql(
+            'publish-please hooks were successfully setup for the project'
+        );
+        readPkg.sync(projectDir).scripts.should.containEql({
+            'publish-please': 'publish-please',
+            prepublishOnly: 'publish-please guard',
+        });
+    });
+
+    it(`Should not add/modify hooks in the package.json file on 'npm install --save-dev ${packageName}' when publish-please has already been installed`, () => {
+        // Given
+        process.env[
+            'npm_config_argv'
+        ] = `{"remain":["${packageName}"],"cooked":["install","--save-dev","${packageName}"],"original":["install","--save-dev","${packageName}"]}`;
+        mkdirp('test/tmp');
+        const existingPrePublishScript = 'npm run my-pre-publish-script';
+        const existingPrePublishOnlyScript =
+            'npm run my-pre-publish-only-script';
+        const pkg = {
+            name: 'testing-repo',
+            scripts: {
+                'publish-please': 'publish-please',
+                prepublish: existingPrePublishScript,
+                prepublishOnly: existingPrePublishOnlyScript,
+            },
+        };
+        const projectDir = pathJoin(__dirname, 'tmp');
+        writeFile(
+            pathJoin(projectDir, 'package.json'),
+            JSON.stringify(pkg, null, 2)
+        );
+
+        // When
+        init(projectDir);
+        // Then
+        (exitCode || 0).should.be.equal(0);
+        output.should.not.containEql(
+            'publish-please hooks were successfully setup for the project'
+        );
+        readPkg.sync(projectDir).scripts.should.containEql({
+            'publish-please': 'publish-please',
+            prepublish: existingPrePublishScript,
+            prepublishOnly: existingPrePublishOnlyScript,
+        });
+    });
+
+    it(`Should preserve existing prepublish script in the package.json file on 'npm install --save-dev ${packageName}'`, () => {
+        // Given
+        process.env[
+            'npm_config_argv'
+        ] = `{"remain":["${packageName}"],"cooked":["install","--save-dev","${packageName}"],"original":["install","--save-dev","${packageName}"]}`;
+        mkdirp('test/tmp');
+        const existingPrePublishScript = 'npm run my-pre-publish-script';
+        const pkg = {
+            name: 'testing-repo',
+            scripts: {
+                prepublish: existingPrePublishScript,
+            },
+        };
+        const projectDir = pathJoin(__dirname, 'tmp');
+        writeFile(
+            pathJoin(projectDir, 'package.json'),
+            JSON.stringify(pkg, null, 2)
+        );
+
+        // When
+        init(projectDir);
+        // Then
+        (exitCode || 0).should.be.equal(0);
+        output.should.containEql(
+            'publish-please hooks were successfully setup for the project'
+        );
+        readPkg.sync(projectDir).scripts.should.containEql({
+            'publish-please': 'publish-please',
+            prepublish: `publish-please guard && ${existingPrePublishScript}`,
+        });
+    });
+
+    it(`Should show a deprecation message on npm version > 5 if existing prepublish script in the package.json file on 'npm install --save-dev ${packageName}'`, () => {
+        // Given
+        process.env[
+            'npm_config_argv'
+        ] = `{"remain":["${packageName}"],"cooked":["install","--save-dev","${packageName}"],"original":["install","--save-dev","${packageName}"]}`;
+        mkdirp('test/tmp');
+        const existingPrePublishScript = 'npm run my-pre-publish-script';
+        const pkg = {
+            name: 'testing-repo',
+            scripts: {
+                prepublish: existingPrePublishScript,
+            },
+        };
+        const projectDir = pathJoin(__dirname, 'tmp');
+        writeFile(
+            pathJoin(projectDir, 'package.json'),
+            JSON.stringify(pkg, null, 2)
+        );
+
+        // When
+        init(projectDir);
+        // Then
+        (exitCode || 0).should.be.equal(0);
+        if (isPrePublishOnly) {
+            output.should.containEql(
+                "See the deprecation note in 'npm help scripts'"
+            );
+        }
+        if (!isPrePublishOnly) {
+            output.should.not.containEql(
+                "See the deprecation note in 'npm help scripts'"
+            );
+        }
     });
 });
