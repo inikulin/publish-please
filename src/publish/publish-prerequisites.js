@@ -5,13 +5,13 @@ module.exports.assertNode6PublishingPrerequisite = assertNode6PublishingPrerequi
 
 // NOTE: adopted from https://github.com/sindresorhus/np/blob/master/index.js#L78
 function assertNode6PublishingPrerequisite() {
-    return node.getNodeInfos().then((version) => {
-        if (version.isNode6 && version.isSafeNpm) {
+    return node.getNodeInfos().then((nodeInfos) => {
+        if (nodeInfos.isAtLeastNode6 && nodeInfos.isSafeNpm) {
             return Promise.resolve();
         }
         throw new Error(
             `npm@${
-                version.npm
+                nodeInfos.npmVersion
             } has known issues publishing when running Node.js 6. Please upgrade npm or downgrade Node and publish again. See: https://github.com/npm/npm/issues/5082`
         );
     });

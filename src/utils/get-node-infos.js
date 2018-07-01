@@ -9,17 +9,17 @@ module.exports = {
 };
 
 function getNodeInfosSync() {
-    const npm = getCurrentNpmVersionSync();
-    const node = getCurrentNodeVersionSync();
-    const isNode6 = isVersion6(node);
-    const isSafeNpm = isSafeNpmVersion(npm);
+    const npmVersion = getCurrentNpmVersionSync();
+    const nodeVersion = getCurrentNodeVersionSync();
+    const isAtLeastNode6 = isAtLeastVersion6(nodeVersion);
+    const isSafeNpm = isSafeNpmVersion(npmVersion);
     const shouldUsePrePublishOnlyScript = shouldUsePrePublishOnlyScriptInThis(
-        npm
+        npmVersion
     );
     return {
-        node,
-        npm,
-        isNode6,
+        nodeVersion,
+        npmVersion,
+        isAtLeastNode6,
         isSafeNpm,
         shouldUsePrePublishOnlyScript,
     };
@@ -28,18 +28,18 @@ function getNodeInfosSync() {
 function getNodeInfos() {
     return Promise.all([getCurrentNodeVersion(), getCurrentNpmVersion()]).then(
         (results) => {
-            const node = results[0];
-            const npm = results[1];
-            const isNode6 = isVersion6(node);
-            const isSafeNpm = isSafeNpmVersion(npm);
+            const nodeVersion = results[0];
+            const npmVersion = results[1];
+            const isAtLeastNode6 = isAtLeastVersion6(nodeVersion);
+            const isSafeNpm = isSafeNpmVersion(npmVersion);
             const shouldUsePrePublishOnlyScript = shouldUsePrePublishOnlyScriptInThis(
-                npm
+                npmVersion
             );
 
             return Promise.resolve({
-                node,
-                npm,
-                isNode6,
+                nodeVersion,
+                npmVersion,
+                isAtLeastNode6,
                 isSafeNpm,
                 shouldUsePrePublishOnlyScript,
             });
@@ -64,7 +64,7 @@ function getCurrentNodeVersionSync() {
     return process.version;
 }
 
-function isVersion6(version) {
+function isAtLeastVersion6(version) {
     return semver.gte(version, '6.0.0');
 }
 
