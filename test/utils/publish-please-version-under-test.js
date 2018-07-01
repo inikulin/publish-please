@@ -1,2 +1,5 @@
 'use strict';
-module.exports = 'publish-please@3.1.0';
+const readFile = require('fs').readFileSync;
+const pkg = JSON.parse(readFile('package.json').toString());
+
+module.exports = `publish-please@${pkg.version}`;
