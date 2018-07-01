@@ -5,7 +5,7 @@ module.exports.assertNode6PublishingPrerequisite = assertNode6PublishingPrerequi
 
 // NOTE: adopted from https://github.com/sindresorhus/np/blob/master/index.js#L78
 function assertNode6PublishingPrerequisite() {
-    return node.getCurrentNodeAndNpmVersions().then((version) => {
+    return node.getNodeInfos().then((version) => {
         if (version.isNode6 && version.isSafeNpm) {
             return Promise.resolve();
         }

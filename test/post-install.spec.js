@@ -11,8 +11,8 @@ const pathJoin = require('path').join;
 const writeFile = require('fs').writeFileSync;
 const del = require('del');
 const readPkg = require('read-pkg');
-const versions = require('../lib/utils/get-node-infos').getCurrentNodeAndNpmVersionsSync();
-const shouldUsePrePublishOnlyScript = versions.shouldUsePrePublishOnlyScript;
+const nodeInfos = require('../lib/utils/get-node-infos').getNodeInfosSync();
+const shouldUsePrePublishOnlyScript = nodeInfos.shouldUsePrePublishOnlyScript;
 
 describe('Post-Install Execution', () => {
     let nativeExit;

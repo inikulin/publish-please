@@ -4,8 +4,8 @@ const writeFile = require('fs').writeFileSync;
 const readPkg = require('read-pkg');
 const chalk = require('chalk');
 const getProjectDir = require('./utils/get-project-dir');
-const versions = require('./utils/get-node-infos').getCurrentNodeAndNpmVersionsSync();
-const shouldUsePrePublishOnlyScript = versions.shouldUsePrePublishOnlyScript;
+const nodeInfos = require('./utils/get-node-infos').getNodeInfosSync();
+const shouldUsePrePublishOnlyScript = nodeInfos.shouldUsePrePublishOnlyScript;
 
 const NO_CONFIG_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

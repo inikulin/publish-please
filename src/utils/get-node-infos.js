@@ -4,11 +4,11 @@ const execSync = require('./exec-sync');
 const semver = require('semver');
 
 module.exports = {
-    getCurrentNodeAndNpmVersions,
-    getCurrentNodeAndNpmVersionsSync,
+    getNodeInfos,
+    getNodeInfosSync,
 };
 
-function getCurrentNodeAndNpmVersionsSync() {
+function getNodeInfosSync() {
     const npm = getCurrentNpmVersionSync();
     const node = getCurrentNodeVersionSync();
     const isNode6 = isVersion6(node);
@@ -25,7 +25,7 @@ function getCurrentNodeAndNpmVersionsSync() {
     };
 }
 
-function getCurrentNodeAndNpmVersions() {
+function getNodeInfos() {
     return Promise.all([getCurrentNodeVersion(), getCurrentNpmVersion()]).then(
         (results) => {
             const node = results[0];

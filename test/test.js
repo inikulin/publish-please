@@ -14,8 +14,8 @@ const Promise = require('pinkie-promise');
 const chalk = require('chalk');
 const requireUncached = require('import-fresh');
 const packageName = require('./utils/publish-please-version-under-test');
-const versions = require('../lib/utils/get-node-infos').getCurrentNodeAndNpmVersionsSync();
-const shouldUsePrePublishOnlyScript = versions.shouldUsePrePublishOnlyScript;
+const nodeInfos = require('../lib/utils/get-node-infos').getNodeInfosSync();
+const shouldUsePrePublishOnlyScript = nodeInfos.shouldUsePrePublishOnlyScript;
 const lineSeparator =
     '---------------------------------------------------------------------';
 
