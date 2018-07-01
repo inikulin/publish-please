@@ -15,7 +15,7 @@ const chalk = require('chalk');
 const requireUncached = require('import-fresh');
 const packageName = require('./utils/publish-please-version-under-test');
 const versions = require('../lib/utils/get-node-infos').getCurrentNodeAndNpmVersionsSync();
-const isPrePublishOnly = versions.isPrePublishOnly;
+const shouldUsePrePublishOnlyScript = versions.shouldUsePrePublishOnlyScript;
 const lineSeparator =
     '---------------------------------------------------------------------';
 
@@ -27,7 +27,9 @@ describe('Integration tests', () => {
     require('../lib/utils/inquires').confirm = (...args) =>
         mockConfirm(...args);
 
-    const prepublishKey = isPrePublishOnly ? 'prepublishOnly' : 'prepublish';
+    const prepublishKey = shouldUsePrePublishOnlyScript
+        ? 'prepublishOnly'
+        : 'prepublish';
 
     // NOTE: loading tested code
     const publish = requireUncached('../lib/publish/publish-workflow');

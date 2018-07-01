@@ -12,7 +12,7 @@ const writeFile = require('fs').writeFileSync;
 const del = require('del');
 const readPkg = require('read-pkg');
 const versions = require('../lib/utils/get-node-infos').getCurrentNodeAndNpmVersionsSync();
-const isPrePublishOnly = versions.isPrePublishOnly;
+const shouldUsePrePublishOnlyScript = versions.shouldUsePrePublishOnlyScript;
 
 describe('Post-Install Execution', () => {
     let nativeExit;
@@ -93,7 +93,7 @@ describe('Post-Install Execution', () => {
             'publish-please hooks were successfully setup for the project'
         );
         /* prettier-ignore  */
-        const expectedHooks = isPrePublishOnly
+        const expectedHooks = shouldUsePrePublishOnlyScript
             ? {
                 'publish-please': 'publish-please',
                 prepublishOnly: 'publish-please guard',
@@ -129,7 +129,7 @@ describe('Post-Install Execution', () => {
             'publish-please hooks were successfully setup for the project'
         );
         /* prettier-ignore  */
-        const expectedHooks = isPrePublishOnly
+        const expectedHooks = shouldUsePrePublishOnlyScript
             ? {
                 'publish-please': 'publish-please',
                 prepublishOnly: 'publish-please guard',
@@ -234,12 +234,12 @@ describe('Post-Install Execution', () => {
         init(projectDir);
         // Then
         (exitCode || 0).should.be.equal(0);
-        if (isPrePublishOnly) {
+        if (shouldUsePrePublishOnlyScript) {
             output.should.containEql(
                 "See the deprecation note in 'npm help scripts'"
             );
         }
-        if (!isPrePublishOnly) {
+        if (!shouldUsePrePublishOnlyScript) {
             output.should.not.containEql(
                 "See the deprecation note in 'npm help scripts'"
             );

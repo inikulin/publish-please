@@ -13,13 +13,15 @@ function getCurrentNodeAndNpmVersionsSync() {
     const node = getCurrentNodeVersionSync();
     const isNode6 = isVersion6(node);
     const isSafeNpm = isSafeNpmVersion(npm);
-    const isPrePublishOnly = isPrePublishOnlyNpmVersion(npm);
+    const shouldUsePrePublishOnlyScript = shouldUsePrePublishOnlyScriptInThis(
+        npm
+    );
     return {
         node,
         npm,
         isNode6,
         isSafeNpm,
-        isPrePublishOnly,
+        shouldUsePrePublishOnlyScript,
     };
 }
 
@@ -30,14 +32,16 @@ function getCurrentNodeAndNpmVersions() {
             const npm = results[1];
             const isNode6 = isVersion6(node);
             const isSafeNpm = isSafeNpmVersion(npm);
-            const isPrePublishOnly = isPrePublishOnlyNpmVersion(npm);
+            const shouldUsePrePublishOnlyScript = shouldUsePrePublishOnlyScriptInThis(
+                npm
+            );
 
             return Promise.resolve({
                 node,
                 npm,
                 isNode6,
                 isSafeNpm,
-                isPrePublishOnly,
+                shouldUsePrePublishOnlyScript,
             });
         }
     );
@@ -68,6 +72,6 @@ function isSafeNpmVersion(version) {
     return semver.satisfies(version, '>=2.15.8 <3.0.0 || >=3.10.1');
 }
 
-function isPrePublishOnlyNpmVersion(version) {
+function shouldUsePrePublishOnlyScriptInThis(version) {
     return semver.gte(version, '5.6.0');
 }

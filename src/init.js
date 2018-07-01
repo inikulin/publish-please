@@ -5,7 +5,7 @@ const readPkg = require('read-pkg');
 const chalk = require('chalk');
 const getProjectDir = require('./utils/get-project-dir');
 const versions = require('./utils/get-node-infos').getCurrentNodeAndNpmVersionsSync();
-const isPrePublishOnly = versions.isPrePublishOnly;
+const shouldUsePrePublishOnlyScript = versions.shouldUsePrePublishOnlyScript;
 
 const NO_CONFIG_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -74,12 +74,12 @@ function onInstall(projectDir) {
     }
 
     function getPrePublishKey(scripts) {
-        if (isPrePublishOnly && scripts['prepublish']) {
+        if (shouldUsePrePublishOnlyScript && scripts['prepublish']) {
             reportDeprecationNoteOnPrePublish();
             return 'prepublish';
         }
 
-        if (isPrePublishOnly) {
+        if (shouldUsePrePublishOnlyScript) {
             return 'prepublishOnly';
         }
 
