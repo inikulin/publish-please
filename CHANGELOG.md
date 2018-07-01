@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Unreleased
 - Check [Github status](https://developer.github.com/v3/repos/statuses/) as a new kind of validation
 
+## [3.1.1] - 2018-07-01
+### Fixed
+- gracefully handle prepublish vs prepublishOnly script on all node versions
+
 ## [3.1.0] - 2018-06-21
 ### Added
 - be able to run publish-please in dry mode

@@ -4,6 +4,8 @@ const writeFile = require('fs').writeFileSync;
 const readPkg = require('read-pkg');
 const chalk = require('chalk');
 const getProjectDir = require('./utils/get-project-dir');
+const nodeInfos = require('./utils/get-node-infos').getNodeInfosSync();
+const shouldUsePrePublishOnlyScript = nodeInfos.shouldUsePrePublishOnlyScript;
 
 const NO_CONFIG_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -34,6 +36,14 @@ const POST_INSTALL_HOOKS_ARE_IGNORED = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 `;
 
+const DEPRECATION_NOTE_ON_PREPUBLISH = `
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!! prepublish script in package.json              !!
+!! should be renamed to prepublishOnly            !!
+!! See the deprecation note in 'npm help scripts' !!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+`;
+
 function onInstall(projectDir) {
     function readCfg() {
         try {
@@ -59,14 +69,34 @@ function onInstall(projectDir) {
         console.log(chalk.bgGreen(COMPLETION_MESSAGE));
     }
 
+    function reportDeprecationNoteOnPrePublish() {
+        console.log(chalk.inverse(DEPRECATION_NOTE_ON_PREPUBLISH));
+    }
+
+    function getPrePublishKey(scripts) {
+        if (shouldUsePrePublishOnlyScript && scripts['prepublish']) {
+            reportDeprecationNoteOnPrePublish();
+            return 'prepublish';
+        }
+
+        if (shouldUsePrePublishOnlyScript) {
+            return 'prepublishOnly';
+        }
+
+        return 'prepublish';
+    }
+
     function addConfigHooks(cfg) {
         if (!cfg.scripts) cfg.scripts = {};
 
         if (cfg.scripts['publish-please']) return false;
 
         cfg.scripts['publish-please'] = 'publish-please';
-        cfg.scripts['prepublishOnly'] = cfg.scripts['prepublishOnly']
-            ? `publish-please guard && ${cfg.scripts['prepublishOnly']}`
+
+        const prepublishKey = getPrePublishKey(cfg.scripts);
+        const existingPrepublishScript = cfg.scripts[prepublishKey];
+        cfg.scripts[prepublishKey] = existingPrepublishScript
+            ? `publish-please guard && ${existingPrepublishScript}`
             : 'publish-please guard';
 
         writeFile(
