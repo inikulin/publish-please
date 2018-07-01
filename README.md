@@ -67,6 +67,7 @@ npm run publish-please
  - **untrackedFiles** - Check that there are no untracked files in the working tree. Default: `true`.
  - **gitTag** - Check that git tag matches version specified in the `package.json`. Default: `true`.
  - **branch** - Check that current branch matches the specified branch. Default: `master`.
+ - **githubStatus** - Check that last commit in current branch has a `success` [Github status](https://developer.github.com/v3/repos/statuses/#get-the-combined-status-for-a-specific-ref). Default: `true` 
  - **sensitiveData** - Perform [audit for the sensitive data](#sensitive-information-audit). Default: `true`.
  - **vulnerableDependencies** - Perform vulnerable dependencies check using [Node Security Project](https://nodesecurity.io/) data. Default: `true`.
     - you may prevent specific vulnerabilities to be reported by publish-please by creating a [.nsprc file](https://github.com/nodesecurity/nsp#exceptions).
