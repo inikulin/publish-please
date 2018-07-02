@@ -7,6 +7,10 @@ environment:
 install:
   - ps: Install-Product node $env:nodejs_version
   - set PATH=%APPDATA%\npm;%PATH%
+  - ps: >-
+      if ($env.nodejs_version -eq "6") {
+        npm i -g npx
+      }
   - npm install
 matrix:
   fast_finish: false
