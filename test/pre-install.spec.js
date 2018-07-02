@@ -70,4 +70,30 @@ describe('Pre-Install Execution', () => {
         (exitCode || 0).should.be.equal(0);
         output.should.be.equal('');
     });
+
+    it('Should not return an error message if npm args are not recognized', () => {
+        // Given
+        process.env[
+            'npm_config_argv'
+        ] = `{"remain":["${packageName}],"cooked":["install","--global","${packageName}"],"original":["install","-g","${packageName}"]}`;
+
+        // When
+        requireUncached('../lib/pre-install');
+        // Then
+        (exitCode || 0).should.be.equal(0);
+        output.should.be.equal('');
+    });
+
+    it(`Should not return an error message on 'npx ${packageName}'`, () => {
+        // Given
+        process.env[
+            'npm_config_argv'
+        ] = `{"remain":["${packageName}"],"cooked":["install","${packageName}","--global","--prefix","/Users/HDO/.npm/_npx/78031","--loglevel","error","--json"],"original":["install","${packageName}","--global","--prefix","/Users/HDO/.npm/_npx/78031","--loglevel","error","--json"]}`;
+
+        // When
+        requireUncached('../lib/pre-install');
+        // Then
+        (exitCode || 0).should.be.equal(0);
+        output.should.be.equal('');
+    });
 });
