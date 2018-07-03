@@ -2,10 +2,10 @@
 
 const fileExists = require('fs').existsSync;
 const pathJoin = require('path').join;
-const getNpmArgs = require('./utils/get-npm-args');
-const npmArgs = getNpmArgs(process.env);
 
 (function postInstall(currentDir) {
+    const getNpmArgs = require('./utils/get-npm-args');
+    const npmArgs = getNpmArgs(process.env);
     if (npmArgs.npx) {
         return;
     }
