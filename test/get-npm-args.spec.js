@@ -217,10 +217,12 @@ describe('npm args parser util', () => {
 
     it.only("Should parse the command 'npx publish-please'", () => {
         // Given
-        const npxPath = pathJoin('Users', 'HDO', '.npm', '_npx', '78031');
+        const npxPath = JSON.stringify(
+            pathJoin('Users', 'HDO', '.npm', '_npx', '78031')
+        );
         process.env[
             'npm_config_argv'
-        ] = `{"remain":["publish-please"],"cooked":["install","publish-please","--global","--prefix","${npxPath}","--loglevel","error","--json"],"original":["install","publish-please","--global","--prefix","${npxPath}","--loglevel","error","--json"]}`;
+        ] = `{"remain":["publish-please"],"cooked":["install","publish-please","--global","--prefix",${npxPath},"--loglevel","error","--json"],"original":["install","publish-please","--global","--prefix",${npxPath},"--loglevel","error","--json"]}`;
         // When
         const args = npmArgs(process.env);
         // Then

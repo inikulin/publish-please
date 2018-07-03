@@ -63,10 +63,12 @@ describe('Prevent Global Install', () => {
 
     it(`Should not throw an error when chalk module is not found on 'npx ${packageName}'`, () => {
         // Given
-        const npxPath = pathJoin('Users', 'HDO', '.npm', '_npx', '78031');
+        const npxPath = JSON.stringify(
+            pathJoin('Users', 'HDO', '.npm', '_npx', '78031')
+        );
         process.env[
             'npm_config_argv'
-        ] = `{"remain":["${packageName}"],"cooked":["install","${packageName}","--global","--prefix","${npxPath}","--loglevel","error","--json"],"original":["install","${packageName}","--global","--prefix","${npxPath}","--loglevel","error","--json"]}`;
+        ] = `{"remain":["${packageName}"],"cooked":["install","${packageName}","--global","--prefix",${npxPath},"--loglevel","error","--json"],"original":["install","${packageName}","--global","--prefix",${npxPath},"--loglevel","error","--json"]}`;
 
         // When
         preventGlobalInstall();

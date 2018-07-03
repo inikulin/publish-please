@@ -1,14 +1,11 @@
 'use strict';
-const pathJoin = require('path').join;
+const pathSeparator = require('path').sep;
 
 // NOTE: the following code was partially adopted from https://github.com/iarna/in-publish
 module.exports = function getNpmArgs(processEnv) {
     const npmArgs = {};
     if (processEnv && processEnv['npm_config_argv']) {
         try {
-            console.error(processEnv['npm_config_argv']);
-            console.error('===========================');
-            console.error(process.env);
             const args = JSON.parse(processEnv['npm_config_argv']);
             npmArgs.install =
                 npmCommand(args).hasArg('install') ||
@@ -22,18 +19,20 @@ module.exports = function getNpmArgs(processEnv) {
             npmArgs['config'] = npmCommand(args).hasArg('config');
             npmArgs.npx =
                 npmCommand(args).hasArg('--prefix') &&
-                npmCommand(args).hasArgThatContains(pathJoin('.npm', '_npx'));
+                npmCommand(args).hasArgThatContains(
+                    `${pathSeparator}_npx${pathSeparator}`
+                );
             // prettier-ignore
             npmArgs['--with-publish-please'] = npmCommand(args).hasArg('--with-publish-please');
         } catch (err) {
-            console.error(err.message);
-            console.warn(
+            console.error(
                 "[Publish-please] Cannot parse property 'npm_config_argv' in process.env "
             );
             // prettier-ignore
-            console.warn(
+            console.error(
                 `[Publish-please] process.env['npm_config_argv']= '${processEnv['npm_config_argv']}'`
             );
+            console.error(`[Publish-please] ${err.message}`);
         }
     }
 
