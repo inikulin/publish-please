@@ -245,4 +245,20 @@ describe('Post-Install Execution', () => {
             );
         }
     });
+
+    it(`Should not run postinstall script on 'npx ${packageName}'`, () => {
+        // Given
+        const npxPath = JSON.stringify(
+            pathJoin('Users', 'HDO', '.npm', '_npx', '78031')
+        );
+        process.env[
+            'npm_config_argv'
+        ] = `{"remain":["${packageName}"],"cooked":["install","${packageName}","--global","--prefix",${npxPath},"--loglevel","error","--json"],"original":["install","${packageName}","--global","--prefix",${npxPath},"--loglevel","error","--json"]}`;
+
+        // When
+        requireUncached('../lib/post-install');
+        // Then
+        (exitCode || 0).should.be.equal(0);
+        output.should.be.equal('');
+    });
 });

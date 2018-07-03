@@ -1032,9 +1032,13 @@ describe('Integration tests', () => {
         beforeEach(() => {
             return mkdir(
                 'node_modules/publish-please/lib'.replace(/\\|\//g, sep)
-            ).then(() =>
-                exec('cp -r ../lib/* node_modules/publish-please/lib')
-            );
+            )
+                .then(() =>
+                    exec('cp -r ../lib/* node_modules/publish-please/lib')
+                )
+                .then(() => {
+                    process.env['npm_config_argv'] = '';
+                });
         });
 
         it('Should add hooks to package.json', () =>
