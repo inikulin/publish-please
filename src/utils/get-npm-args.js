@@ -7,6 +7,8 @@ module.exports = function getNpmArgs(processEnv) {
     if (processEnv && processEnv['npm_config_argv']) {
         try {
             console.error(processEnv['npm_config_argv']);
+            console.error('===========================');
+            console.error(process.env);
             const args = JSON.parse(processEnv['npm_config_argv']);
             npmArgs.install =
                 npmCommand(args).hasArg('install') ||
