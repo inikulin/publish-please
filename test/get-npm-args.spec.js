@@ -4,6 +4,7 @@ const npmArgs = require('../lib/utils/get-npm-args');
 /* eslint-disable no-unused-vars */
 const should = require('should');
 const packageName = require('./utils/publish-please-version-under-test');
+const pathJoin = require('path').join;
 
 describe('npm args parser util', () => {
     it('Should return an empty object when process.env does not exist', () => {
@@ -216,8 +217,10 @@ describe('npm args parser util', () => {
 
     it("Should parse the command 'npx publish-please'", () => {
         // Given
-        process.env['npm_config_argv'] =
-            '{"remain":["publish-please"],"cooked":["install","publish-please","--global","--prefix","/Users/HDO/.npm/_npx/78031","--loglevel","error","--json"],"original":["install","publish-please","--global","--prefix","/Users/HDO/.npm/_npx/78031","--loglevel","error","--json"]}';
+        const npxPath = pathJoin('Users', 'HDO', '.npm', '_npx', '78031');
+        process.env[
+            'npm_config_argv'
+        ] = `{"remain":["publish-please"],"cooked":["install","publish-please","--global","--prefix","${npxPath}","--loglevel","error","--json"],"original":["install","publish-please","--global","--prefix","${npxPath}","--loglevel","error","--json"]}`;
         // When
         const args = npmArgs(process.env);
         // Then
