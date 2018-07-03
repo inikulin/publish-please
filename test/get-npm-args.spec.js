@@ -215,7 +215,7 @@ describe('npm args parser util', () => {
         args['config'].should.be.true();
     });
 
-    it("Should parse the command 'npx publish-please'", () => {
+    it.only("Should parse the command 'npx publish-please'", () => {
         // Given
         const npxPath = pathJoin('Users', 'HDO', '.npm', '_npx', '78031');
         process.env[

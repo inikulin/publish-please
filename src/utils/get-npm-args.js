@@ -24,6 +24,7 @@ module.exports = function getNpmArgs(processEnv) {
             // prettier-ignore
             npmArgs['--with-publish-please'] = npmCommand(args).hasArg('--with-publish-please');
         } catch (err) {
+            console.error(err.message);
             console.warn(
                 "[Publish-please] Cannot parse property 'npm_config_argv' in process.env "
             );
