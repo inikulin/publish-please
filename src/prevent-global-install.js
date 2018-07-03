@@ -11,6 +11,9 @@ const NO_GLOBAL_INSTALL_MESSAGE = `
 module.exports = function preventGlobalInstall() {
     const getNpmArgs = require('./utils/get-npm-args');
     const npmArgs = getNpmArgs(process.env);
+    if (npmArgs.npx) {
+        return;
+    }
     if (npmArgs['--global']) {
         reportNoGlobalInstall();
         process.exit(1);
