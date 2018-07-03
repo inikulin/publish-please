@@ -1,10 +1,12 @@
 'use strict';
+const pathJoin = require('path').join;
 
 // NOTE: the following code was partially adopted from https://github.com/iarna/in-publish
 module.exports = function getNpmArgs(processEnv) {
     const npmArgs = {};
     if (processEnv && processEnv['npm_config_argv']) {
         try {
+            console.error(processEnv['npm_config_argv']);
             const args = JSON.parse(processEnv['npm_config_argv']);
             npmArgs.install =
                 npmCommand(args).hasArg('install') ||
@@ -16,6 +18,9 @@ module.exports = function getNpmArgs(processEnv) {
             npmArgs['--global'] = npmCommand(args).hasArg('--global');
             npmArgs['--dry-run'] = npmCommand(args).hasArg('--dry-run');
             npmArgs['config'] = npmCommand(args).hasArg('config');
+            npmArgs.npx =
+                npmCommand(args).hasArg('--prefix') &&
+                npmCommand(args).hasArgThatContains(pathJoin('.npm', '_npx'));
             // prettier-ignore
             npmArgs['--with-publish-please'] = npmCommand(args).hasArg('--with-publish-please');
         } catch (err) {
@@ -38,6 +43,12 @@ function npmCommand(args) {
         hasArg: (arg) => {
             return isValidArgs
                 ? args.cooked.filter((a) => a === arg).length > 0
+                : false;
+        },
+        hasArgThatContains: (substring) => {
+            /* prettier-ignore */
+            return isValidArgs
+                ? args.cooked.filter((a) => a && a.includes(substring)).length > 0
                 : false;
         },
     };

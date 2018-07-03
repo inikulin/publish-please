@@ -33,6 +33,7 @@ describe('npm args parser util', () => {
         args.publish.should.be.true();
         args.install.should.be.false();
         args.runScript.should.be.false();
+        args.npx.should.be.false();
         args['--with-publish-please'].should.be.false();
         args['--dry-run'].should.be.false();
         args['config'].should.be.false();
@@ -47,6 +48,7 @@ describe('npm args parser util', () => {
         args.publish.should.be.true();
         args.install.should.be.false();
         args.runScript.should.be.false();
+        args.npx.should.be.false();
         args['--with-publish-please'].should.be.true();
         args['--dry-run'].should.be.false();
         args['config'].should.be.false();
@@ -61,6 +63,7 @@ describe('npm args parser util', () => {
         args.publish.should.be.false();
         args.install.should.be.false();
         args.runScript.should.be.true();
+        args.npx.should.be.false();
         args['--save-dev'].should.be.false();
         args['--save'].should.be.false();
         args['--global'].should.be.false();
@@ -78,6 +81,7 @@ describe('npm args parser util', () => {
         args.publish.should.be.false();
         args.install.should.be.true();
         args.runScript.should.be.false();
+        args.npx.should.be.false();
         args['--save-dev'].should.be.false();
         args['--save'].should.be.false();
         args['--global'].should.be.false();
@@ -95,6 +99,7 @@ describe('npm args parser util', () => {
         args.publish.should.be.false();
         args.install.should.be.true();
         args.runScript.should.be.false();
+        args.npx.should.be.false();
         args['--save-dev'].should.be.false();
         args['--save'].should.be.false();
         args['--global'].should.be.false();
@@ -113,6 +118,7 @@ describe('npm args parser util', () => {
         args.install.should.be.true();
         args.publish.should.be.false();
         args.runScript.should.be.false();
+        args.npx.should.be.false();
         args['--save-dev'].should.be.true();
         args['--save'].should.be.false();
         args['--global'].should.be.false();
@@ -130,6 +136,7 @@ describe('npm args parser util', () => {
         args.install.should.be.true();
         args.publish.should.be.false();
         args.runScript.should.be.false();
+        args.npx.should.be.false();
         args['--save-dev'].should.be.true();
         args['--save'].should.be.false();
         args['--global'].should.be.false();
@@ -147,6 +154,7 @@ describe('npm args parser util', () => {
         args.install.should.be.true();
         args.publish.should.be.false();
         args.runScript.should.be.false();
+        args.npx.should.be.false();
         args['--global'].should.be.true();
         args['--save-dev'].should.be.false();
         args['--save'].should.be.false();
@@ -164,6 +172,7 @@ describe('npm args parser util', () => {
         args.install.should.be.true();
         args.publish.should.be.false();
         args.runScript.should.be.false();
+        args.npx.should.be.false();
         args['--global'].should.be.true();
         args['--save-dev'].should.be.false();
         args['--save'].should.be.false();
@@ -180,6 +189,7 @@ describe('npm args parser util', () => {
         args.install.should.be.false();
         args.publish.should.be.false();
         args.runScript.should.be.true();
+        args.npx.should.be.false();
         args['--global'].should.be.false();
         args['--save-dev'].should.be.false();
         args['--save'].should.be.false();
@@ -196,10 +206,29 @@ describe('npm args parser util', () => {
         args.install.should.be.false();
         args.publish.should.be.false();
         args.runScript.should.be.true();
+        args.npx.should.be.false();
         args['--global'].should.be.false();
         args['--save-dev'].should.be.false();
         args['--save'].should.be.false();
         args['--dry-run'].should.be.false();
         args['config'].should.be.true();
+    });
+
+    it("Should parse the command 'npx publish-please'", () => {
+        // Given
+        process.env['npm_config_argv'] =
+            '{"remain":["publish-please"],"cooked":["install","publish-please","--global","--prefix","/Users/HDO/.npm/_npx/78031","--loglevel","error","--json"],"original":["install","publish-please","--global","--prefix","/Users/HDO/.npm/_npx/78031","--loglevel","error","--json"]}';
+        // When
+        const args = npmArgs(process.env);
+        // Then
+        args.install.should.be.true();
+        args.publish.should.be.false();
+        args.runScript.should.be.false();
+        args.npx.should.be.true();
+        args['--global'].should.be.true();
+        args['--save-dev'].should.be.false();
+        args['--save'].should.be.false();
+        args['--dry-run'].should.be.false();
+        args['config'].should.be.false();
     });
 });
