@@ -7,7 +7,7 @@ const packageName = require('./utils/publish-please-version-under-test');
 const pathJoin = require('path').join;
 
 describe('npm args parser util', () => {
-    it('Should return an empty object when process.env does not exist', () => {
+    it('Should return an empty object when process.env is undefined', () => {
         // Given
         const processEnv = undefined;
         // When
@@ -18,6 +18,23 @@ describe('npm args parser util', () => {
     it('Should return an empty object when the command is not an npm command', () => {
         // Given
         process.env['npm_config_argv'] = undefined;
+        const processEnv = process.env;
+        // When
+        const args = npmArgs(processEnv);
+        // Then
+        args.should.be.empty();
+    });
+    it('Should return an empty object when process.env["npm_config_argv"] does not exist', () => {
+        // Given
+        delete process.env['npm_config_argv'];
+        // When
+        const args = npmArgs(process.env);
+        // Then
+        args.should.be.empty();
+    });
+    it('Should return an empty object when process.env["npm_config_argv"] is a bad json', () => {
+        // Given
+        process.env['npm_config_argv'] = '<bad json>';
         const processEnv = process.env;
         // When
         const args = npmArgs(processEnv);

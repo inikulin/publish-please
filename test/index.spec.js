@@ -4,6 +4,7 @@
 const readFile = require('fs').readFileSync;
 const should = require('should');
 const cli = require('../lib');
+const pathJoin = require('path').join;
 
 describe('Publish-please CLI Options', () => {
     let nativeExit;
@@ -47,6 +48,36 @@ describe('Publish-please CLI Options', () => {
         // Given
         process.env['npm_config_argv'] =
             '{"remain":[],"cooked":["run","publish-please","--dry-run"],"original":["run","publish-please","--dry-run"]}';
+        // When
+        return (
+            cli()
+                // Then
+                .catch((err) => err.message.should.containEql('ERRORS'))
+                .catch((err) => output.should.containEql('dry mode activated'))
+        );
+    });
+
+    it('Should execute dry-run workflow on `npx publish-please --dry-run`', () => {
+        // Given
+        process.env['npm_config_argv'] = undefined;
+
+        // [ '/usr/local/bin/node',
+        //   '/Users/HDO/.npm/_npx/97852/bin/publish-please',
+        //   '--dry-run'
+        // ]
+        process.argv = [
+            pathJoin('usr', 'local', 'bin', 'node'),
+            pathJoin(
+                'Users',
+                'xxx',
+                '.npm',
+                '_npx',
+                '97852',
+                'bin',
+                'publish-please'
+            ),
+            '--dry-run',
+        ];
         // When
         return (
             cli()
