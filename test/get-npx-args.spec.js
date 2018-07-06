@@ -16,6 +16,7 @@ describe('npx args parser util', () => {
         const args = npxArgs(process);
         // Then
         args['--dry-run'].should.be.false();
+        args['config'].should.be.false();
     });
     it('Should parse even if process.argv does not exist', () => {
         // Given
@@ -24,6 +25,7 @@ describe('npx args parser util', () => {
         const args = npxArgs(process);
         // Then
         args['--dry-run'].should.be.false();
+        args['config'].should.be.false();
     });
     it('Should parse even if process.argv is not an array', () => {
         // Given
@@ -33,6 +35,7 @@ describe('npx args parser util', () => {
         const args = npxArgs(process);
         // Then
         args['--dry-run'].should.be.false();
+        args['config'].should.be.false();
     });
     it('Should parse even if process.argv is an empty array', () => {
         // Given
@@ -42,6 +45,7 @@ describe('npx args parser util', () => {
         const args = npxArgs(process);
         // Then
         args['--dry-run'].should.be.false();
+        args['config'].should.be.false();
     });
     it('Should parse even if the command is not an npx command', () => {
         // Given
@@ -50,6 +54,7 @@ describe('npx args parser util', () => {
         const args = npxArgs(process);
         // Then
         args['--dry-run'].should.be.false();
+        args['config'].should.be.false();
     });
     it('Should parse the command `npx publish-please --dry-run`', () => {
         // Given
@@ -76,5 +81,34 @@ describe('npx args parser util', () => {
         const args = npxArgs(process);
         // Then
         args['--dry-run'].should.be.true();
+        args['config'].should.be.false();
+    });
+
+    it('Should parse the command `npx publish-please config`', () => {
+        // Given
+        // [ '/usr/local/bin/node',
+        //   '/Users/HDO/.npm/_npx/97852/bin/publish-please',
+        //   'config'
+        // ]
+
+        process.argv = [
+            pathJoin('usr', 'local', 'bin', 'node'),
+            pathJoin(
+                'Users',
+                'xxx',
+                '.npm',
+                '_npx',
+                '97852',
+                'bin',
+                'publish-please'
+            ),
+            'config',
+        ];
+
+        // When
+        const args = npxArgs(process);
+        // Then
+        args['--dry-run'].should.be.false();
+        args['config'].should.be.true();
     });
 });
