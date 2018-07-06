@@ -35,6 +35,7 @@ describe('Integration tests', () => {
     const publish = requireUncached('../lib/publish/publish-workflow');
     const getOptions = require('../lib/publish-options').getOptions;
     const echoPublishCommand = 'echo "npm publish"';
+
     function mkdir(path) {
         return new Promise((resolve, reject) =>
             mkdirp(path, null, (err) => (err ? reject(err) : resolve()))
@@ -174,7 +175,11 @@ describe('Integration tests', () => {
         it('Should expect `master` branch by default', () =>
             exec('git checkout some-branch')
                 .then(() =>
-                    publish(getTestOptions({ remove: 'validations.branch' }))
+                    publish(
+                        getTestOptions({
+                            remove: 'validations.branch',
+                        })
+                    )
                 )
                 .then(() => {
                     throw new Error('Promise rejection expected');
@@ -191,7 +196,11 @@ describe('Integration tests', () => {
                 .then(() =>
                     publish(
                         getTestOptions({
-                            set: { validations: { branch: 'no-package-json' } },
+                            set: {
+                                validations: {
+                                    branch: 'no-package-json',
+                                },
+                            },
                         })
                     )
                 )
@@ -210,7 +219,11 @@ describe('Integration tests', () => {
                 .then(() =>
                     publish(
                         getTestOptions({
-                            set: { validations: { branch: 'master' } },
+                            set: {
+                                validations: {
+                                    branch: 'master',
+                                },
+                            },
                         })
                     )
                 )
@@ -229,7 +242,9 @@ describe('Integration tests', () => {
                     getTestOptions({
                         set: {
                             publishCommand: echoPublishCommand,
-                            validations: { branch: 'some-branch' },
+                            validations: {
+                                branch: 'some-branch',
+                            },
                         },
                     })
                 )
@@ -260,7 +275,9 @@ describe('Integration tests', () => {
                     publish(
                         getTestOptions({
                             set: {
-                                validations: { gitTag: true },
+                                validations: {
+                                    gitTag: true,
+                                },
                             },
                         })
                     )
@@ -280,7 +297,11 @@ describe('Integration tests', () => {
                 .then(() =>
                     publish(
                         getTestOptions({
-                            set: { validations: { gitTag: true } },
+                            set: {
+                                validations: {
+                                    gitTag: true,
+                                },
+                            },
                         })
                     )
                 )
@@ -302,7 +323,9 @@ describe('Integration tests', () => {
                         getTestOptions({
                             set: {
                                 publishCommand: echoPublishCommand,
-                                validations: { gitTag: true },
+                                validations: {
+                                    gitTag: true,
+                                },
                             },
                         })
                     )
@@ -333,7 +356,11 @@ describe('Integration tests', () => {
 
                     return publish(
                         getTestOptions({
-                            set: { validations: { uncommittedChanges: true } },
+                            set: {
+                                validations: {
+                                    uncommittedChanges: true,
+                                },
+                            },
                         })
                     );
                 })
@@ -369,7 +396,9 @@ describe('Integration tests', () => {
                     getTestOptions({
                         set: {
                             publishCommand: echoPublishCommand,
-                            validations: { uncommittedChanges: true },
+                            validations: {
+                                uncommittedChanges: true,
+                            },
                         },
                     })
                 )
@@ -384,7 +413,11 @@ describe('Integration tests', () => {
 
                     return publish(
                         getTestOptions({
-                            set: { validations: { untrackedFiles: true } },
+                            set: {
+                                validations: {
+                                    untrackedFiles: true,
+                                },
+                            },
                         })
                     );
                 })
@@ -406,7 +439,9 @@ describe('Integration tests', () => {
                     getTestOptions({
                         set: {
                             publishCommand: echoPublishCommand,
-                            validations: { untrackedFiles: false },
+                            validations: {
+                                untrackedFiles: false,
+                            },
                         },
                     })
                 );
@@ -418,7 +453,9 @@ describe('Integration tests', () => {
                     getTestOptions({
                         set: {
                             publishCommand: echoPublishCommand,
-                            validations: { untrackedFiles: true },
+                            validations: {
+                                untrackedFiles: true,
+                            },
                         },
                     })
                 )
@@ -437,7 +474,11 @@ describe('Integration tests', () => {
                 .then(() =>
                     publish(
                         getTestOptions({
-                            set: { validations: { sensitiveData: true } },
+                            set: {
+                                validations: {
+                                    sensitiveData: true,
+                                },
+                            },
                         })
                     )
                 )
@@ -495,7 +536,9 @@ describe('Integration tests', () => {
                         getTestOptions({
                             set: {
                                 publishCommand: echoPublishCommand,
-                                validations: { sensitiveData: false },
+                                validations: {
+                                    sensitiveData: false,
+                                },
                             },
                         })
                     )
@@ -507,14 +550,18 @@ describe('Integration tests', () => {
             exec('git checkout master')
                 .then(() => pkgd())
                 .then((pkgInfo) => {
-                    pkgInfo.cfg.dependencies = { ms: '0.7.0' };
+                    pkgInfo.cfg.dependencies = {
+                        ms: '0.7.0',
+                    };
                     writeFile('package.json', JSON.stringify(pkgInfo.cfg));
                 })
                 .then(() =>
                     publish(
                         getTestOptions({
                             set: {
-                                validations: { vulnerableDependencies: true },
+                                validations: {
+                                    vulnerableDependencies: true,
+                                },
                             },
                         })
                     )
@@ -687,7 +734,9 @@ describe('Integration tests', () => {
             exec('git checkout master')
                 .then(() => pkgd())
                 .then((pkgInfo) => {
-                    pkgInfo.cfg.dependencies = { ms: '0.7.1' };
+                    pkgInfo.cfg.dependencies = {
+                        ms: '0.7.1',
+                    };
                     writeFile('package.json', JSON.stringify(pkgInfo.cfg));
                 })
                 .then(() =>
@@ -695,7 +744,9 @@ describe('Integration tests', () => {
                         getTestOptions({
                             set: {
                                 publishCommand: echoPublishCommand,
-                                validations: { vulnerableDependencies: true },
+                                validations: {
+                                    vulnerableDependencies: true,
+                                },
                             },
                         })
                     )
@@ -729,7 +780,9 @@ describe('Integration tests', () => {
                         getTestOptions({
                             set: {
                                 publishCommand: echoPublishCommand,
-                                validations: { vulnerableDependencies: true },
+                                validations: {
+                                    vulnerableDependencies: true,
+                                },
                             },
                         })
                     )
@@ -749,7 +802,9 @@ describe('Integration tests', () => {
                     publish(
                         getTestOptions({
                             set: {
-                                validations: { vulnerableDependencies: true },
+                                validations: {
+                                    vulnerableDependencies: true,
+                                },
                             },
                         })
                     )
@@ -768,7 +823,9 @@ describe('Integration tests', () => {
             exec('git checkout master')
                 .then(() => pkgd())
                 .then((pkgInfo) => {
-                    pkgInfo.cfg.dependencies = { ms: '0.7.0' };
+                    pkgInfo.cfg.dependencies = {
+                        ms: '0.7.0',
+                    };
 
                     writeFile('package.json', JSON.stringify(pkgInfo.cfg));
                 })
@@ -777,7 +834,9 @@ describe('Integration tests', () => {
                         getTestOptions({
                             set: {
                                 publishCommand: echoPublishCommand,
-                                validations: { vulnerableDependencies: false },
+                                validations: {
+                                    vulnerableDependencies: false,
+                                },
                             },
                         })
                     )
@@ -916,7 +975,9 @@ describe('Integration tests', () => {
                 .then(() =>
                     publish(
                         getTestOptions({
-                            set: { publishCommand: echoPublishCommand },
+                            set: {
+                                publishCommand: echoPublishCommand,
+                            },
                             remove: 'publishTag',
                         })
                     )
@@ -1019,9 +1080,9 @@ describe('Integration tests', () => {
                 .catch((err) => {
                     // prettier-ignore
                     assert(
-                        err.message.indexOf('You do not have permission to publish') > -1
-                        || err.message.indexOf('auth required for publishing') > -1
-                        || err.message.indexOf('operation not permitted') > -1
+                        err.message.indexOf('You do not have permission to publish') > -1 ||
+                        err.message.indexOf('auth required for publishing') > -1 ||
+                        err.message.indexOf('operation not permitted') > -1
                     );
                 }));
 
@@ -1291,6 +1352,42 @@ describe('Integration tests', () => {
                     assert(publishLog.includes('testing-repo-1.3.77.tgz'));
                     /* prettier-ignore */
                     assert(publishLog.includes("run 'npm pack' to have more details on the package"));
+                });
+        });
+    });
+
+    describe('npx usage', () => {
+        it(`Should be able to use publish-please in dry mode (with no .publishrc config file) with npx ${packageName} --dry-run`, () => {
+            return Promise.resolve()
+                .then(() => {
+                    const pkg = JSON.parse(readFile('package.json').toString());
+                    const scripts = {};
+                    scripts.test = 'echo "running tests ..."';
+                    pkg.scripts = scripts;
+                    writeFile('package.json', JSON.stringify(pkg, null, 2));
+                    return Promise.resolve();
+                })
+                .then(() =>
+                    exec(
+                        /* prettier-ignore */
+                        `npx ../${packageName.replace('@','-')}.tgz --dry-run > ./publish.log`
+                    )
+                )
+                .then(() => {
+                    const publishLog = readFile('./publish.log').toString();
+                    console.log(publishLog);
+                    /* prettier-ignore */
+                    assert(publishLog.includes('dry mode activated'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running pre-publish script'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('running tests ...'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running validations'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('ERRORS'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('There are uncommitted changes in the working tree.'));
                 });
         });
     });
