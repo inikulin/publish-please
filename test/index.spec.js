@@ -87,6 +87,53 @@ describe('Publish-please CLI Options', () => {
         );
     });
 
+    it('Should execute configuration workflow on `npx publish-please config`', () => {
+        // Given
+        process.env['npm_config_argv'] = undefined;
+
+        // [ '/usr/local/bin/node',
+        //   '/Users/HDO/.npm/_npx/97852/bin/publish-please',
+        //   'config'
+        // ]
+        process.argv = [
+            pathJoin('usr', 'local', 'bin', 'node'),
+            pathJoin(
+                'Users',
+                'xxx',
+                '.npm',
+                '_npx',
+                '97852',
+                'bin',
+                'publish-please'
+            ),
+            'config',
+        ];
+        // When
+        return cli().then(() => {
+            output.should.containEql('Configuring option "prePublishScript":');
+            output.should.containEql('Configuring option "postPublishScript":');
+            output.should.containEql('Configuring option "publishCommand":');
+            output.should.containEql('Configuring option "publishTag"');
+            output.should.containEql('Configuring option "confirm":');
+            output.should.containEql(
+                'Configuring validation "vulnerableDependencies"'
+            );
+            output.should.containEql(
+                'Configuring validation "uncommittedChanges":'
+            );
+            output.should.containEql(
+                'Configuring validation "untrackedFiles":'
+            );
+            output.should.containEql('Configuring validation "sensitiveData":');
+            output.should.containEql('Configuring validation "branch":');
+            output.should.containEql('Configuring validation "gitTag"');
+            output.should.containEql('Current configuration:');
+            output.should.containEql(
+                'Configuration has been successfully saved.'
+            );
+        });
+    });
+
     it('Should execute guard on `publish-please guard`', () => {
         // Given
         process.env['npm_config_argv'] =

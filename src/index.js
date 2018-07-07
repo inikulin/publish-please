@@ -39,5 +39,10 @@ function shouldRunConfigurationWizard() {
     if (npmArgs && npmArgs['config']) {
         return true;
     }
+
+    const npxArgs = getNpxArgs(process);
+    if (npxArgs && npxArgs['config']) {
+        return true;
+    }
     return false;
 }
