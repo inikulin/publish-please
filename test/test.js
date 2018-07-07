@@ -1,5 +1,8 @@
 'use strict';
 
+/* eslint-disable no-unused-vars */
+const should = require('should');
+
 const assert = require('assert');
 const del = require('del');
 const writeFile = require('fs').writeFileSync;
@@ -1452,6 +1455,38 @@ describe('Integration tests', () => {
                     assert(publishLog.includes('testing-repo-1.3.77.tgz'));
                     /* prettier-ignore */
                     assert(publishLog.includes("run 'npm pack' to have more details on the package"));
+                });
+        });
+
+        it(`Should be able to configure publish-please with 'npx ${packageName} config'`, () => {
+            return Promise.resolve()
+                .then(() => console.log(`> npx ${packageName} config`))
+                .then(() =>
+                    exec(
+                        /* prettier-ignore */
+                        `npx ../${packageName.replace('@','-')}.tgz config > ./publish.log`
+                    )
+                )
+                .then(() => {
+                    const publishLog = readFile('./publish.log').toString();
+                    console.log(publishLog);
+                })
+                .then(() => {
+                    const publishrc = JSON.parse(
+                        readFile('.publishrc').toString()
+                    );
+                    publishrc.confirm.should.be.true();
+                    publishrc.prePublishScript.should.equal('npm test');
+                    publishrc.postPublishScript.should.equal('');
+                    publishrc.publishCommand.should.equal('npm publish');
+                    publishrc.publishTag.should.equal('latest');
+                    publishrc.validations.branch.should.equal('master');
+                    publishrc.validations.uncommittedChanges.should.be.true();
+                    publishrc.validations.untrackedFiles.should.be.true();
+                    publishrc.validations.vulnerableDependencies.should.be.true();
+                    publishrc.validations.sensitiveData.should.be.true();
+                    publishrc.validations.gitTag.should.be.true();
+                    publishrc.validations.branch.should.equal('master');
                 });
         });
     });
