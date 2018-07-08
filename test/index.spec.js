@@ -100,7 +100,7 @@ describe('Publish-please CLI Options', () => {
         );
     });
 
-    it('Should execute publihing workflow on `npx publish-please`', () => {
+    it('Should execute publishing workflow on `npx publish-please`', () => {
         // Given
         process.env['npm_config_argv'] = undefined;
 
@@ -126,12 +126,10 @@ describe('Publish-please CLI Options', () => {
             cli()
                 // Then
                 .catch((err) => {
+                    output.should.not.containEql('dry mode activated');
                     output.should.containEql('Running pre-publish script');
                     output.should.containEql('Running validations');
                     output.should.containEql('ERRORS');
-                    output.should.containEql(
-                        'There are uncommitted changes in the working tree.'
-                    );
                 })
         );
     });
