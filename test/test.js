@@ -1593,7 +1593,7 @@ describe('Integration tests', () => {
                     /* prettier-ignore */
                     assert(publishLog.includes('ERRORS'));
                     /* prettier-ignore */
-                    assert(publishLog.includes('Command `npm` exited with code 1'));
+                    assert(publishLog.includes('Command `npm` exited with code'));
                 });
         });
     });
