@@ -1489,5 +1489,112 @@ describe('Integration tests', () => {
                     publishrc.validations.branch.should.equal('master');
                 });
         });
+
+        it(`Should be able to start the publishing workflow with 'npx ${packageName}' (no .publishrc config file)`, () => {
+            return Promise.resolve()
+                .then(() => console.log(`> npx ${packageName}`))
+
+                .then(() =>
+                    exec(
+                        /* prettier-ignore */
+                        `npx ../${packageName.replace('@','-')}.tgz > ./publish.log`
+                    )
+                )
+                .then(() => {
+                    const publishLog = readFile('./publish.log').toString();
+                    console.log(publishLog);
+                    return publishLog;
+                })
+                .then((publishLog) => {
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running pre-publish script'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Error: no test specified'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running validations'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Checking for the vulnerable dependencies'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Checking for the uncommitted changes'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Checking for the untracked files'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Checking for the sensitive data in the working tree'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Validating branch'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Validating git tag'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('ERRORS'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('* There are untracked files in the working tree.'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes("* Latest commit doesn't have git tag."));
+                });
+        });
+
+        it(`Should be able to run the publishing workflow with 'npx ${packageName}' (with .publishrc config file)`, () => {
+            return Promise.resolve()
+                .then(() => {
+                    const pkg = JSON.parse(readFile('package.json').toString());
+                    const scripts = {};
+                    scripts.test = 'echo "running tests ..."';
+                    pkg.scripts = scripts;
+                    writeFile('package.json', JSON.stringify(pkg, null, 2));
+                    return Promise.resolve();
+                })
+                .then(() => {
+                    writeFile(
+                        '.publishrc',
+                        JSON.stringify({
+                            confirm: false,
+                            validations: {
+                                vulnerableDependencies: true,
+                                sensitiveData: true,
+                                uncommittedChanges: false,
+                                untrackedFiles: false,
+                                branch: 'master',
+                                gitTag: false,
+                            },
+                            publishTag: 'latest',
+                            prePublishScript:
+                                'echo "running script defined in .publishrc ..."',
+                            postPublishScript: false,
+                        })
+                    );
+                })
+                .then(() => console.log(`> npx ${packageName}`))
+                .then(() =>
+                    exec(
+                        /* prettier-ignore */
+                        `npx ../${packageName.replace('@','-')}.tgz > ./publish.log`
+                    )
+                )
+                .then(() => {
+                    const publishLog = readFile('./publish.log').toString();
+                    console.log(publishLog);
+                    return publishLog;
+                })
+                .then((publishLog) => {
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running pre-publish script'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('running script defined in .publishrc ...'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running validations'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Checking for the vulnerable dependencies'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Checking for the sensitive data in the working tree'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Validating branch'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Release info'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('ERRORS'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Command `npm` exited with code 1'));
+                });
+        });
     });
 });
