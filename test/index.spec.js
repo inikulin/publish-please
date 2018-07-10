@@ -82,6 +82,7 @@ describe('Publish-please CLI Options', () => {
         const publishrc = JSON.parse(readFile('.publishrc').toString());
         publishrc.confirm = false;
         publishrc.validations.uncommittedChanges = false;
+        publishrc.validations.untrackedFiles = false;
         publishrc.validations.gitTag = false;
         publishrc.validations.branch = false;
         writeFile('.publishrc', JSON.stringify(publishrc, null, 2));
@@ -159,6 +160,7 @@ describe('Publish-please CLI Options', () => {
         const publishrc = JSON.parse(readFile('.publishrc').toString());
         publishrc.confirm = false;
         publishrc.validations.uncommittedChanges = false;
+        publishrc.validations.untrackedFiles = false;
         publishrc.validations.gitTag = false;
         publishrc.validations.branch = false;
         writeFile('.publishrc', JSON.stringify(publishrc, null, 2));
