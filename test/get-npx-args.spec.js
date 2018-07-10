@@ -6,8 +6,13 @@ const should = require('should');
 const pathJoin = require('path').join;
 
 describe('npx args parser util', () => {
+    let originalArgv;
     before(() => {
         process.env['npm_config_argv'] = undefined;
+        originalArgv = process.argv.map((arg) => arg);
+    });
+    after(() => {
+        process.argv = originalArgv;
     });
     it('Should parse even if process does not exist', () => {
         // Given

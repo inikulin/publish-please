@@ -19,8 +19,8 @@ describe('Publish-please CLI Options', () => {
     let nativeConsoleLog;
     let exitCode;
     let output;
-    let hasAddedArg;
     let originalConfiguration;
+    let originalArgv;
 
     before(() => {
         originalConfiguration = JSON.parse(readFile('.publishrc').toString());
@@ -29,7 +29,6 @@ describe('Publish-please CLI Options', () => {
         writeFile('.publishrc', JSON.stringify(originalConfiguration, null, 2));
     });
     beforeEach(() => {
-        hasAddedArg = false;
         process.env.PUBLISH_PLEASE_TEST_MODE = true;
         exitCode = undefined;
         output = '';
@@ -44,6 +43,8 @@ describe('Publish-please CLI Options', () => {
             output = output + p1;
         };
 
+        originalArgv = process.argv.map((arg) => arg);
+
         // patch the .publisrc file to make sure publishing will fail
         const publishrc = JSON.parse(readFile('.publishrc').toString());
         publishrc.prePublishScript =
@@ -54,9 +55,7 @@ describe('Publish-please CLI Options', () => {
         process.exit = nativeExit;
         console.log = nativeConsoleLog;
         delete process.env.PUBLISH_PLEASE_TEST_MODE;
-        if (hasAddedArg) {
-            process.argv.pop();
-        }
+        process.argv = originalArgv;
 
         writeFile('.publishrc', JSON.stringify(originalConfiguration, null, 2));
     });
@@ -266,7 +265,6 @@ describe('Publish-please CLI Options', () => {
         process.env['npm_config_argv'] =
             '{"remain":[],"cooked":["publish"],"original":["publish"]}';
         process.argv.push('guard');
-        hasAddedArg = true;
         // When
         cli();
         // Then
