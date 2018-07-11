@@ -1368,17 +1368,16 @@ describe('Integration tests', () => {
                     scripts.test = 'echo "running tests ..."';
                     pkg.scripts = scripts;
                     writeFile('package.json', JSON.stringify(pkg, null, 2));
-                    return Promise.resolve();
                 })
                 .then(() => console.log(`> npx ${packageName} --dry-run`))
                 .then(() =>
                     exec(
                         /* prettier-ignore */
-                        `npx ../${packageName.replace('@','-')}.tgz --dry-run > ./publish.log`
+                        `npx ../${packageName.replace('@','-')}.tgz --dry-run > ./publish01.log`
                     )
                 )
                 .then(() => {
-                    const publishLog = readFile('./publish.log').toString();
+                    const publishLog = readFile('./publish01.log').toString();
                     console.log(publishLog);
                     /* prettier-ignore */
                     assert(publishLog.includes('dry mode activated'));
@@ -1403,7 +1402,6 @@ describe('Integration tests', () => {
                     scripts.test = 'echo "running tests ..."';
                     pkg.scripts = scripts;
                     writeFile('package.json', JSON.stringify(pkg, null, 2));
-                    return Promise.resolve();
                 })
                 .then(() => {
                     writeFile(
@@ -1429,11 +1427,11 @@ describe('Integration tests', () => {
                 .then(() =>
                     exec(
                         /* prettier-ignore */
-                        `npx ../${packageName.replace('@','-')}.tgz --dry-run > ./publish.log`
+                        `npx ../${packageName.replace('@','-')}.tgz --dry-run > ./publish02.log`
                     )
                 )
                 .then(() => {
-                    const publishLog = readFile('./publish.log').toString();
+                    const publishLog = readFile('./publish02.log').toString();
                     console.log(publishLog);
                     /* prettier-ignore */
                     assert(publishLog.includes('dry mode activated'));
@@ -1464,11 +1462,11 @@ describe('Integration tests', () => {
                 .then(() =>
                     exec(
                         /* prettier-ignore */
-                        `npx ../${packageName.replace('@','-')}.tgz config > ./publish.log`
+                        `npx ../${packageName.replace('@','-')}.tgz config > ./publish03.log`
                     )
                 )
                 .then(() => {
-                    const publishLog = readFile('./publish.log').toString();
+                    const publishLog = readFile('./publish03.log').toString();
                     console.log(publishLog);
                 })
                 .then(() => {
@@ -1493,15 +1491,14 @@ describe('Integration tests', () => {
         it(`Should be able to start the publishing workflow with 'npx ${packageName}' (no .publishrc config file)`, () => {
             return Promise.resolve()
                 .then(() => console.log(`> npx ${packageName}`))
-
                 .then(() =>
                     exec(
                         /* prettier-ignore */
-                        `npx ../${packageName.replace('@','-')}.tgz > ./publish.log`
+                        `npx ../${packageName.replace('@','-')}.tgz > ./publish04.log`
                     )
                 )
                 .then(() => {
-                    const publishLog = readFile('./publish.log').toString();
+                    const publishLog = readFile('./publish04.log').toString();
                     console.log(publishLog);
                     return publishLog;
                 })
@@ -1541,7 +1538,6 @@ describe('Integration tests', () => {
                     scripts.test = 'echo "running tests ..."';
                     pkg.scripts = scripts;
                     writeFile('package.json', JSON.stringify(pkg, null, 2));
-                    return Promise.resolve();
                 })
                 .then(() => {
                     writeFile(
@@ -1567,11 +1563,11 @@ describe('Integration tests', () => {
                 .then(() =>
                     exec(
                         /* prettier-ignore */
-                        `npx ../${packageName.replace('@','-')}.tgz > ./publish.log`
+                        `npx ../${packageName.replace('@','-')}.tgz > ./publish05.log`
                     )
                 )
                 .then(() => {
-                    const publishLog = readFile('./publish.log').toString();
+                    const publishLog = readFile('./publish05.log').toString();
                     console.log(publishLog);
                     return publishLog;
                 })
