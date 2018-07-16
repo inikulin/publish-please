@@ -25,7 +25,8 @@ There are numerous ways to "shoot yourself in the foot" using `npm publish`. The
  - Get release summary and publishing confirmation.
  - Configure publishing using built-in configuration wizard.
 
-## Getting started
+## Getting started ( [or use npx directly](#Running-publish-please-with-npx) )
+
 Setup process of *publish-please* is quite trivial - just run
 ```shell
 npm install --save-dev publish-please
@@ -90,6 +91,24 @@ It might be a good idea to add these two lines inside your .gitignore file:
 ```sh
 package
 *.tgz
+```
+
+## Running publish-please with npx
+
+You can execute publish-please directly with npx:  
+* **Publish in a dry-run mode**
+```sh
+npx publish-please --dry-run
+```
+
+* **Safely publish to the npm registry**
+```sh
+npx publish-please
+```
+
+* **Setup a configuration file in order to customise the publishing workflow**
+```sh
+npx publish-please config
 ```
 
 ## Sensitive information audit

@@ -6,6 +6,7 @@ const requireUncached = require('import-fresh');
 const packageName = require('./utils/publish-please-version-under-test');
 const copy = require('./utils/copy-file-sync');
 const mkdirp = require('mkdirp');
+const pathJoin = require('path').join;
 
 describe('Pre-Install Execution', () => {
     let nativeExit;
@@ -66,6 +67,35 @@ describe('Pre-Install Execution', () => {
 
         // When
         requireUncached('./tmp/pre-install');
+        // Then
+        (exitCode || 0).should.be.equal(0);
+        output.should.be.equal('');
+    });
+
+    it('Should not return an error message if npm args are not recognized', () => {
+        // Given
+        process.env[
+            'npm_config_argv'
+        ] = `{"remain":["${packageName}],"cooked":["install","--global","${packageName}"],"original":["install","-g","${packageName}"]}`;
+
+        // When
+        requireUncached('../lib/pre-install');
+        // Then
+        (exitCode || 0).should.be.equal(0);
+        output.should.be.equal('');
+    });
+
+    it(`Should not return an error message on 'npx ${packageName}'`, () => {
+        // Given
+        const npxPath = JSON.stringify(
+            pathJoin('Users', 'HDO', '.npm', '_npx', '78031')
+        );
+        process.env[
+            'npm_config_argv'
+        ] = `{"remain":["${packageName}"],"cooked":["install","${packageName}","--global","--prefix",${npxPath},"--loglevel","error","--json"],"original":["install","${packageName}","--global","--prefix",${npxPath},"--loglevel","error","--json"]}`;
+
+        // When
+        requireUncached('../lib/pre-install');
         // Then
         (exitCode || 0).should.be.equal(0);
         output.should.be.equal('');

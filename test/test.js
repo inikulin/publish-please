@@ -1,5 +1,8 @@
 'use strict';
 
+/* eslint-disable no-unused-vars */
+const should = require('should');
+
 const assert = require('assert');
 const del = require('del');
 const writeFile = require('fs').writeFileSync;
@@ -35,6 +38,7 @@ describe('Integration tests', () => {
     const publish = requireUncached('../lib/publish/publish-workflow');
     const getOptions = require('../lib/publish-options').getOptions;
     const echoPublishCommand = 'echo "npm publish"';
+
     function mkdir(path) {
         return new Promise((resolve, reject) =>
             mkdirp(path, null, (err) => (err ? reject(err) : resolve()))
@@ -174,7 +178,11 @@ describe('Integration tests', () => {
         it('Should expect `master` branch by default', () =>
             exec('git checkout some-branch')
                 .then(() =>
-                    publish(getTestOptions({ remove: 'validations.branch' }))
+                    publish(
+                        getTestOptions({
+                            remove: 'validations.branch',
+                        })
+                    )
                 )
                 .then(() => {
                     throw new Error('Promise rejection expected');
@@ -191,7 +199,11 @@ describe('Integration tests', () => {
                 .then(() =>
                     publish(
                         getTestOptions({
-                            set: { validations: { branch: 'no-package-json' } },
+                            set: {
+                                validations: {
+                                    branch: 'no-package-json',
+                                },
+                            },
                         })
                     )
                 )
@@ -210,7 +222,11 @@ describe('Integration tests', () => {
                 .then(() =>
                     publish(
                         getTestOptions({
-                            set: { validations: { branch: 'master' } },
+                            set: {
+                                validations: {
+                                    branch: 'master',
+                                },
+                            },
                         })
                     )
                 )
@@ -229,7 +245,9 @@ describe('Integration tests', () => {
                     getTestOptions({
                         set: {
                             publishCommand: echoPublishCommand,
-                            validations: { branch: 'some-branch' },
+                            validations: {
+                                branch: 'some-branch',
+                            },
                         },
                     })
                 )
@@ -260,7 +278,9 @@ describe('Integration tests', () => {
                     publish(
                         getTestOptions({
                             set: {
-                                validations: { gitTag: true },
+                                validations: {
+                                    gitTag: true,
+                                },
                             },
                         })
                     )
@@ -280,7 +300,11 @@ describe('Integration tests', () => {
                 .then(() =>
                     publish(
                         getTestOptions({
-                            set: { validations: { gitTag: true } },
+                            set: {
+                                validations: {
+                                    gitTag: true,
+                                },
+                            },
                         })
                     )
                 )
@@ -302,7 +326,9 @@ describe('Integration tests', () => {
                         getTestOptions({
                             set: {
                                 publishCommand: echoPublishCommand,
-                                validations: { gitTag: true },
+                                validations: {
+                                    gitTag: true,
+                                },
                             },
                         })
                     )
@@ -333,7 +359,11 @@ describe('Integration tests', () => {
 
                     return publish(
                         getTestOptions({
-                            set: { validations: { uncommittedChanges: true } },
+                            set: {
+                                validations: {
+                                    uncommittedChanges: true,
+                                },
+                            },
                         })
                     );
                 })
@@ -369,7 +399,9 @@ describe('Integration tests', () => {
                     getTestOptions({
                         set: {
                             publishCommand: echoPublishCommand,
-                            validations: { uncommittedChanges: true },
+                            validations: {
+                                uncommittedChanges: true,
+                            },
                         },
                     })
                 )
@@ -384,7 +416,11 @@ describe('Integration tests', () => {
 
                     return publish(
                         getTestOptions({
-                            set: { validations: { untrackedFiles: true } },
+                            set: {
+                                validations: {
+                                    untrackedFiles: true,
+                                },
+                            },
                         })
                     );
                 })
@@ -406,7 +442,9 @@ describe('Integration tests', () => {
                     getTestOptions({
                         set: {
                             publishCommand: echoPublishCommand,
-                            validations: { untrackedFiles: false },
+                            validations: {
+                                untrackedFiles: false,
+                            },
                         },
                     })
                 );
@@ -418,7 +456,9 @@ describe('Integration tests', () => {
                     getTestOptions({
                         set: {
                             publishCommand: echoPublishCommand,
-                            validations: { untrackedFiles: true },
+                            validations: {
+                                untrackedFiles: true,
+                            },
                         },
                     })
                 )
@@ -437,7 +477,11 @@ describe('Integration tests', () => {
                 .then(() =>
                     publish(
                         getTestOptions({
-                            set: { validations: { sensitiveData: true } },
+                            set: {
+                                validations: {
+                                    sensitiveData: true,
+                                },
+                            },
                         })
                     )
                 )
@@ -495,7 +539,9 @@ describe('Integration tests', () => {
                         getTestOptions({
                             set: {
                                 publishCommand: echoPublishCommand,
-                                validations: { sensitiveData: false },
+                                validations: {
+                                    sensitiveData: false,
+                                },
                             },
                         })
                     )
@@ -507,14 +553,18 @@ describe('Integration tests', () => {
             exec('git checkout master')
                 .then(() => pkgd())
                 .then((pkgInfo) => {
-                    pkgInfo.cfg.dependencies = { ms: '0.7.0' };
+                    pkgInfo.cfg.dependencies = {
+                        ms: '0.7.0',
+                    };
                     writeFile('package.json', JSON.stringify(pkgInfo.cfg));
                 })
                 .then(() =>
                     publish(
                         getTestOptions({
                             set: {
-                                validations: { vulnerableDependencies: true },
+                                validations: {
+                                    vulnerableDependencies: true,
+                                },
                             },
                         })
                     )
@@ -687,7 +737,9 @@ describe('Integration tests', () => {
             exec('git checkout master')
                 .then(() => pkgd())
                 .then((pkgInfo) => {
-                    pkgInfo.cfg.dependencies = { ms: '0.7.1' };
+                    pkgInfo.cfg.dependencies = {
+                        ms: '0.7.1',
+                    };
                     writeFile('package.json', JSON.stringify(pkgInfo.cfg));
                 })
                 .then(() =>
@@ -695,7 +747,9 @@ describe('Integration tests', () => {
                         getTestOptions({
                             set: {
                                 publishCommand: echoPublishCommand,
-                                validations: { vulnerableDependencies: true },
+                                validations: {
+                                    vulnerableDependencies: true,
+                                },
                             },
                         })
                     )
@@ -729,7 +783,9 @@ describe('Integration tests', () => {
                         getTestOptions({
                             set: {
                                 publishCommand: echoPublishCommand,
-                                validations: { vulnerableDependencies: true },
+                                validations: {
+                                    vulnerableDependencies: true,
+                                },
                             },
                         })
                     )
@@ -749,7 +805,9 @@ describe('Integration tests', () => {
                     publish(
                         getTestOptions({
                             set: {
-                                validations: { vulnerableDependencies: true },
+                                validations: {
+                                    vulnerableDependencies: true,
+                                },
                             },
                         })
                     )
@@ -768,7 +826,9 @@ describe('Integration tests', () => {
             exec('git checkout master')
                 .then(() => pkgd())
                 .then((pkgInfo) => {
-                    pkgInfo.cfg.dependencies = { ms: '0.7.0' };
+                    pkgInfo.cfg.dependencies = {
+                        ms: '0.7.0',
+                    };
 
                     writeFile('package.json', JSON.stringify(pkgInfo.cfg));
                 })
@@ -777,7 +837,9 @@ describe('Integration tests', () => {
                         getTestOptions({
                             set: {
                                 publishCommand: echoPublishCommand,
-                                validations: { vulnerableDependencies: false },
+                                validations: {
+                                    vulnerableDependencies: false,
+                                },
                             },
                         })
                     )
@@ -916,7 +978,9 @@ describe('Integration tests', () => {
                 .then(() =>
                     publish(
                         getTestOptions({
-                            set: { publishCommand: echoPublishCommand },
+                            set: {
+                                publishCommand: echoPublishCommand,
+                            },
                             remove: 'publishTag',
                         })
                     )
@@ -1019,9 +1083,9 @@ describe('Integration tests', () => {
                 .catch((err) => {
                     // prettier-ignore
                     assert(
-                        err.message.indexOf('You do not have permission to publish') > -1
-                        || err.message.indexOf('auth required for publishing') > -1
-                        || err.message.indexOf('operation not permitted') > -1
+                        err.message.indexOf('You do not have permission to publish') > -1 ||
+                        err.message.indexOf('auth required for publishing') > -1 ||
+                        err.message.indexOf('operation not permitted') > -1
                     );
                 }));
 
@@ -1032,9 +1096,13 @@ describe('Integration tests', () => {
         beforeEach(() => {
             return mkdir(
                 'node_modules/publish-please/lib'.replace(/\\|\//g, sep)
-            ).then(() =>
-                exec('cp -r ../lib/* node_modules/publish-please/lib')
-            );
+            )
+                .then(() =>
+                    exec('cp -r ../lib/* node_modules/publish-please/lib')
+                )
+                .then(() => {
+                    process.env['npm_config_argv'] = '';
+                });
         });
 
         it('Should add hooks to package.json', () =>
@@ -1287,6 +1355,241 @@ describe('Integration tests', () => {
                     assert(publishLog.includes('testing-repo-1.3.77.tgz'));
                     /* prettier-ignore */
                     assert(publishLog.includes("run 'npm pack' to have more details on the package"));
+                });
+        });
+    });
+
+    describe('npx usage', () => {
+        it(`Should be able to use publish-please in dry mode (with no .publishrc config file) with 'npx ${packageName} --dry-run'`, () => {
+            return Promise.resolve()
+                .then(() => {
+                    const pkg = JSON.parse(readFile('package.json').toString());
+                    const scripts = {};
+                    scripts.test = 'echo "running tests ..."';
+                    pkg.scripts = scripts;
+                    writeFile('package.json', JSON.stringify(pkg, null, 2));
+                })
+                .then(() => console.log(`> npx ${packageName} --dry-run`))
+                .then(() =>
+                    exec(
+                        /* prettier-ignore */
+                        `npx ../${packageName.replace('@','-')}.tgz --dry-run > ./publish01.log`
+                    )
+                )
+                .then(() => {
+                    const publishLog = readFile('./publish01.log').toString();
+                    console.log(publishLog);
+                    /* prettier-ignore */
+                    assert(publishLog.includes('dry mode activated'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running pre-publish script'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('running tests ...'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running validations'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('ERRORS'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('There are uncommitted changes in the working tree.'));
+                });
+        });
+
+        it(`Should be able to use publish-please in dry mode (with existing .publishrc config file) with 'npx ${packageName} --dry-run'`, () => {
+            return Promise.resolve()
+                .then(() => {
+                    const pkg = JSON.parse(readFile('package.json').toString());
+                    const scripts = {};
+                    scripts.test = 'echo "running tests ..."';
+                    pkg.scripts = scripts;
+                    writeFile('package.json', JSON.stringify(pkg, null, 2));
+                })
+                .then(() => {
+                    writeFile(
+                        '.publishrc',
+                        JSON.stringify({
+                            confirm: true,
+                            validations: {
+                                vulnerableDependencies: true,
+                                sensitiveData: false,
+                                uncommittedChanges: false,
+                                untrackedFiles: false,
+                                branch: 'master',
+                                gitTag: false,
+                            },
+                            publishTag: 'latest',
+                            prePublishScript:
+                                'echo "running script defined in .publishrc ..."',
+                            postPublishScript: false,
+                        })
+                    );
+                })
+                .then(() => console.log(`> npx ${packageName} --dry-run`))
+                .then(() =>
+                    exec(
+                        /* prettier-ignore */
+                        `npx ../${packageName.replace('@','-')}.tgz --dry-run > ./publish02.log`
+                    )
+                )
+                .then(() => {
+                    const publishLog = readFile('./publish02.log').toString();
+                    console.log(publishLog);
+                    /* prettier-ignore */
+                    assert(publishLog.includes('dry mode activated'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running pre-publish script'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('running script defined in .publishrc ...'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running validations'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Checking for the vulnerable dependencies'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Validating branch'));
+                    /* prettier-ignore */
+                    assert(!publishLog.includes('ERRORS'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Release info'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('testing-repo-1.3.77.tgz'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes("run 'npm pack' to have more details on the package"));
+                });
+        });
+
+        it(`Should be able to configure publish-please with 'npx ${packageName} config'`, () => {
+            return Promise.resolve()
+                .then(() => console.log(`> npx ${packageName} config`))
+                .then(() =>
+                    exec(
+                        /* prettier-ignore */
+                        `npx ../${packageName.replace('@','-')}.tgz config > ./publish03.log`
+                    )
+                )
+                .then(() => {
+                    const publishLog = readFile('./publish03.log').toString();
+                    console.log(publishLog);
+                })
+                .then(() => {
+                    const publishrc = JSON.parse(
+                        readFile('.publishrc').toString()
+                    );
+                    publishrc.confirm.should.be.true();
+                    publishrc.prePublishScript.should.equal('npm test');
+                    publishrc.postPublishScript.should.equal('');
+                    publishrc.publishCommand.should.equal('npm publish');
+                    publishrc.publishTag.should.equal('latest');
+                    publishrc.validations.branch.should.equal('master');
+                    publishrc.validations.uncommittedChanges.should.be.true();
+                    publishrc.validations.untrackedFiles.should.be.true();
+                    publishrc.validations.vulnerableDependencies.should.be.true();
+                    publishrc.validations.sensitiveData.should.be.true();
+                    publishrc.validations.gitTag.should.be.true();
+                    publishrc.validations.branch.should.equal('master');
+                });
+        });
+
+        it(`Should be able to start the publishing workflow with 'npx ${packageName}' (no .publishrc config file)`, () => {
+            return Promise.resolve()
+                .then(() => console.log(`> npx ${packageName}`))
+                .then(() =>
+                    exec(
+                        /* prettier-ignore */
+                        `npx ../${packageName.replace('@','-')}.tgz > ./publish04.log`
+                    )
+                )
+                .then(() => {
+                    const publishLog = readFile('./publish04.log').toString();
+                    console.log(publishLog);
+                    return publishLog;
+                })
+                .then((publishLog) => {
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running pre-publish script'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Error: no test specified'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running validations'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Checking for the vulnerable dependencies'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Checking for the uncommitted changes'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Checking for the untracked files'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Checking for the sensitive data in the working tree'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Validating branch'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Validating git tag'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('ERRORS'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('* There are untracked files in the working tree.'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes("* Latest commit doesn't have git tag."));
+                });
+        });
+
+        it(`Should be able to run the publishing workflow with 'npx ${packageName}' (with .publishrc config file)`, () => {
+            return Promise.resolve()
+                .then(() => {
+                    const pkg = JSON.parse(readFile('package.json').toString());
+                    const scripts = {};
+                    scripts.test = 'echo "running tests ..."';
+                    pkg.scripts = scripts;
+                    writeFile('package.json', JSON.stringify(pkg, null, 2));
+                })
+                .then(() => {
+                    writeFile(
+                        '.publishrc',
+                        JSON.stringify({
+                            confirm: false,
+                            validations: {
+                                vulnerableDependencies: true,
+                                sensitiveData: true,
+                                uncommittedChanges: false,
+                                untrackedFiles: false,
+                                branch: 'master',
+                                gitTag: false,
+                            },
+                            publishTag: 'latest',
+                            prePublishScript:
+                                'echo "running script defined in .publishrc ..."',
+                            postPublishScript: false,
+                        })
+                    );
+                })
+                .then(() => console.log(`> npx ${packageName}`))
+                .then(() =>
+                    exec(
+                        /* prettier-ignore */
+                        `npx ../${packageName.replace('@','-')}.tgz > ./publish05.log`
+                    )
+                )
+                .then(() => {
+                    const publishLog = readFile('./publish05.log').toString();
+                    console.log(publishLog);
+                    return publishLog;
+                })
+                .then((publishLog) => {
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running pre-publish script'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('running script defined in .publishrc ...'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running validations'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Checking for the vulnerable dependencies'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Checking for the sensitive data in the working tree'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Validating branch'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Release info'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('ERRORS'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Command `npm` exited with code'));
                 });
         });
     });

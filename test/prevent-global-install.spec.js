@@ -6,6 +6,7 @@ const should = require('should');
 const packageName = require('./utils/publish-please-version-under-test');
 const preventGlobalInstall = require('../lib/prevent-global-install');
 const rename = require('fs').renameSync;
+const pathJoin = require('path').join;
 
 describe('Prevent Global Install', () => {
     let nativeExit;
@@ -39,7 +40,7 @@ describe('Prevent Global Install', () => {
         process.env[
             'npm_config_argv'
         ] = `{"remain":["${packageName}"],"cooked":["install","--global","${packageName}"],"original":["install","-g","${packageName}"]}`;
-        //
+
         // When
         preventGlobalInstall();
         // Then
@@ -52,7 +53,23 @@ describe('Prevent Global Install', () => {
         process.env[
             'npm_config_argv'
         ] = `{"remain":["${packageName}"],"cooked":["install","--save-dev","${packageName}"],"original":["install","--save-dev","${packageName}"]}`;
-        //
+
+        // When
+        preventGlobalInstall();
+        // Then
+        (exitCode || 0).should.be.equal(0);
+        output.should.be.equal('');
+    });
+
+    it(`Should not throw an error when chalk module is not found on 'npx ${packageName}'`, () => {
+        // Given
+        const npxPath = JSON.stringify(
+            pathJoin('Users', 'HDO', '.npm', '_npx', '78031')
+        );
+        process.env[
+            'npm_config_argv'
+        ] = `{"remain":["${packageName}"],"cooked":["install","${packageName}","--global","--prefix",${npxPath},"--loglevel","error","--json"],"original":["install","${packageName}","--global","--prefix",${npxPath},"--loglevel","error","--json"]}`;
+
         // When
         preventGlobalInstall();
         // Then
