@@ -25,7 +25,7 @@ There are numerous ways to "shoot yourself in the foot" using `npm publish`. The
  - Get release summary and publishing confirmation.
  - Configure publishing using built-in configuration wizard.
 
-## Getting started ( [or use npx directly](#Running-publish-please-with-npx) )
+## Getting started ( [or use npx directly](#running-publish-please-with-npx) )
 
 Setup process of *publish-please* is quite trivial - just run
 ```shell
@@ -69,8 +69,14 @@ npm run publish-please
  - **gitTag** - Check that git tag matches version specified in the `package.json`. Default: `true`.
  - **branch** - Check that current branch matches the specified branch. Default: `master`.
  - **sensitiveData** - Perform [audit for the sensitive data](#sensitive-information-audit). Default: `true`.
- - **vulnerableDependencies** - Perform vulnerable dependencies check using [Node Security Project](https://nodesecurity.io/) data. Default: `true`.
-    - you may prevent specific vulnerabilities to be reported by publish-please by creating a [.nsprc file](https://github.com/nodesecurity/nsp#exceptions).
+ - **vulnerableDependencies** - Perform vulnerable dependencies check using `npm audit`. Default: `true`.
+    - you may prevent specific vulnerabilities to be reported by publish-please by creating a `.auditignore` file in the root of your project with content like the following:
+
+        ```json
+        {
+          "exceptions": ["https://nodesecurity.io/advisories/12"]
+        }
+        ```
  
 
 ### Running in dry mode
