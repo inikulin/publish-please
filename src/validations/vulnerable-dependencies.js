@@ -6,11 +6,12 @@ const confirm = require('../utils/inquires').confirm;
 const Promise = require('pinkie-promise');
 const readPkg = require('read-pkg');
 const chalk = require('chalk');
+const nodeInfos = require('../utils/get-node-infos').getNodeInfosSync();
 
 module.exports = {
     option: 'vulnerableDependencies',
     statusText: 'Checking for the vulnerable dependencies',
-    defaultParam: true,
+    defaultParam: nodeInfos.isAtLeastNpm6 || true,
 
     configurator(currentVal) {
         return confirm(

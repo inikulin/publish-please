@@ -12,6 +12,7 @@ function getNodeInfosSync() {
     const npmVersion = getCurrentNpmVersionSync();
     const nodeVersion = getCurrentNodeVersionSync();
     const isAtLeastNode6 = isAtLeastVersion6(nodeVersion);
+    const isAtLeastNpm6 = isAtLeastVersion6(npmVersion);
     const isSafeNpm = isSafeNpmVersion(npmVersion);
     const shouldUsePrePublishOnlyScript = shouldUsePrePublishOnlyScriptInThis(
         npmVersion
@@ -20,6 +21,7 @@ function getNodeInfosSync() {
         nodeVersion,
         npmVersion,
         isAtLeastNode6,
+        isAtLeastNpm6,
         isSafeNpm,
         shouldUsePrePublishOnlyScript,
     };
@@ -31,6 +33,7 @@ function getNodeInfos() {
             const nodeVersion = results[0];
             const npmVersion = results[1];
             const isAtLeastNode6 = isAtLeastVersion6(nodeVersion);
+            const isAtLeastNpm6 = isAtLeastVersion6(npmVersion);
             const isSafeNpm = isSafeNpmVersion(npmVersion);
             const shouldUsePrePublishOnlyScript = shouldUsePrePublishOnlyScriptInThis(
                 npmVersion
@@ -40,6 +43,7 @@ function getNodeInfos() {
                 nodeVersion,
                 npmVersion,
                 isAtLeastNode6,
+                isAtLeastNpm6,
                 isSafeNpm,
                 shouldUsePrePublishOnlyScript,
             });
