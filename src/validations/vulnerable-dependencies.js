@@ -11,7 +11,7 @@ const nodeInfos = require('../utils/get-node-infos').getNodeInfosSync();
 module.exports = {
     option: 'vulnerableDependencies',
     statusText: 'Checking for the vulnerable dependencies',
-    defaultParam: nodeInfos.isAtLeastNpm6 || true,
+    defaultParam: nodeInfos ? nodeInfos.isAtLeastNpm6 : true,
 
     configurator(currentVal) {
         return confirm(
@@ -30,7 +30,9 @@ module.exports = {
                 reporter: 'summary',
                 'warn-only': false,
                 path: projectDir,
-                pkg: readPkg.sync(projectDir, { normalize: false }),
+                pkg: readPkg.sync(projectDir, {
+                    normalize: false,
+                }),
                 offline: false,
                 exceptions: Array.isArray(defaultArgs.exceptions)
                     ? defaultArgs.exceptions
@@ -80,9 +82,9 @@ function summaryOf(vulnerability) {
     const vulnerabilityIsDirectDependency =
         vulnerablePackageName === rootPackageName;
     // prettier-ignore
-    const summary = vulnerabilityIsDirectDependency
-        ? `Vulnerability found in ${elegant(rootPackageName)}\n\t${recommendation}\n\tAdvisory: ${vulnerability.advisory || ''}`
-        : `Vulnerability found in ${chalk.bold(rootPackageName)}\n\tinside ${elegant(vulnerablePackagePath)}\n\t${vulnerability.recommendation || ''}\n\tAdvisory: ${vulnerability.advisory || ''}`;
+    const summary = vulnerabilityIsDirectDependency ?
+        `Vulnerability found in ${elegant(rootPackageName)}\n\t${recommendation}\n\tAdvisory: ${vulnerability.advisory || ''}` :
+        `Vulnerability found in ${chalk.bold(rootPackageName)}\n\tinside ${elegant(vulnerablePackagePath)}\n\t${vulnerability.recommendation || ''}\n\tAdvisory: ${vulnerability.advisory || ''}`;
     return summary;
 }
 
@@ -94,16 +96,16 @@ function elegant(pathOrName) {
 
 function elegantPath(path) {
     // prettier-ignore
-    const lastIndex = path && path.length
-        ? path.length - 1
-        : -1;
+    const lastIndex = path && path.length ?
+        path.length - 1 :
+        -1;
 
     // prettier-ignore
     const result = path
         .map((item, index) => {
-            return index === lastIndex
-                ? chalk.red.bold(item)
-                : item;
+            return index === lastIndex ?
+                chalk.red.bold(item) :
+                item;
         })
         .join(' -> ');
     return result;
