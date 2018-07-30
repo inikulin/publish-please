@@ -1452,9 +1452,7 @@ describe('Integration tests', () => {
                     assert(publishLog.includes('Running validations'));
 
                     /* prettier-ignore */
-                    nodeInfos.isAtLeastNpm6
-                        ? assert(publishLog.includes('Checking for the vulnerable dependencies'))
-                        : assert(!publishLog.includes('Checking for the vulnerable dependencies'));
+                    assert(publishLog.includes('Checking for the vulnerable dependencies'));
 
                     /* prettier-ignore */
                     assert(publishLog.includes('Validating branch'));
