@@ -1279,7 +1279,12 @@ describe('Integration tests', () => {
                 assert.strictEqual(publishrc.validations.branch, 'master');
                 assert(publishrc.validations.uncommittedChanges);
                 assert(publishrc.validations.untrackedFiles);
-                assert(publishrc.validations.vulnerableDependencies);
+
+                /* prettier-ignore */
+                nodeInfos.isAtLeastNpm6
+                    ? assert(publishrc.validations.vulnerableDependencies === true)
+                    : assert(publishrc.validations.vulnerableDependencies === false);
+
                 assert(publishrc.validations.sensitiveData);
                 assert(publishrc.validations.gitTag);
                 assert.strictEqual(publishrc.validations.branch, 'master');
@@ -1301,8 +1306,12 @@ describe('Integration tests', () => {
                     assert(publishLog.includes('Running validations'));
                     /* prettier-ignore */
                     assert(publishLog.includes('Error: no test specified'));
+
                     /* prettier-ignore */
-                    assert(publishLog.includes('Checking for the vulnerable dependencies'));
+                    nodeInfos.isAtLeastNpm6
+                        ? assert(publishLog.includes('Checking for the vulnerable dependencies'))
+                        : assert(!publishLog.includes('Checking for the vulnerable dependencies'));
+
                     /* prettier-ignore */
                     assert(publishLog.includes('Checking for the uncommitted changes'));
                     /* prettier-ignore */
@@ -1441,8 +1450,12 @@ describe('Integration tests', () => {
                     assert(publishLog.includes('running script defined in .publishrc ...'));
                     /* prettier-ignore */
                     assert(publishLog.includes('Running validations'));
+
                     /* prettier-ignore */
-                    assert(publishLog.includes('Checking for the vulnerable dependencies'));
+                    nodeInfos.isAtLeastNpm6
+                        ? assert(publishLog.includes('Checking for the vulnerable dependencies'))
+                        : assert(!publishLog.includes('Checking for the vulnerable dependencies'));
+
                     /* prettier-ignore */
                     assert(publishLog.includes('Validating branch'));
                     /* prettier-ignore */
@@ -1481,7 +1494,11 @@ describe('Integration tests', () => {
                     publishrc.validations.branch.should.equal('master');
                     publishrc.validations.uncommittedChanges.should.be.true();
                     publishrc.validations.untrackedFiles.should.be.true();
-                    publishrc.validations.vulnerableDependencies.should.be.true();
+
+                    nodeInfos.isAtLeastNpm6
+                        ? publishrc.validations.vulnerableDependencies.should.be.true()
+                        : publishrc.validations.vulnerableDependencies.should.be.false();
+
                     publishrc.validations.sensitiveData.should.be.true();
                     publishrc.validations.gitTag.should.be.true();
                     publishrc.validations.branch.should.equal('master');
@@ -1509,8 +1526,12 @@ describe('Integration tests', () => {
                     assert(publishLog.includes('Error: no test specified'));
                     /* prettier-ignore */
                     assert(publishLog.includes('Running validations'));
+
                     /* prettier-ignore */
-                    assert(publishLog.includes('Checking for the vulnerable dependencies'));
+                    nodeInfos.isAtLeastNpm6
+                        ? assert(publishLog.includes('Checking for the vulnerable dependencies'))
+                        : assert(!publishLog.includes('Checking for the vulnerable dependencies'));
+
                     /* prettier-ignore */
                     assert(publishLog.includes('Checking for the uncommitted changes'));
                     /* prettier-ignore */
