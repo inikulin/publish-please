@@ -1452,7 +1452,9 @@ describe('Integration tests', () => {
                     assert(publishLog.includes('Running validations'));
 
                     /* prettier-ignore */
-                    assert(publishLog.includes('Checking for the vulnerable dependencies'));
+                    nodeInfos.isAtLeastNpm6
+                        ? assert(publishLog.includes('Checking for the vulnerable dependencies'))
+                        : assert(publishLog.includes('Skipped vulnerable dependencies'));
 
                     /* prettier-ignore */
                     assert(publishLog.includes('Validating branch'));
@@ -1597,8 +1599,12 @@ describe('Integration tests', () => {
                     assert(publishLog.includes('running script defined in .publishrc ...'));
                     /* prettier-ignore */
                     assert(publishLog.includes('Running validations'));
+
                     /* prettier-ignore */
-                    assert(publishLog.includes('Checking for the vulnerable dependencies'));
+                    nodeInfos.isAtLeastNpm6
+                        ? assert(publishLog.includes('Checking for the vulnerable dependencies'))
+                        : assert(publishLog.includes('Skipped vulnerable dependencies'));
+               
                     /* prettier-ignore */
                     assert(publishLog.includes('Checking for the sensitive data in the working tree'));
                     /* prettier-ignore */
