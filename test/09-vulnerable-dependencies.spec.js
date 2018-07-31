@@ -17,4 +17,16 @@ describe('Vulnerability validation', () => {
             ? defaultParam.should.be.true()
             : defaultParam.should.be.false();
     });
+    it('Should show a skipped message when npm version is < 6', () => {
+        // Given the current node version
+
+        // When
+        const statusText = validation.statusText;
+
+        // Then
+        /* prettier-ignore */
+        nodeInfos.isAtLeastNpm6
+            ? statusText.should.containEql('Checking for the vulnerable dependencies')
+            : statusText.should.containEql('Skipped vulnerable dependencies');
+    });
 });

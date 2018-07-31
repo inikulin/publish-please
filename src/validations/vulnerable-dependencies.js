@@ -10,7 +10,10 @@ const nodeInfos = require('../utils/get-node-infos').getNodeInfosSync();
 
 module.exports = {
     option: 'vulnerableDependencies',
-    statusText: 'Checking for the vulnerable dependencies',
+    /* prettier-ignore */
+    statusText: nodeInfos && nodeInfos.isAtLeastNpm6
+        ? 'Checking for the vulnerable dependencies'
+        : `Skipped vulnerable dependencies (because npm version is ${nodeInfos.npmVersion}. You should upgrade npm to version 6 or above)`,
     defaultParam: nodeInfos ? nodeInfos.isAtLeastNpm6 : true,
 
     configurator(currentVal) {
