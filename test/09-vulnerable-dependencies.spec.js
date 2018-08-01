@@ -29,4 +29,16 @@ describe('Vulnerability validation', () => {
             ? statusText.should.containEql('Checking for the vulnerable dependencies')
             : statusText.should.containEql('Skipped vulnerable dependencies');
     });
+    it('Should not run when npm version is < 6', () => {
+        // Given the current node version
+
+        // When
+        const canRun = validation.canRun();
+
+        // Then
+        /* prettier-ignore */
+        nodeInfos.isAtLeastNpm6
+            ? canRun.should.be.true()
+            : canRun.should.be.false();
+    });
 });

@@ -15,7 +15,7 @@ module.exports = {
             currentVal
         );
     },
-
+    canRun: () => true,
     run() {
         return exec('git status --porcelain').then((result) => {
             if (/^\?\?/m.test(result))

@@ -17,7 +17,7 @@ module.exports = {
             currentVal
         );
     },
-
+    canRun: () => true,
     run(expected) {
         return exec('git branch --no-color')
             .then((branches) =>

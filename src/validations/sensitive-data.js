@@ -42,7 +42,7 @@ module.exports = {
             !!currentVal
         ).then((yes) => (yes ? configureIgnores() : false));
     },
-
+    canRun: () => true,
     run(opts, pkgInfo) {
         return Promise.resolve()
             .then(() => {

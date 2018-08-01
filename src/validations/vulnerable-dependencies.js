@@ -22,7 +22,7 @@ module.exports = {
             currentVal
         );
     },
-
+    canRun,
     run() {
         return new Promise((resolve, reject) => {
             const projectDir = pathJoin(process.cwd());
@@ -116,4 +116,11 @@ function elegantPath(path) {
 
 function elegantName(name) {
     return chalk.red.bold(name);
+}
+
+function canRun() {
+    // prettier-ignore
+    return nodeInfos && nodeInfos.isAtLeastNpm6
+        ? true
+        : false;
 }
