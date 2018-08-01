@@ -14,6 +14,7 @@ module.exports = {
     statusText: nodeInfos && nodeInfos.isAtLeastNpm6
         ? 'Checking for the vulnerable dependencies'
         : `Skipped vulnerable dependencies (because npm version is ${nodeInfos.npmVersion}. You should upgrade npm to version 6 or above)`,
+
     defaultParam: nodeInfos ? nodeInfos.isAtLeastNpm6 : true,
 
     configurator(currentVal) {
@@ -68,16 +69,20 @@ function vulnerabilitiesFoundIn(result) {
 function summaryOf(vulnerability) {
     const vulnerablePackageName = `${vulnerability.module ||
         'undefined'}@${vulnerability.version || '?.?.?'}`;
+
+    // prettier-ignore
     const vulnerablePackagePath =
         vulnerability.path && vulnerability.path.length >= 2
             ? vulnerability.path.slice(1)
             : [];
 
+    // prettier-ignore
     const rootPackageName =
         vulnerablePackagePath.length >= 1
             ? vulnerablePackagePath[0]
             : vulnerablePackageName;
 
+    // prettier-ignore
     const recommendation = vulnerability.recommendation
         ? vulnerability.recommendation.replace('\n', '\n\t')
         : '';
@@ -85,13 +90,14 @@ function summaryOf(vulnerability) {
     const vulnerabilityIsDirectDependency =
         vulnerablePackageName === rootPackageName;
     // prettier-ignore
-    const summary = vulnerabilityIsDirectDependency ?
-        `Vulnerability found in ${elegant(rootPackageName)}\n\t${recommendation}\n\tAdvisory: ${vulnerability.advisory || ''}` :
-        `Vulnerability found in ${chalk.bold(rootPackageName)}\n\tinside ${elegant(vulnerablePackagePath)}\n\t${vulnerability.recommendation || ''}\n\tAdvisory: ${vulnerability.advisory || ''}`;
+    const summary = vulnerabilityIsDirectDependency
+        ? `Vulnerability found in ${elegant(rootPackageName)}\n\t${recommendation}\n\tAdvisory: ${vulnerability.advisory || ''}`
+        : `Vulnerability found in ${chalk.bold(rootPackageName)}\n\tinside ${elegant(vulnerablePackagePath)}\n\t${vulnerability.recommendation || ''}\n\tAdvisory: ${vulnerability.advisory || ''}`;
     return summary;
 }
 
 function elegant(pathOrName) {
+    // prettier-ignore
     return Array.isArray(pathOrName)
         ? elegantPath(pathOrName)
         : elegantName(pathOrName);
@@ -99,16 +105,16 @@ function elegant(pathOrName) {
 
 function elegantPath(path) {
     // prettier-ignore
-    const lastIndex = path && path.length ?
-        path.length - 1 :
-        -1;
+    const lastIndex = path && path.length
+        ? path.length - 1
+        : -1;
 
     // prettier-ignore
     const result = path
         .map((item, index) => {
-            return index === lastIndex ?
-                chalk.red.bold(item) :
-                item;
+            return index === lastIndex
+                ? chalk.red.bold(item)
+                : item;
         })
         .join(' -> ');
     return result;
