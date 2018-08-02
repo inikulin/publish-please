@@ -577,7 +577,9 @@ describe('Integration tests', () => {
                         /* prettier-ignore */
                         nodeInfos.isAtLeastNpm6
                             ? assert(err.message.indexOf('Vulnerability found') > -1)
-                            : assert(err.message.indexOf('Skipped vulnerable dependencies check') > -1)
+                            : err.message.indexOf('You do not have permission to publish') > -1 ||
+                              err.message.indexOf('auth required for publishing') > -1 ||
+                              err.message.indexOf('operation not permitted') > -1
                 ));
         ['publish-please@2.4.1', 'testcafe@0.19.2'].forEach(function(
             dependency
