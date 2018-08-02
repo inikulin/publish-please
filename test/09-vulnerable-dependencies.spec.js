@@ -25,7 +25,7 @@ describe('Vulnerability validation', () => {
         // When
         const statusText = validation.canRun()
             ? validation.statusText
-            : validation.skippedText;
+            : validation.skipText;
 
         // Then
         /* prettier-ignore */
