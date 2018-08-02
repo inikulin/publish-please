@@ -549,7 +549,7 @@ describe('Integration tests', () => {
     });
 
     describe('Node security project audit', () => {
-        it('Should fail if there are vulnerable dependencies', () =>
+        it.only('Should fail if there are vulnerable dependencies', () =>
             exec('git checkout master')
                 .then(() => pkgd())
                 .then((pkgInfo) => {
@@ -572,8 +572,12 @@ describe('Integration tests', () => {
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) =>
-                    assert(err.message.indexOf('Vulnerability found') > -1)
+                .catch(
+                    (err) =>
+                        /* prettier-ignore */
+                        nodeInfos.isAtLeastNpm6
+                            ? assert(err.message.indexOf('Vulnerability found') > -1)
+                            : assert(err.message.indexOf('Skipped vulnerable dependencies check') > -1)
                 ));
         ['publish-please@2.4.1', 'testcafe@0.19.2'].forEach(function(
             dependency
@@ -1604,7 +1608,7 @@ describe('Integration tests', () => {
                     nodeInfos.isAtLeastNpm6
                         ? assert(publishLog.includes('Checking for the vulnerable dependencies'))
                         : assert(publishLog.includes('Skipped vulnerable dependencies'));
-               
+
                     /* prettier-ignore */
                     assert(publishLog.includes('Checking for the sensitive data in the working tree'));
                     /* prettier-ignore */
