@@ -10,7 +10,9 @@ describe('Vulnerability validation', () => {
         // Given the current node version
 
         // When
-        const defaultParam = validation.defaultParam;
+        const defaultParam = validation.canRun()
+            ? validation.defaultParam
+            : false;
 
         // Then
         nodeInfos.isAtLeastNpm6
@@ -21,13 +23,15 @@ describe('Vulnerability validation', () => {
         // Given the current node version
 
         // When
-        const statusText = validation.statusText;
+        const statusText = validation.canRun()
+            ? validation.statusText
+            : validation.skippedText;
 
         // Then
         /* prettier-ignore */
         nodeInfos.isAtLeastNpm6
             ? statusText.should.containEql('Checking for the vulnerable dependencies')
-            : statusText.should.containEql('Skipped vulnerable dependencies');
+            : statusText.should.containEql('Skipped vulnerable dependencies check');
     });
     it('Should not run when npm version is < 6', () => {
         // Given the current node version

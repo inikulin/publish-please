@@ -10,12 +10,13 @@ const nodeInfos = require('../utils/get-node-infos').getNodeInfosSync();
 
 module.exports = {
     option: 'vulnerableDependencies',
-    /* prettier-ignore */
-    statusText: nodeInfos && nodeInfos.isAtLeastNpm6
-        ? 'Checking for the vulnerable dependencies'
-        : `Skipped vulnerable dependencies (because npm version is ${nodeInfos.npmVersion}. You should upgrade npm to version 6 or above)`,
 
-    defaultParam: nodeInfos ? nodeInfos.isAtLeastNpm6 : true,
+    statusText: 'Checking for the vulnerable dependencies',
+    skipText: `Skipped vulnerable dependencies check (because npm version is ${
+        nodeInfos.npmVersion
+    }. To use this validation, you must upgrade npm to version 6 or above)`,
+
+    defaultParam: true,
 
     configurator(currentVal) {
         return confirm(
@@ -23,7 +24,12 @@ module.exports = {
             currentVal
         );
     },
-    canRun,
+    canRun() {
+        // prettier-ignore
+        return nodeInfos && nodeInfos.isAtLeastNpm6
+            ? true
+            : false;
+    },
     run() {
         return new Promise((resolve, reject) => {
             const projectDir = pathJoin(process.cwd());
@@ -122,11 +128,4 @@ function elegantPath(path) {
 
 function elegantName(name) {
     return chalk.red.bold(name);
-}
-
-function canRun() {
-    // prettier-ignore
-    return nodeInfos && nodeInfos.isAtLeastNpm6
-        ? true
-        : false;
 }
