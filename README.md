@@ -72,10 +72,9 @@ npm run publish-please
  - **vulnerableDependencies** - Perform vulnerable dependencies check using `npm audit`. Default: `true` if npm version is 6 or above, `false` otherwise.
     - you may prevent specific vulnerabilities to be reported by publish-please by creating a `.auditignore` file in the root of your project with content like the following:
 
-        ```json
-        {
-          "exceptions": ["https://nodesecurity.io/advisories/12"]
-        }
+        ```yaml
+        https://nodesecurity.io/advisories/12
+        https://nodesecurity.io/advisories/577
         ```
  
 
