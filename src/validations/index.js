@@ -28,7 +28,7 @@ function runValidation(validation, param, pkgInfo, errs) {
 }
 
 function skipValidation(validation) {
-    const skipped = (text) => console.log(chalk.orange(`! ${text}`));
+    const skipped = (text) => console.log(chalk.inverse(`! ${text}`));
     return Promise.resolve().then(() => skipped(validation.skipText));
 }
 
