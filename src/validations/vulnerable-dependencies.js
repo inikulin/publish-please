@@ -10,12 +10,7 @@ const nodeInfos = require('../utils/get-node-infos').getNodeInfosSync();
 
 module.exports = {
     option: 'vulnerableDependencies',
-
     statusText: 'Checking for the vulnerable dependencies',
-    skipText: `Skipped vulnerable dependencies check (because npm version is ${
-        nodeInfos.npmVersion
-    }. To use this validation, you must upgrade npm to version 6 or above)`,
-
     defaultParam: true,
 
     configurator(currentVal) {
@@ -30,7 +25,12 @@ module.exports = {
             ? true
             : false;
     },
-    run() {
+    whyCannotRun() {
+        return `Cannot check vulnerable dependencies because npm version is ${
+            nodeInfos.npmVersion
+        }. Either upgrade npm to version 6 or above, or disable this validation in the configuration file`;
+    },
+    run(_, pkgInfo) {
         return new Promise((resolve, reject) => {
             const projectDir = pathJoin(process.cwd());
             const defaultArgs = nsp.sanitizeParameters({});
@@ -40,9 +40,12 @@ module.exports = {
                 reporter: 'summary',
                 'warn-only': false,
                 path: projectDir,
-                pkg: readPkg.sync(projectDir, {
-                    normalize: false,
-                }),
+                // prettier-ignore
+                pkg: pkgInfo && pkgInfo.cfg
+                    ? pkgInfo.cfg
+                    : readPkg.sync(projectDir, {
+                        normalize: false,
+                    }),
                 offline: false,
                 exceptions: Array.isArray(defaultArgs.exceptions)
                     ? defaultArgs.exceptions

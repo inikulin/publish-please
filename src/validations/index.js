@@ -27,9 +27,11 @@ function runValidation(validation, param, pkgInfo, errs) {
         });
 }
 
-function skipValidation(validation) {
-    const skipped = (text) => console.log(chalk.red('!') + ` ${text}`);
-    return Promise.resolve().then(() => skipped(validation.skipText));
+function skipValidation(validation, errs) {
+    const done = elegantStatus(validation.statusText);
+    return Promise.resolve()
+        .then(() => errs.push(validation.whyCannotRun()))
+        .then(() => done(false));
 }
 
 module.exports = {
@@ -70,7 +72,7 @@ module.exports = {
                                 pkgInfo,
                                 errs
                             )
-                            : skipValidation(validation)
+                            : skipValidation(validation, errs)
                 );
             }, Promise.resolve())
             .then(() => {
