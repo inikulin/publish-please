@@ -549,7 +549,7 @@ describe('Integration tests', () => {
     });
 
     describe('Node security project audit', () => {
-        it.only('Should fail if there are vulnerable dependencies', () =>
+        it('Should fail if there are vulnerable dependencies', () =>
             exec('git checkout master')
                 .then(() => pkgd())
                 .then((pkgInfo) => {
@@ -577,9 +577,9 @@ describe('Integration tests', () => {
                         /* prettier-ignore */
                         nodeInfos.isAtLeastNpm6
                             ? assert(err.message.indexOf('Vulnerability found') > -1)
-                            : err.message.indexOf('You do not have permission to publish') > -1 ||
+                            : assert(err.message.indexOf('You do not have permission to publish') > -1 ||
                               err.message.indexOf('auth required for publishing') > -1 ||
-                              err.message.indexOf('operation not permitted') > -1
+                              err.message.indexOf('operation not permitted') > -1)
                 ));
         ['publish-please@2.4.1', 'testcafe@0.19.2'].forEach(function(
             dependency
@@ -608,11 +608,14 @@ describe('Integration tests', () => {
                     .then(() => {
                         throw new Error('Promise rejection expected');
                     })
-                    .catch((err) =>
-                        assert(
-                            // prettier-ignore
-                            err.message.indexOf(`Vulnerability found in ${chalk.bold(dependency)}`) > -1
-                        )
+                    .catch(
+                        (err) =>
+                            /* prettier-ignore */
+                            nodeInfos.isAtLeastNpm6
+                                ? assert(err.message.indexOf(`Vulnerability found in ${chalk.bold(dependency)}`) > -1)
+                                : assert(err.message.indexOf('You do not have permission to publish') > -1 ||
+                                  err.message.indexOf('auth required for publishing') > -1 ||
+                                  err.message.indexOf('operation not permitted') > -1)
                     ));
         });
 
@@ -641,11 +644,14 @@ describe('Integration tests', () => {
                     .then(() => {
                         throw new Error('Promise rejection expected');
                     })
-                    .catch((err) =>
-                        assert(
-                            // prettier-ignore
-                            err.message.indexOf(`Vulnerability found in ${chalk.red.bold(dependency)}`) > -1
-                        )
+                    .catch(
+                        (err) =>
+                            /* prettier-ignore */
+                            nodeInfos.isAtLeastNpm6
+                                ? assert(err.message.indexOf(`Vulnerability found in ${chalk.red.bold(dependency)}`) > -1)
+                                : assert(err.message.indexOf('You do not have permission to publish') > -1 ||
+                                  err.message.indexOf('auth required for publishing') > -1 ||
+                                  err.message.indexOf('operation not permitted') > -1)
                     ));
         });
 
@@ -707,11 +713,14 @@ describe('Integration tests', () => {
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) =>
-                    assert(
-                        // prettier-ignore
-                        err.message.indexOf(`Vulnerability found in ${chalk.red.bold('lodash@4.16.4')}`) > -1
-                    )
+                .catch(
+                    (err) =>
+                        /* prettier-ignore */
+                        nodeInfos.isAtLeastNpm6
+                            ? assert(err.message.indexOf(`Vulnerability found in ${chalk.red.bold('lodash@4.16.4')}`) > -1)
+                            : assert(err.message.indexOf('You do not have permission to publish') > -1 ||
+                              err.message.indexOf('auth required for publishing') > -1 ||
+                              err.message.indexOf('operation not permitted') > -1)
                 ));
 
         ['lodash@4.17.5', 'ms@0.7.1'].forEach(function(dependency) {
@@ -822,10 +831,21 @@ describe('Integration tests', () => {
                     throw new Error('Promise rejection expected');
                 })
                 .catch((err) => {
-                    const errors = err.message
-                        .split('\n')
-                        .filter((msg) => msg.startsWith('  * '));
-                    return assert(errors.length === 2);
+                    /* prettier-ignore */
+                    if (nodeInfos.isAtLeastNpm6) {
+                        const errors = err.message
+                            .split('\n')
+                            .filter((msg) => msg.startsWith('  * '));
+
+                        return assert(errors.length === 2);
+                    }
+
+                    return assert(
+                        // prettier-ignore
+                        err.message.indexOf('You do not have permission to publish') > -1 ||
+                        err.message.indexOf('auth required for publishing') > -1 ||
+                        err.message.indexOf('operation not permitted') > -1
+                    );
                 }));
 
         it('Should not perform check if vulnerableDependencies-validation is disabled', () =>
