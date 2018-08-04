@@ -14,7 +14,7 @@ const shouldUsePrePublishOnlyScript = nodeInfos.shouldUsePrePublishOnlyScript;
 const lineSeparator = '----------------------------------';
 
 /* eslint-disable max-nested-callbacks */
-describe.only('npm integration tests', () => {
+describe('npm integration tests', () => {
     const prepublishKey = shouldUsePrePublishOnlyScript
         ? 'prepublishOnly'
         : 'prepublish';
