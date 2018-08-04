@@ -22,7 +22,7 @@ const shouldUsePrePublishOnlyScript = nodeInfos.shouldUsePrePublishOnlyScript;
 const lineSeparator = '----------------------------------';
 
 /* eslint-disable max-nested-callbacks */
-describe.only('Integration tests', () => {
+describe('Integration tests', () => {
     // NOTE: mocking confirm function
     let mockConfirm = () => {};
 
