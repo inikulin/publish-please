@@ -248,13 +248,6 @@ describe.only('npx integration tests', () => {
     it('Should be able to run the publishing workflow (with .publishrc config file)', () => {
         return Promise.resolve()
             .then(() => {
-                const pkg = JSON.parse(readFile('package.json').toString());
-                const scripts = {};
-                scripts.test = 'echo "running tests ..."';
-                pkg.scripts = scripts;
-                writeFile('package.json', JSON.stringify(pkg, null, 2));
-            })
-            .then(() => {
                 writeFile(
                     '.publishrc',
                     JSON.stringify({
@@ -310,13 +303,6 @@ describe.only('npx integration tests', () => {
         it('Should abort the publishing workflow when npm version < 6 and vulnerability check is enabled in .publishrc config file', () => {
             return Promise.resolve()
                 .then(() => {
-                    const pkg = JSON.parse(readFile('package.json').toString());
-                    const scripts = {};
-                    scripts.test = 'echo "running tests ..."';
-                    pkg.scripts = scripts;
-                    writeFile('package.json', JSON.stringify(pkg, null, 2));
-                })
-                .then(() => {
                     writeFile(
                         '.publishrc',
                         JSON.stringify({
@@ -368,13 +354,6 @@ describe.only('npx integration tests', () => {
 
         it('Should abort the dry mode workflow when npm version < 6 and vulnerability check is enabled in .publishrc config file', () => {
             return Promise.resolve()
-                .then(() => {
-                    const pkg = JSON.parse(readFile('package.json').toString());
-                    const scripts = {};
-                    scripts.test = 'echo "running tests ..."';
-                    pkg.scripts = scripts;
-                    writeFile('package.json', JSON.stringify(pkg, null, 2));
-                })
                 .then(() => {
                     writeFile(
                         '.publishrc',
