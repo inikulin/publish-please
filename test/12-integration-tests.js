@@ -92,7 +92,6 @@ describe('Integration tests', () => {
                     'git clone https://github.com/inikulin/testing-repo.git testing-repo'
                 )
             )
-            .then(() => exec('npm run package'))
             .then(() => process.chdir('testing-repo'))
             .then(() => (process.env.PUBLISH_PLEASE_TEST_MODE = true));
     });
