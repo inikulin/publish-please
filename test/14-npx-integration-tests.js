@@ -34,14 +34,31 @@ describe('npx integration tests', () => {
         );
     }
     before(() => {
+        const projectDir = process.cwd();
+        if (projectDir.includes('testing-repo')) {
+            return Promise.resolve()
+                .then(() => process.chdir('..'))
+                .then(() => exec('npm run package'))
+                .then(() => del('testing-repo'))
+                .then(() =>
+                    exec(
+                        'git clone https://github.com/inikulin/testing-repo.git testing-repo'
+                    )
+                )
+                .then(() => process.chdir('testing-repo'))
+                .then(() => console.log(`tests will run in ${process.cwd()}`))
+                .then(() => (process.env.PUBLISH_PLEASE_TEST_MODE = true));
+        }
+
         return del('testing-repo')
+            .then(() => exec('npm run package'))
             .then(() =>
                 exec(
                     'git clone https://github.com/inikulin/testing-repo.git testing-repo'
                 )
             )
-            .then(() => exec('npm run package'))
             .then(() => process.chdir('testing-repo'))
+            .then(() => console.log(`tests will run in ${process.cwd()}`))
             .then(() => (process.env.PUBLISH_PLEASE_TEST_MODE = true));
     });
 
