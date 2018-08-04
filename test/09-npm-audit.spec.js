@@ -9,31 +9,64 @@ const mkdirp = require('mkdirp');
 const pathJoin = require('path').join;
 const del = require('del');
 const audit = require('../lib/utils/npm-audit');
+const nodeInfos = require('../lib/utils/get-node-infos').getNodeInfosSync();
 
-describe('npm audit analyzer', () => {
-    let originalWorkingDirectory;
+if (nodeInfos.isAtLeastNpm6) {
+    describe('npm audit analyzer when npm is >= 6', () => {
+        let originalWorkingDirectory;
 
-    before(() => (originalWorkingDirectory = process.cwd()));
-    afterEach(() => process.chdir(originalWorkingDirectory));
-    after(() => console.log(`cwd is restored to: ${process.cwd()}`));
-    it('Cannot audit a project without a lockfile', () => {
-        // Given
-        mkdirp('test/tmp/audit');
-        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
-        del.sync(pathJoin(projectDir, 'package.json'));
-        del.sync(pathJoin(projectDir, 'package-lock.json'));
+        before(() => (originalWorkingDirectory = process.cwd()));
+        afterEach(() => process.chdir(originalWorkingDirectory));
+        after(() => console.log(`cwd is restored to: ${process.cwd()}`));
+        it('Cannot audit a project without a lockfile', () => {
+            // Given
+            mkdirp('test/tmp/audit');
+            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
+            del.sync(pathJoin(projectDir, 'package.json'));
+            del.sync(pathJoin(projectDir, 'package-lock.json'));
 
-        // When
-        return (
-            Promise.resolve()
-                .then(() => audit(projectDir))
+            // When
+            return (
+                Promise.resolve()
+                    .then(() => audit(projectDir))
 
-                // Then
-                .then((result) => {
-                    result.error.summary.should.containEql(
-                        'Cannot audit a project without a lockfile'
-                    );
-                })
-        );
+                    // Then
+                    .then((result) => {
+                        result.error.summary.should.containEql(
+                            'Cannot audit a project without a lockfile'
+                        );
+                    })
+            );
+        });
     });
-});
+}
+
+if (!nodeInfos.isAtLeastNpm6) {
+    describe('npm audit analyzer when npm is < 6', () => {
+        let originalWorkingDirectory;
+
+        before(() => (originalWorkingDirectory = process.cwd()));
+        afterEach(() => process.chdir(originalWorkingDirectory));
+        after(() => console.log(`cwd is restored to: ${process.cwd()}`));
+        it('Cannot audit a project on npm < 6', () => {
+            // Given
+            mkdirp('test/tmp/audit');
+            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
+            del.sync(pathJoin(projectDir, 'package.json'));
+            del.sync(pathJoin(projectDir, 'package-lock.json'));
+
+            // When
+            return (
+                Promise.resolve()
+                    .then(() => audit(projectDir))
+
+                    // Then
+                    .then((result) => {
+                        result.error.summary.should.containEql(
+                            'Command failed: npm audit'
+                        );
+                    })
+            );
+        });
+    });
+}
