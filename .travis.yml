@@ -9,3 +9,16 @@ node_js:
 before_install:
   - if [[ `node -v` = v6* ]]; then npm i -g npx; fi
   - npx --version
+
+script:
+  - node --version
+  - npm --version
+  - npx --version
+  - npm test
+  # Update npm to check that audit analyzer is then (still) active
+  - npm i -g npm@latest
+  - node --version
+  - npm --version
+  - npx --version
+  - npm test
+  
