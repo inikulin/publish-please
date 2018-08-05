@@ -578,7 +578,7 @@ describe('Integration tests', () => {
                 .catch(
                     (err) =>
                         /* prettier-ignore */
-                        nodeInfos.isAtLeastNpm6
+                        nodeInfos.npmAuditHasJsonReporter
                             ? assert(err.message.indexOf('Vulnerability found') > -1)
                             : assert(err.message.indexOf('Cannot check vulnerable dependencies') > -1)
                 ));
@@ -612,7 +612,7 @@ describe('Integration tests', () => {
                     .catch(
                         (err) =>
                             /* prettier-ignore */
-                            nodeInfos.isAtLeastNpm6
+                            nodeInfos.npmAuditHasJsonReporter
                                 ? assert(err.message.indexOf(`Vulnerability found in ${chalk.bold(dependency)}`) > -1)
                                 : assert(err.message.indexOf('Cannot check vulnerable dependencies') > -1)
                     ));
@@ -646,7 +646,7 @@ describe('Integration tests', () => {
                     .catch(
                         (err) =>
                             /* prettier-ignore */
-                            nodeInfos.isAtLeastNpm6
+                            nodeInfos.npmAuditHasJsonReporter
                                 ? assert(err.message.indexOf(`Vulnerability found in ${chalk.red.bold(dependency)}`) > -1)
                                 : assert(err.message.indexOf('Cannot check vulnerable dependencies') > -1)
                     ));
@@ -684,7 +684,7 @@ describe('Integration tests', () => {
                 .catch(
                     (err) =>
                         /* prettier-ignore */
-                        nodeInfos.isAtLeastNpm6
+                        nodeInfos.npmAuditHasJsonReporter
                             ? assert(err.message.indexOf(`Vulnerability found in ${chalk.red.bold('lodash@4.16.4')}`) > -1)
                             : assert(err.message.indexOf('Cannot check vulnerable dependencies') > -1)
                 ));
@@ -713,8 +713,8 @@ describe('Integration tests', () => {
                 ));
     });
 
-    if (nodeInfos.isAtLeastNpm6) {
-        describe('Node security project audit when npm version is >= 6', () => {
+    if (nodeInfos.npmAuditHasJsonReporter) {
+        describe('Node security project audit when npm version is >= 6.1.0', () => {
             it('Should respect exceptions configured in .nsprc file', () =>
                 exec('git checkout master')
                     .then(() => pkgd())

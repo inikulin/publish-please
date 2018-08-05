@@ -134,7 +134,7 @@ describe('npm integration tests', () => {
                 assert(publishrc.validations.untrackedFiles);
 
                 /* prettier-ignore */
-                nodeInfos.isAtLeastNpm6
+                nodeInfos.npmAuditHasJsonReporter
                     ? assert(publishrc.validations.vulnerableDependencies === true)
                     : assert(publishrc.validations.vulnerableDependencies === false);
 
@@ -166,7 +166,7 @@ describe('npm integration tests', () => {
                 assert(publishLog.includes('Error: no test specified'));
 
                 /* prettier-ignore */
-                nodeInfos.isAtLeastNpm6
+                nodeInfos.npmAuditHasJsonReporter
                     ? assert(publishLog.includes('Checking for the vulnerable dependencies'))
                     : assert(!publishLog.includes('Checking for the vulnerable dependencies'));
 
@@ -231,7 +231,7 @@ describe('npm integration tests', () => {
                 assert(publishLog.includes('Running validations'));
 
                 /* prettier-ignore */
-                nodeInfos.isAtLeastNpm6
+                nodeInfos.npmAuditHasJsonReporter
                     ? assert(publishLog.includes('Checking for the vulnerable dependencies'))
                     : assert(!publishLog.includes('Checking for the vulnerable dependencies'));
 
@@ -244,8 +244,8 @@ describe('npm integration tests', () => {
             });
     });
 
-    if (!nodeInfos.isAtLeastNpm6) {
-        it('Should abort the publishing workflow when npm version < 6 and vulnerability check is enabled in .publishrc config file', () => {
+    if (!nodeInfos.npmAuditHasJsonReporter) {
+        it('Should abort the publishing workflow when npm version < 6.1.0 and vulnerability check is enabled in .publishrc config file', () => {
             return Promise.resolve()
                 .then(() =>
                     console.log(`> npm install --save-dev ${packageName}`)
@@ -301,7 +301,7 @@ describe('npm integration tests', () => {
                 });
         });
 
-        it('Should abort the dry-mode workflow when npm version < 6 and vulnerability check is enabled in .publishrc config file', () => {
+        it('Should abort the dry-mode workflow when npm version < 6.1.0 and vulnerability check is enabled in .publishrc config file', () => {
             return Promise.resolve()
                 .then(() =>
                     console.log(`> npm install --save-dev ${packageName}`)

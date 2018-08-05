@@ -8,7 +8,7 @@ const requireUncached = require('import-fresh');
 const showValidationErrors = require('../lib/utils/show-validation-errors');
 const lineSeparator = '----------------------------------';
 
-describe('Vulnerability validation when npm is < 6', () => {
+describe('Vulnerability validation when npm is < 6.1.0', () => {
     let nativeCanRun;
 
     before(() => {
@@ -70,7 +70,7 @@ describe('Vulnerability validation when npm is < 6', () => {
     });
 });
 
-describe('Vulnerability validation when npm is >= 6', () => {
+describe('Vulnerability validation when npm is >= 6.1.0', () => {
     let nativeCanRun;
 
     before(() => {

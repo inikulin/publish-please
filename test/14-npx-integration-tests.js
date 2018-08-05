@@ -111,7 +111,7 @@ describe('npx integration tests', () => {
                 assert(publishLog.includes('Running validations'));
 
                 /* prettier-ignore */
-                nodeInfos.isAtLeastNpm6
+                nodeInfos.npmAuditHasJsonReporter
                     ? assert(publishLog.includes('Checking for the vulnerable dependencies'))
                     : assert(!publishLog.includes('Checking for the vulnerable dependencies'));
 
@@ -206,7 +206,7 @@ describe('npx integration tests', () => {
                 publishrc.validations.uncommittedChanges.should.be.true();
                 publishrc.validations.untrackedFiles.should.be.true();
 
-                nodeInfos.isAtLeastNpm6
+                nodeInfos.npmAuditHasJsonReporter
                     ? publishrc.validations.vulnerableDependencies.should.be.true()
                     : publishrc.validations.vulnerableDependencies.should.be.false();
 
@@ -239,7 +239,7 @@ describe('npx integration tests', () => {
                 assert(publishLog.includes('Running validations'));
 
                 /* prettier-ignore */
-                nodeInfos.isAtLeastNpm6
+                nodeInfos.npmAuditHasJsonReporter
                     ? assert(publishLog.includes('Checking for the vulnerable dependencies'))
                     : assert(!publishLog.includes('Checking for the vulnerable dependencies'));
 
@@ -316,8 +316,8 @@ describe('npx integration tests', () => {
             });
     });
 
-    if (!nodeInfos.isAtLeastNpm6) {
-        it('Should abort the publishing workflow when npm version < 6 and vulnerability check is enabled in .publishrc config file', () => {
+    if (!nodeInfos.npmAuditHasJsonReporter) {
+        it('Should abort the publishing workflow when npm version < 6.1.0 and vulnerability check is enabled in .publishrc config file', () => {
             return Promise.resolve()
                 .then(() => {
                     writeFile(
@@ -369,7 +369,7 @@ describe('npx integration tests', () => {
                 });
         });
 
-        it('Should abort the dry mode workflow when npm version < 6 and vulnerability check is enabled in .publishrc config file', () => {
+        it('Should abort the dry mode workflow when npm version < 6.1.0 and vulnerability check is enabled in .publishrc config file', () => {
             return Promise.resolve()
                 .then(() => {
                     writeFile(

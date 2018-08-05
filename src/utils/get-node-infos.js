@@ -2,6 +2,7 @@
 const exec = require('cp-sugar').exec;
 const execSync = require('./exec-sync');
 const semver = require('semver');
+const npmVersionWithAuditJsonReporter = '6.1.0';
 
 module.exports = {
     getNodeInfos,
@@ -14,15 +15,18 @@ function getNodeInfosSync() {
     const isAtLeastNode6 = isAtLeastVersion6(nodeVersion);
     const isAtLeastNpm6 = isAtLeastVersion6(npmVersion);
     const isSafeNpm = isSafeNpmVersion(npmVersion);
+    const npmAuditHasJsonReporter = npmAuditCanReportInJson(npmVersion);
     const shouldUsePrePublishOnlyScript = shouldUsePrePublishOnlyScriptInThis(
         npmVersion
     );
     return {
         nodeVersion,
         npmVersion,
+        npmVersionWithAuditJsonReporter,
         isAtLeastNode6,
         isAtLeastNpm6,
         isSafeNpm,
+        npmAuditHasJsonReporter,
         shouldUsePrePublishOnlyScript,
     };
 }
@@ -35,6 +39,7 @@ function getNodeInfos() {
             const isAtLeastNode6 = isAtLeastVersion6(nodeVersion);
             const isAtLeastNpm6 = isAtLeastVersion6(npmVersion);
             const isSafeNpm = isSafeNpmVersion(npmVersion);
+            const npmAuditHasJsonReporter = npmAuditCanReportInJson(npmVersion);
             const shouldUsePrePublishOnlyScript = shouldUsePrePublishOnlyScriptInThis(
                 npmVersion
             );
@@ -42,9 +47,11 @@ function getNodeInfos() {
             return Promise.resolve({
                 nodeVersion,
                 npmVersion,
+                npmVersionWithAuditJsonReporter,
                 isAtLeastNode6,
                 isAtLeastNpm6,
                 isSafeNpm,
+                npmAuditHasJsonReporter,
                 shouldUsePrePublishOnlyScript,
             });
         }
@@ -78,4 +85,8 @@ function isSafeNpmVersion(version) {
 
 function shouldUsePrePublishOnlyScriptInThis(version) {
     return semver.gte(version, '5.6.0');
+}
+
+function npmAuditCanReportInJson(version) {
+    return semver.gte(version, npmVersionWithAuditJsonReporter);
 }

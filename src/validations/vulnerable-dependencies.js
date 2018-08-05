@@ -21,14 +21,14 @@ module.exports = {
     },
     canRun() {
         // prettier-ignore
-        return nodeInfos && nodeInfos.isAtLeastNpm6
+        return nodeInfos && nodeInfos.npmAuditHasJsonReporter
             ? true
             : false;
     },
     whyCannotRun() {
         return `Cannot check vulnerable dependencies because npm version is ${
             nodeInfos.npmVersion
-        }. Either upgrade npm to version 6 or above, or disable this validation in the configuration file`;
+        }. Either upgrade npm to version 6.1.0 or above, or disable this validation in the configuration file`;
     },
     run(_, pkgInfo) {
         return new Promise((resolve, reject) => {
