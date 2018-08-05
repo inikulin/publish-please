@@ -19,6 +19,7 @@
     "mocha-with-coverage": "istanbul cover -x test node_modules/mocha/bin/_mocha test",
     "check-coverage": "istanbul check-coverage --statements 96 --lines 96 --branches 81 --functions 96",
     "test": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage && npm run check-coverage",
+    "test-with-no-coverage-check": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage",
     "preinstall": "node lib/pre-install.js",
     "postinstall": "node lib/post-install.js",
     "package": "rimraf package && rimraf publish-please*.tgz && npm pack",

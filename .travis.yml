@@ -14,7 +14,7 @@ script:
   - node --version
   - npm --version
   - npx --version
-  - npm test
+  - npm run test-with-no-coverage-check
   # Update npm to check that audit analyzer is then (still) active
   - npm i -g npm@latest
   - node --version
