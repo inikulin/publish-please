@@ -3,6 +3,7 @@
 const exec = require('cp-sugar').exec;
 const pathJoin = require('path').join;
 const readFile = require('fs').readFileSync;
+const unlink = require('fs').unlinkSync;
 
 /**
  * @inikulin - this code is generated using a TDD approach. It might look incomplete or wrong because of this
@@ -33,6 +34,9 @@ module.exports = function audit(projectDir) {
                     )
                     .catch((err) =>
                         responseFromAuditLogOrFromError(auditLogFilePath, err)
+                    )
+                    .then((result) =>
+                        removePackageLockFrom(projectDir, result)
                     );
             }
             return response;
@@ -52,5 +56,19 @@ function responseFromAuditLogOrFromError(logFilePath, err) {
                     : err2.message,
             },
         };
+    }
+}
+
+function removePackageLockFrom(projectDir, response) {
+    try {
+        const file = pathJoin(projectDir, 'package-lock.json');
+        unlink(file);
+        return response;
+    } catch (error) {
+        if (response) {
+            response.internalErrors = response.internalErrors || [];
+            response.internalErrors.push(error.message);
+            return response;
+        }
     }
 }

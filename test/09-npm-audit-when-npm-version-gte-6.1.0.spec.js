@@ -8,6 +8,7 @@ const del = require('del');
 const audit = require('../lib/utils/npm-audit');
 const nodeInfos = require('../lib/utils/get-node-infos').getNodeInfosSync();
 const writeFile = require('fs').writeFileSync;
+const existsSync = require('fs').existsSync;
 const lineSeparator = '----------------------------------';
 
 if (nodeInfos.npmAuditHasJsonReporter) {
@@ -66,6 +67,33 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                             },
                         };
                         result.should.containDeep(expected);
+                    })
+            );
+        });
+
+        it('Should remove auto-generated package-lock.json to prevent further validations to fail', () => {
+            // Given
+            const pkg = {
+                name: 'testing-repo',
+                scripts: {},
+            };
+            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
+            writeFile(
+                pathJoin(projectDir, 'package.json'),
+                JSON.stringify(pkg, null, 2)
+            );
+            // When
+            return (
+                Promise.resolve()
+                    .then(() => audit(projectDir))
+
+                    // Then
+                    .then((result) => {
+                        const pakageLockFile = pathJoin(
+                            projectDir,
+                            'package-lock.json'
+                        );
+                        existsSync(pakageLockFile).should.be.false();
                     })
             );
         });
