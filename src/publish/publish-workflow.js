@@ -1,6 +1,5 @@
 'use strict';
 
-const chalk = require('chalk');
 const pkgd = require('pkgd');
 const validate = require('../validations').validate;
 const confirm = require('../utils/inquires').confirm;
@@ -12,6 +11,7 @@ const getOptions = require('../publish-options').getOptions;
 const assertNode6PublishingPrerequisite = require('./publish-prerequisites')
     .assertNode6PublishingPrerequisite;
 const executionContext = require('../utils/execution-context');
+const showValidationErrors = require('../utils/show-validation-errors');
 
 module.exports = function(opts, projectDir) {
     let pkgInfo = null;
@@ -51,9 +51,7 @@ module.exports = function(opts, projectDir) {
             ).then(() => command);
         })
         .catch((err) => {
-            console.log(chalk.red.bold('ERRORS'));
-            console.log(err.message);
-            console.log('');
+            showValidationErrors(err);
             if (executionContext && executionContext.isInTestMode()) {
                 return Promise.reject(err);
             }
