@@ -44,7 +44,8 @@ if (!nodeInfos.npmAuditHasJsonReporter) {
                     .then((result) => {
                         // prettier-ignore
                         nodeInfos.isAtLeastNpm6
-                            ? result.error.summary.should.containEql('Cannot audit a project without a lockfile')
+                            // npm audit reports only with parseable reporter not json reporter
+                            ? result.error.summary.should.containEql('Unexpected token = in JSON at position 104')
                             : result.error.summary.should.containEql('Command failed: npm audit');
                     })
             );
