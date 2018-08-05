@@ -14,10 +14,12 @@ if (nodeInfos.npmAuditHasJsonReporter) {
     describe('npm audit analyzer when npm is >= 6.1.0', () => {
         let originalWorkingDirectory;
 
-        before(() => (originalWorkingDirectory = process.cwd()));
+        before(() => {
+            originalWorkingDirectory = process.cwd();
+            mkdirp('test/tmp/audit');
+        });
         beforeEach(() => {
             console.log(`${lineSeparator} begin test ${lineSeparator}`);
-            mkdirp('test/tmp/audit');
             const projectDir = pathJoin(__dirname, 'tmp', 'audit');
             del.sync(pathJoin(projectDir, 'package.json'));
             del.sync(pathJoin(projectDir, 'package-lock.json'));
@@ -67,23 +69,8 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                     })
             );
         });
-    });
-}
 
-if (!nodeInfos.npmAuditHasJsonReporter) {
-    describe('npm audit analyzer when npm is < 6.1.0', () => {
-        let originalWorkingDirectory;
-
-        before(() => (originalWorkingDirectory = process.cwd()));
-        beforeEach(() => {
-            mkdirp('test/tmp/audit');
-            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
-            del.sync(pathJoin(projectDir, 'package.json'));
-            del.sync(pathJoin(projectDir, 'package-lock.json'));
-        });
-        afterEach(() => process.chdir(originalWorkingDirectory));
-        after(() => console.log(`cwd is restored to: ${process.cwd()}`));
-        it('Cannot audit a project on npm < 6.1.0', () => {
+        it('Should audit a project that has no dependency', () => {
             // Given
             const pkg = {
                 name: 'testing-repo',
@@ -94,7 +81,14 @@ if (!nodeInfos.npmAuditHasJsonReporter) {
                 pathJoin(projectDir, 'package.json'),
                 JSON.stringify(pkg, null, 2)
             );
-
+            const pkgLock = {
+                name: 'testing-repo',
+                lockfileVersion: 1,
+            };
+            writeFile(
+                pathJoin(projectDir, 'package-lock.json'),
+                JSON.stringify(pkgLock, null, 2)
+            );
             // When
             return (
                 Promise.resolve()
@@ -102,10 +96,25 @@ if (!nodeInfos.npmAuditHasJsonReporter) {
 
                     // Then
                     .then((result) => {
-                        // prettier-ignore
-                        nodeInfos.isAtLeastNpm6
-                            ? result.error.summary.should.containEql('Cannot audit a project without a lockfile')
-                            : result.error.summary.should.containEql('Command failed: npm audit');
+                        const expected = {
+                            actions: [],
+                            advisories: {},
+                            muted: [],
+                            metadata: {
+                                vulnerabilities: {
+                                    info: 0,
+                                    low: 0,
+                                    moderate: 0,
+                                    high: 0,
+                                    critical: 0,
+                                },
+                                dependencies: 0,
+                                devDependencies: 0,
+                                optionalDependencies: 0,
+                                totalDependencies: 0,
+                            },
+                        };
+                        result.should.containDeep(expected);
                     })
             );
         });
