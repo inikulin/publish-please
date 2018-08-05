@@ -21,5 +21,11 @@ test_script:
   - npm --version
   - npx --version
   - npm test
+  # Update npm to check that audit analyzer is then (still) active
+  - npm i -g npm@latest
+  - node --version
+  - npm --version
+  - npx --version
+  - npm test
 cache:
   - '%APPDATA%\npm-cache'
