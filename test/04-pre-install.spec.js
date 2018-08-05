@@ -7,6 +7,7 @@ const packageName = require('./utils/publish-please-version-under-test');
 const copy = require('./utils/copy-file-sync');
 const mkdirp = require('mkdirp');
 const pathJoin = require('path').join;
+const lineSeparator = '----------------------------------';
 
 describe('Pre-Install Execution', () => {
     let nativeExit;
@@ -14,7 +15,12 @@ describe('Pre-Install Execution', () => {
     let exitCode;
     let output;
 
+    before(() => {
+        mkdirp('test/tmp');
+    });
+
     beforeEach(() => {
+        console.log(`${lineSeparator} begin test ${lineSeparator}`);
         exitCode = undefined;
         output = '';
         nativeExit = process.exit;
@@ -31,6 +37,7 @@ describe('Pre-Install Execution', () => {
     afterEach(() => {
         process.exit = nativeExit;
         console.log = nativeConsoleLog;
+        console.log(`${lineSeparator} end test ${lineSeparator}\n`);
     });
 
     it(`Should return an error message on 'npm install -g ${packageName}'`, () => {
@@ -62,7 +69,7 @@ describe('Pre-Install Execution', () => {
         // Given
         process.env['npm_config_argv'] =
             '{"remain":[],"cooked":["install"],"original":["install"]}';
-        mkdirp('test/tmp');
+
         copy('lib/pre-install.js', 'test/tmp/pre-install.js');
 
         // When
