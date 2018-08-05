@@ -30,6 +30,41 @@ if (nodeInfos.npmAuditHasJsonReporter) {
             console.log(`${lineSeparator} end test ${lineSeparator}\n`);
         });
 
+        it('Should report an error when package.json is badly formatted and there is no lock file', () => {
+            // Given
+            const pkg = {
+                name: 'testing-repo',
+                dependencies: 'yo123',
+            };
+            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
+            writeFile(
+                pathJoin(projectDir, 'package.json'),
+                JSON.stringify(pkg, null, 2)
+            );
+
+            // When
+            return (
+                Promise.resolve()
+                    .then(() => audit(projectDir))
+
+                    // Then
+                    .then((result) => {
+                        const expected = {
+                            error: {
+                                code: 'EAUDITNOLOCK',
+                                summary:
+                                    'package.json file is missing or is badly formatted. Neither npm-shrinkwrap.json nor package-lock.json found: Cannot audit a project without a lockfile',
+                                detail:
+                                    'Try creating one first with: npm i --package-lock-only',
+                            },
+                        };
+                        result.error.summary.should.containEql(
+                            'package.json file is missing or is badly formatted'
+                        );
+                    })
+            );
+        });
+
         it('Should audit a project without a lockfile', () => {
             // Given
             const pkg = {
@@ -143,6 +178,11 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                             },
                         };
                         result.should.containDeep(expected);
+                        const pakageLockFile = pathJoin(
+                            projectDir,
+                            'package-lock.json'
+                        );
+                        existsSync(pakageLockFile).should.be.true();
                     })
             );
         });
