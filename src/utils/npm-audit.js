@@ -14,14 +14,28 @@ module.exports = function audit(projectDir) {
     const auditLogFilePath = pathJoin(directoryToAudit, auditLogFilename);
 
     process.chdir(directoryToAudit);
-    console.log(`auditing project in ${process.cwd()}`);
     const command = `npm audit --json > ${auditLogFilename}`;
     return exec(command)
-        .then(() => {
-            return responseFromAuditLogOrFromError(auditLogFilePath);
-        })
-        .catch((err) => {
-            return responseFromAuditLogOrFromError(auditLogFilePath, err);
+        .then(() => responseFromAuditLogOrFromError(auditLogFilePath))
+        .catch((err) => responseFromAuditLogOrFromError(auditLogFilePath, err))
+        .then((response) => {
+            if (
+                response &&
+                response.error &&
+                response.error.code === 'EAUDITNOLOCK'
+            ) {
+                const createLockLogFilename = 'npm-audit-create-lock.log';
+                const createLockFileCommand = `npm i --package-lock-only > ${createLockLogFilename}`;
+                return exec(createLockFileCommand)
+                    .then(() => exec(command))
+                    .then(() =>
+                        responseFromAuditLogOrFromError(auditLogFilePath)
+                    )
+                    .catch((err) =>
+                        responseFromAuditLogOrFromError(auditLogFilePath, err)
+                    );
+            }
+            return response;
         });
 };
 
