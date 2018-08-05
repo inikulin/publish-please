@@ -69,7 +69,7 @@ npm run publish-please
  - **gitTag** - Check that git tag matches version specified in the `package.json`. Default: `true`.
  - **branch** - Check that current branch matches the specified branch. Default: `master`.
  - **sensitiveData** - Perform [audit for the sensitive data](#sensitive-information-audit). Default: `true`.
- - **vulnerableDependencies** - Perform vulnerable dependencies check using `npm audit`. Default: `true` if npm version is 6 or above, `false` otherwise.
+ - **vulnerableDependencies** - Perform vulnerable dependencies check using `npm audit`. Default: `true` if npm version is 6.1.0 or above, `false` otherwise.
     - you may prevent specific vulnerabilities to be reported by publish-please by creating a `.auditignore` file in the root of your project with content like the following:
 
         ```yaml
