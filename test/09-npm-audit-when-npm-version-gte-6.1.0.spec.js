@@ -9,6 +9,9 @@ const audit = require('../lib/utils/npm-audit');
 const nodeInfos = require('../lib/utils/get-node-infos').getNodeInfosSync();
 const writeFile = require('fs').writeFileSync;
 const existsSync = require('fs').existsSync;
+const sep = require('path').sep;
+const readDir = require('fs').readdirSync;
+
 const lineSeparator = '----------------------------------';
 
 if (nodeInfos.npmAuditHasJsonReporter) {
@@ -129,6 +132,33 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                             'package-lock.json'
                         );
                         existsSync(pakageLockFile).should.be.false();
+                    })
+            );
+        });
+
+        it('Should create auto-generated log files in a temp folder to prevent further validations to fail', () => {
+            // Given
+            const tempDir = require('osenv').tmpdir();
+            const pkg = {
+                name: 'testing-repo',
+                dependencies: {},
+            };
+            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
+            writeFile(
+                pathJoin(projectDir, 'package.json'),
+                JSON.stringify(pkg, null, 2)
+            );
+            // When
+            return (
+                Promise.resolve()
+                    .then(() => audit(projectDir))
+
+                    // Then
+                    .then((result) => {
+                        const logFiles = readDir(projectDir).filter(
+                            (filename) => filename.includes('.log')
+                        );
+                        logFiles.should.be.empty();
                     })
             );
         });

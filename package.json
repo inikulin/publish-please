@@ -61,6 +61,7 @@
     "lodash": "4.17.10",
     "node-emoji": "1.8.1",
     "nsp": "3.2.1",
+    "osenv": "0.1.5",
     "pinkie-promise": "^2.0.1",
     "pkgd": "^1.1.2",
     "promisify-event": "^1.0.0",
