@@ -7,6 +7,7 @@ const unlink = require('fs').unlinkSync;
 const sep = require('path').sep;
 const tempFolder = require('osenv').tmpdir();
 const path = require('path');
+const EOL = require('os').EOL;
 
 // npm audit error codes
 const EAUDITNOLOCK = 'EAUDITNOLOCK';
@@ -19,6 +20,7 @@ module.exports = function audit(projectDir) {
     const options = getDefaultOptionsFor(projectDir);
     process.chdir(options.directoryToAudit);
     const command = `npm audit --json > ${options.auditLogFilepath}`;
+
     return exec(command)
         .then(() => createResponseFromAuditLog(options.auditLogFilepath))
         .catch((err) =>
@@ -49,7 +51,10 @@ module.exports = function audit(projectDir) {
                         processResult(result).whenErrorIs(EAUDITNOLOCK)
                     )
                     .then((result) =>
-                        removePackageLockFrom(projectDir, result)
+                        removePackageLockFrom(options.directoryToAudit, result)
+                    )
+                    .then((result) =>
+                        removeIgnoredVulnerabilities(result, options)
                     );
             }
             return response;
@@ -130,6 +135,65 @@ function removePackageLockFrom(projectDir, response) {
     }
 }
 
+function removeIgnoredVulnerabilities(response, options) {
+    try {
+        const ignoredVulnerabilities = getIgnoredVulnerabilities(options);
+        if (ignoredVulnerabilities && ignoredVulnerabilities.length == 0) {
+            return response;
+        }
+        const filteredResponse = JSON.parse(JSON.stringify(response, null, 2));
+
+        filteredResponse.actions = filteredResponse.actions
+            .map((action) => {
+                action.resolves = action.resolves.filter(
+                    (resolve) =>
+                        ignoredVulnerabilities.indexOf(`${resolve.id}`) < 0
+                );
+                return action;
+            })
+            .filter((action) => action.resolves.length > 0);
+
+        ignoredVulnerabilities.forEach(
+            (ignoredVulnerability) =>
+                delete filteredResponse.advisories[ignoredVulnerability]
+        );
+
+        const vulnerabilitiesMetadata = {
+            info: 0,
+            low: 0,
+            moderate: 0,
+            high: 0,
+            critical: 0,
+        };
+
+        const severities = {};
+        const advisories = filteredResponse.advisories;
+        for (const key in advisories) {
+            if (advisories.hasOwnProperty(key)) {
+                const advisory = advisories[key];
+                severities[`${advisory.id}`] = advisory.severity;
+            }
+        }
+
+        filteredResponse.actions.forEach((action) => {
+            action.resolves.forEach((resolve) => {
+                vulnerabilitiesMetadata[severities[resolve.id]] += 1;
+            });
+        });
+
+        filteredResponse.metadata.vulnerabilities = vulnerabilitiesMetadata;
+
+        return filteredResponse;
+    } catch (error) {
+        if (response) {
+            response.internalErrors = response.internalErrors || [];
+            response.internalErrors.push(error.message);
+            return response;
+        }
+        return response;
+    }
+}
+
 /**
  * Get default options of this module
  * @param {*} projectDir - path to the directory that will be analyzed by npm audit
@@ -150,4 +214,22 @@ function getDefaultOptionsFor(projectDir) {
         auditLogFilepath,
         createLockLogFilepath,
     };
+}
+
+function getIgnoredVulnerabilities(options) {
+    try {
+        const auditIgnoreFile = path.resolve(
+            options.directoryToAudit,
+            '.auditignore'
+        );
+        const content = readFile(auditIgnoreFile).toString();
+        return content
+            .split(EOL)
+            .filter((vulnerabilityUri) =>
+                vulnerabilityUri.includes('nodesecurity.io/advisories')
+            )
+            .map((vulnerabilityUri) => vulnerabilityUri.split('/').pop());
+    } catch (error) {
+        return [];
+    }
 }
