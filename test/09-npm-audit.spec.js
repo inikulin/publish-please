@@ -36,8 +36,6 @@ describe('npm audit analyzer', () => {
         // Then
         result.should.containDeep(response);
         Array.isArray(result.internalErrors).should.be.true();
-        result.internalErrors[0].message.should.containEql(
-            'The "path" argument must be of type string'
-        );
+        result.internalErrors[0].should.be.Error();
     });
 });
