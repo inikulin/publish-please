@@ -9,9 +9,9 @@ const audit = require('../lib/utils/npm-audit');
 const nodeInfos = require('../lib/utils/get-node-infos').getNodeInfosSync();
 const writeFile = require('fs').writeFileSync;
 const existsSync = require('fs').existsSync;
-const sep = require('path').sep;
 const readDir = require('fs').readdirSync;
 const EOL = require('os').EOL;
+const exec = require('cp-sugar').exec;
 
 const lineSeparator = '----------------------------------';
 
@@ -631,6 +631,176 @@ if (nodeInfos.npmAuditHasJsonReporter) {
             // When
             return (
                 Promise.resolve()
+                    .then(() => audit(projectDir))
+
+                    // Then
+                    .then((result) => {
+                        const expected = {
+                            actions: [
+                                {
+                                    action: 'install',
+                                    module: 'lodash',
+                                    target: '4.17.10',
+                                    isMajor: false,
+                                    resolves: [
+                                        {
+                                            id: 577,
+                                            path: 'lodash',
+                                            dev: true,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                    ],
+                                },
+                                {
+                                    action: 'update',
+                                    module: 'lodash',
+                                    depth: 3,
+                                    target: '4.17.10',
+                                    resolves: [
+                                        {
+                                            id: 577,
+                                            path: 'nsp>inquirer>lodash',
+                                            dev: true,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                    ],
+                                },
+                                {
+                                    action: 'review',
+                                    module: 'lodash',
+                                    resolves: [
+                                        {
+                                            id: 577,
+                                            path:
+                                                'ban-sensitive-files>ggit>lodash',
+                                            dev: false,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                        {
+                                            id: 577,
+                                            path: 'nsp>cli-table2>lodash',
+                                            dev: true,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                    ],
+                                },
+                            ],
+                            advisories: {
+                                '577': {
+                                    findings: [
+                                        {
+                                            version: '4.17.4',
+                                            paths: [
+                                                'ban-sensitive-files>ggit>lodash',
+                                            ],
+                                            dev: false,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                        {
+                                            version: '4.16.4',
+                                            paths: [
+                                                'lodash',
+                                                'nsp>inquirer>lodash',
+                                            ],
+                                            dev: true,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                        {
+                                            version: '3.10.1',
+                                            paths: ['nsp>cli-table2>lodash'],
+                                            dev: true,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                    ],
+                                    id: 577,
+                                    created: '2018-04-24T14:27:02.796Z',
+                                    updated: '2018-04-24T14:27:13.049Z',
+                                    deleted: null,
+                                    title: 'Prototype Pollution',
+                                    found_by: {
+                                        name: 'Olivier Arteau (HoLyVieR)',
+                                    },
+                                    reported_by: {
+                                        name: 'Olivier Arteau (HoLyVieR)',
+                                    },
+                                    module_name: 'lodash',
+                                    cves: ['CVE-2018-3721'],
+                                    vulnerable_versions: '<4.17.5',
+                                    patched_versions: '>=4.17.5',
+                                    overview:
+                                        "Versions of `lodash` before 4.17.5 are vulnerable to prototype pollution. \n\nThe vulnerable functions are 'defaultsDeep', 'merge', and 'mergeWith' which allow a malicious user to modify the prototype of `Object` via `__proto__` causing the addition or modification of an existing property that will exist on all objects.\n\n",
+                                    recommendation:
+                                        'Update to version 4.17.5 or later.',
+                                    references:
+                                        '- [HackerOne Report](https://hackerone.com/reports/310443)',
+                                    access: 'public',
+                                    severity: 'low',
+                                    cwe: 'CWE-471',
+                                    metadata: {
+                                        module_type: '',
+                                        exploitability: 1,
+                                        affected_components: '',
+                                    },
+                                    url:
+                                        'https://nodesecurity.io/advisories/577',
+                                },
+                            },
+                            muted: [],
+                            metadata: {
+                                vulnerabilities: {
+                                    info: 0,
+                                    low: 4,
+                                    moderate: 0,
+                                    high: 0,
+                                    critical: 0,
+                                },
+                                dependencies: 164,
+                                devDependencies: 153,
+                                optionalDependencies: 0,
+                                totalDependencies: 317,
+                            },
+                        };
+                        result.should.containDeep(expected);
+                    })
+            );
+        });
+
+        it('Should report vulnerability that is not stored in .auditignore file (package-lock.json exists)', () => {
+            // Given
+            const pkg = {
+                name: 'testing-repo',
+                dependencies: {
+                    ms: '0.7.0',
+                    'ban-sensitive-files': '1.9.2',
+                },
+                devDependencies: {
+                    lodash: '4.16.4',
+                    nsp: '3.2.1',
+                },
+            };
+            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
+            writeFile(
+                pathJoin(projectDir, 'package.json'),
+                JSON.stringify(pkg, null, 2)
+            );
+            const auditIgnore = ['https://nodesecurity.io/advisories/46'];
+            writeFile(
+                pathJoin(projectDir, '.auditignore'),
+                auditIgnore.join(EOL)
+            );
+            return (
+                Promise.resolve()
+                    .then(() => process.chdir(projectDir))
+                    .then(() => exec('npm i --package-lock-only'))
+
+                    // When
                     .then(() => audit(projectDir))
 
                     // Then

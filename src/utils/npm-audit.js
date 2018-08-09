@@ -57,7 +57,8 @@ module.exports = function audit(projectDir) {
                         removeIgnoredVulnerabilities(result, options)
                     );
             }
-            return response;
+
+            return removeIgnoredVulnerabilities(response, options);
         });
 };
 
