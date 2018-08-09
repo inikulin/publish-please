@@ -10,6 +10,9 @@ const path = require('path');
 const EOL = require('os').EOL;
 
 // npm audit error codes
+/**
+ * Missing package-lock.json
+ */
 const EAUDITNOLOCK = 'EAUDITNOLOCK';
 
 /**
@@ -116,8 +119,10 @@ function processResult(result) {
 
 /**
  * Middleware that removes the auto-generated package-lock.json
- * @param {*} projectDir - folder where the file has been generated
- * @param {*} response - result of the npm audit command (eventually modified by previous middleware execution)
+ * @param {string} projectDir - folder where the package-lock.json file has been generated
+ * @param {*} response - result of the npm audit command (eventually modified by previous middlewares execution)
+ * @returns input response if file removal is ok
+ * In case of error it adds or updates into the input response object the property 'internalErrors'
  */
 function removePackageLockFrom(projectDir, response) {
     try {
@@ -130,11 +135,16 @@ function removePackageLockFrom(projectDir, response) {
         }
         if (response) {
             response.internalErrors = response.internalErrors || [];
-            response.internalErrors.push(error.message);
+            response.internalErrors.push(error);
             return response;
         }
     }
 }
+
+/**
+ * exported for testing purposes
+ */
+module.exports.removePackageLockFrom = removePackageLockFrom;
 
 function removeIgnoredVulnerabilities(response, options) {
     try {
@@ -188,7 +198,7 @@ function removeIgnoredVulnerabilities(response, options) {
     } catch (error) {
         if (response) {
             response.internalErrors = response.internalErrors || [];
-            response.internalErrors.push(error.message);
+            response.internalErrors.push(error);
             return response;
         }
         return response;
