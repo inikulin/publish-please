@@ -140,6 +140,7 @@ function removePackageLockFrom(projectDir, response) {
             response.internalErrors.push(error);
             return response;
         }
+        return response;
     }
 }
 
@@ -148,6 +149,11 @@ function removePackageLockFrom(projectDir, response) {
  */
 module.exports.removePackageLockFrom = removePackageLockFrom;
 
+/**
+ * Remove, from npm audit command response, the vulnerabilities defined in .auditignore file
+ * @param {*} response - result of the npm audit command (eventually modified by previous middlewares execution)
+ * @param {DefaultOptions} options - options
+ */
 function removeIgnoredVulnerabilities(response, options) {
     try {
         const ignoredVulnerabilities = getIgnoredVulnerabilities(options);
@@ -190,7 +196,7 @@ function removeIgnoredVulnerabilities(response, options) {
 
         filteredResponse.actions.forEach((action) => {
             action.resolves.forEach((resolve) => {
-                vulnerabilitiesMetadata[severities[resolve.id]] += 1;
+                vulnerabilitiesMetadata[severities[`${resolve.id}`]] += 1;
             });
         });
 
@@ -208,8 +214,22 @@ function removeIgnoredVulnerabilities(response, options) {
 }
 
 /**
+ * exported for testing purposes
+ */
+module.exports.removeIgnoredVulnerabilities = removeIgnoredVulnerabilities;
+
+/**
+ * @typedef DefaultOptions
+ * @type {Object}
+ * @property {string} directoryToAudit - Folder to audit. Defaults to process.cwd()
+ * @property {string} auditLogFilepath - Path of the file that will receive all output of the npm-audit command.
+ * @property {string} createLockLogFilepath - Path of the file that will receive all output of the 'npm i --package-lock-only' command.
+ */
+
+/**
  * Get default options of this module
- * @param {*} projectDir - path to the directory that will be analyzed by npm audit
+ * @param {string} projectDir - path to the directory that will be analyzed by npm audit
+ * @returns {DefaultOptions}
  */
 function getDefaultOptionsFor(projectDir) {
     const directoryToAudit = projectDir || process.cwd();
