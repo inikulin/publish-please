@@ -30,40 +30,44 @@ module.exports = function audit(projectDir) {
             createResponseFromAuditLogOrFromError(options.auditLogFilepath, err)
         )
         .then((response) => {
-            if (
-                response &&
-                response.error &&
-                response.error.code === EAUDITNOLOCK
-            ) {
-                const createLockFileCommand = `npm i --package-lock-only > ${
-                    options.createLockLogFilepath
-                }`;
-
-                return exec(createLockFileCommand)
-                    .then(() => exec(command))
-                    .then(() =>
-                        createResponseFromAuditLog(options.auditLogFilepath)
-                    )
-                    .catch((err) =>
-                        createResponseFromAuditLogOrFromError(
-                            options.auditLogFilepath,
-                            err
-                        )
-                    )
-                    .then((result) =>
-                        processResult(result).whenErrorIs(EAUDITNOLOCK)
-                    )
-                    .then((result) =>
-                        removePackageLockFrom(options.directoryToAudit, result)
-                    )
-                    .then((result) =>
-                        removeIgnoredVulnerabilities(result, options)
-                    );
+            if (packageLockHasBeenFound(response)) {
+                return removeIgnoredVulnerabilities(response, options);
             }
 
-            return removeIgnoredVulnerabilities(response, options);
+            const createLockFileCommand = `npm i --package-lock-only > ${
+                options.createLockLogFilepath
+            }`;
+
+            return exec(createLockFileCommand)
+                .then(() => exec(command))
+                .then(() =>
+                    createResponseFromAuditLog(options.auditLogFilepath)
+                )
+                .catch((err) =>
+                    createResponseFromAuditLogOrFromError(
+                        options.auditLogFilepath,
+                        err
+                    )
+                )
+                .then((result) =>
+                    processResult(result).whenErrorIs(EAUDITNOLOCK)
+                )
+                .then((result) =>
+                    removePackageLockFrom(options.directoryToAudit, result)
+                )
+                .then((result) =>
+                    removeIgnoredVulnerabilities(result, options)
+                );
         });
 };
+
+function packageLockHasNotBeenFound(response) {
+    return response && response.error && response.error.code === EAUDITNOLOCK;
+}
+
+function packageLockHasBeenFound(response) {
+    return !packageLockHasNotBeenFound(response);
+}
 
 function createResponseFromAuditLog(logFilePath) {
     try {
@@ -104,9 +108,7 @@ function processResult(result) {
         whenErrorIs: (errorCode) => {
             if (
                 errorCode === EAUDITNOLOCK &&
-                result &&
-                result.error &&
-                result.error.code === errorCode
+                packageLockHasNotBeenFound(result)
             ) {
                 const summary = result.error.summary || '';
                 result.error.summary = `package.json file is missing or is badly formatted. ${summary}`;
