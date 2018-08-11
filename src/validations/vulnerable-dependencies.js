@@ -45,6 +45,10 @@ module.exports = {
                             reject(errs.sort());
                             return;
                         }
+                        if (auditErrorFoundIn(result)) {
+                            reject(elegantSummary(result.error.summary));
+                            return;
+                        }
                         resolve();
                     })
                     .catch((err) => {
@@ -59,6 +63,10 @@ module.exports = {
 
 function vulnerabilitiesFoundIn(result) {
     return result && Array.isArray(result.actions) && result.actions.length > 0;
+}
+
+function auditErrorFoundIn(result) {
+    return result && result.error && result.error.summary;
 }
 
 function summaryOf(vulnerability) {
@@ -81,5 +89,13 @@ function elegantPath(path, sep) {
                 : item;
         })
         .join(' -> ');
+    return result;
+}
+
+function elegantSummary(summary) {
+    const result = summary
+        .split('\n')
+        .map((line, index) => (index === 0 ? line : `\t${line}`))
+        .join('\n');
     return result;
 }

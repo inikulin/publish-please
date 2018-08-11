@@ -9,6 +9,7 @@ const writeFile = require('fs').writeFileSync;
 const validation = require('../lib/validations/vulnerable-dependencies');
 const requireUncached = require('import-fresh');
 const showValidationErrors = require('../lib/utils/show-validation-errors');
+const nodeInfos = require('../lib/utils/get-node-infos').getNodeInfosSync();
 const lineSeparator = '----------------------------------';
 
 describe('Vulnerability validation when npm is < 6.1.0', () => {
@@ -186,8 +187,17 @@ describe('Vulnerability validation when npm is >= 6.1.0', () => {
                     })
                     .catch((err) => {
                         showValidationErrors(err);
-                        err.message.should.containEql('Vulnerability found in');
-                        err.message.should.containEql(`${packageName}`);
+                        if (nodeInfos.npmAuditHasJsonReporter) {
+                            err.message.should.containEql(
+                                'Vulnerability found in'
+                            );
+                            err.message.should.containEql(`${packageName}`);
+                            return;
+                        }
+
+                        err.message.should.containEql(
+                            'Command failed: npm audit '
+                        );
                     })
             );
         });
@@ -198,17 +208,21 @@ describe('Vulnerability validation', () => {
     let nativeCanRun;
     let nativeProcessCwd;
     let nativeProcessChdir;
+    let nativeJsonParse;
+
     before(() => {
         nativeCanRun = validation.canRun;
         validation.canRun = () => true;
         nativeProcessCwd = process.cwd;
         nativeProcessChdir = process.chdir;
+        nativeJsonParse = JSON.parse;
         return Promise.resolve();
     });
     after(() => {
         validation.canRun = nativeCanRun;
         process.cwd = nativeProcessCwd;
         process.chdir = nativeProcessChdir;
+        JSON.parse = nativeJsonParse;
         return Promise.resolve();
     });
     beforeEach(() =>
@@ -216,6 +230,7 @@ describe('Vulnerability validation', () => {
     afterEach(() => {
         process.cwd = nativeProcessCwd;
         process.chdir = nativeProcessChdir;
+        JSON.parse = nativeJsonParse;
         console.log(`${lineSeparator} end test ${lineSeparator}\n`);
     });
 
@@ -269,6 +284,64 @@ describe('Vulnerability validation', () => {
                 .catch((err) => {
                     showValidationErrors(err);
                     err.message.should.containEql(uncaughtErrorMessage);
+                })
+        );
+    });
+
+    it('Should catch the error when npm audit command fails', () => {
+        // Given validation is enabled in configuration file
+        const validations = requireUncached('../lib/validations');
+        const opts = {
+            vulnerableDependencies: true,
+        };
+        const uncaughtErrorMessage = 'Uncaught error in npm audit analyzer';
+        JSON.parse = () => {
+            return {
+                error: {
+                    summary:
+                        'Command failed: npm audit --json > /var/folders/by/43xfzp8n1wd6z9f5rxxbjn1m0000gn/T/npm-audit-audit.log\n',
+                },
+            };
+        };
+
+        // When
+        return (
+            validations
+                .validate(opts)
+                // Then
+                .then(() => {
+                    throw new Error('Promise rejection expected');
+                })
+                .catch((err) => {
+                    showValidationErrors(err);
+                    err.message.should.containEql('Command failed: npm audit');
+                })
+        );
+    });
+
+    it('Should catch the error when npm audit command result is not in JSON format', () => {
+        // Given validation is enabled in configuration file
+        const validations = requireUncached('../lib/validations');
+        const opts = {
+            vulnerableDependencies: true,
+        };
+        const jsonParseErrorMessage = 'Cannot parse JSON';
+        JSON.parse = () => {
+            throw new Error(jsonParseErrorMessage);
+        };
+        // Given there is no package-lock.json file
+
+        // When
+        return (
+            validations
+                .validate(opts)
+                // Then
+                .then(() => {
+                    throw new Error('Promise rejection expected');
+                })
+                .catch((err) => {
+                    showValidationErrors(err);
+                    err.message.should.containEql('Command failed: npm audit');
                 })
         );
     });
