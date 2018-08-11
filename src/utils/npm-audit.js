@@ -20,45 +20,52 @@ const EAUDITNOLOCK = 'EAUDITNOLOCK';
  * @param {(string | undefined)} projectDir - project directory to be analyzed by npm audit
  */
 module.exports = function audit(projectDir) {
-    const options = getDefaultOptionsFor(projectDir);
-    process.chdir(options.directoryToAudit);
-    const command = `npm audit --json > ${options.auditLogFilepath}`;
+    try {
+        const options = getDefaultOptionsFor(projectDir);
+        process.chdir(options.directoryToAudit);
+        const command = `npm audit --json > ${options.auditLogFilepath}`;
 
-    return exec(command)
-        .then(() => createResponseFromAuditLog(options.auditLogFilepath))
-        .catch((err) =>
-            createResponseFromAuditLogOrFromError(options.auditLogFilepath, err)
-        )
-        .then((response) => {
-            if (packageLockHasBeenFound(response)) {
-                return removeIgnoredVulnerabilities(response, options);
-            }
-
-            const createLockFileCommand = `npm i --package-lock-only > ${
-                options.createLockLogFilepath
-            }`;
-
-            return exec(createLockFileCommand)
-                .then(() => exec(command))
-                .then(() =>
-                    createResponseFromAuditLog(options.auditLogFilepath)
+        return exec(command)
+            .then(() => createResponseFromAuditLog(options.auditLogFilepath))
+            .catch((err) =>
+                createResponseFromAuditLogOrFromError(
+                    options.auditLogFilepath,
+                    err
                 )
-                .catch((err) =>
-                    createResponseFromAuditLogOrFromError(
-                        options.auditLogFilepath,
-                        err
+            )
+            .then((response) => {
+                if (packageLockHasBeenFound(response)) {
+                    return removeIgnoredVulnerabilities(response, options);
+                }
+
+                const createLockFileCommand = `npm i --package-lock-only > ${
+                    options.createLockLogFilepath
+                }`;
+
+                return exec(createLockFileCommand)
+                    .then(() => exec(command))
+                    .then(() =>
+                        createResponseFromAuditLog(options.auditLogFilepath)
                     )
-                )
-                .then((result) =>
-                    processResult(result).whenErrorIs(EAUDITNOLOCK)
-                )
-                .then((result) =>
-                    removePackageLockFrom(options.directoryToAudit, result)
-                )
-                .then((result) =>
-                    removeIgnoredVulnerabilities(result, options)
-                );
-        });
+                    .catch((err) =>
+                        createResponseFromAuditLogOrFromError(
+                            options.auditLogFilepath,
+                            err
+                        )
+                    )
+                    .then((result) =>
+                        processResult(result).whenErrorIs(EAUDITNOLOCK)
+                    )
+                    .then((result) =>
+                        removePackageLockFrom(options.directoryToAudit, result)
+                    )
+                    .then((result) =>
+                        removeIgnoredVulnerabilities(result, options)
+                    );
+            });
+    } catch (error) {
+        return Promise.reject(error.message);
+    }
 };
 
 function packageLockHasNotBeenFound(response) {

@@ -3,6 +3,7 @@
 /* eslint-disable no-unused-vars */
 const should = require('should');
 const assert = require('assert');
+const copy = require('./utils/copy-file-sync');
 const del = require('del');
 const writeFile = require('fs').writeFileSync;
 const readFile = require('fs').readFileSync;
@@ -70,9 +71,11 @@ describe('npm integration tests', () => {
     after(() => delete process.env.PUBLISH_PLEASE_TEST_MODE);
 
     beforeEach(() =>
-        colorGitOutput().then(
-            console.log(`${lineSeparator} begin test ${lineSeparator}`)
-        ));
+        colorGitOutput()
+            .then(() =>
+                console.log(`${lineSeparator} begin test ${lineSeparator}`)
+            )
+            .then(() => copy('../.auditignore', '.auditignore')));
 
     afterEach(() => {
         const projectDir = process.cwd();

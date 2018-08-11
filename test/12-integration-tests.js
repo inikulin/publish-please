@@ -4,6 +4,7 @@
 const should = require('should');
 
 const assert = require('assert');
+const EOL = require('os').EOL;
 const del = require('del');
 const writeFile = require('fs').writeFileSync;
 const readFile = require('fs').readFileSync;
@@ -613,7 +614,7 @@ describe('Integration tests', () => {
                         (err) =>
                             /* prettier-ignore */
                             nodeInfos.npmAuditHasJsonReporter
-                                ? assert(err.message.indexOf(`Vulnerability found in ${chalk.bold(dependency)}`) > -1)
+                                ? assert(err.message.indexOf(`Vulnerability found in ${name}`) > -1)
                                 : assert(err.message.indexOf('Cannot check vulnerable dependencies') > -1)
                     ));
         });
@@ -647,12 +648,12 @@ describe('Integration tests', () => {
                         (err) =>
                             /* prettier-ignore */
                             nodeInfos.npmAuditHasJsonReporter
-                                ? assert(err.message.indexOf(`Vulnerability found in ${chalk.red.bold(dependency)}`) > -1)
+                                ? assert(err.message.indexOf(`Vulnerability found in ${chalk.red.bold(name)}`) > -1)
                                 : assert(err.message.indexOf('Cannot check vulnerable dependencies') > -1)
                     ));
         });
 
-        it('Should skip exceptions configured in .nsprc file with bad format', () =>
+        it('Should ignore vulnerabilities configured in .auditignore file when this file has a bad format', () =>
             exec('git checkout master')
                 .then(() => pkgd())
                 .then((pkgInfo) => {
@@ -660,7 +661,7 @@ describe('Integration tests', () => {
                     pkgInfo.cfg.dependencies['lodash'] = '4.16.4';
                     writeFile('package.json', JSON.stringify(pkgInfo.cfg));
                     writeFile(
-                        '.nsprc',
+                        '.auditignore',
                         JSON.stringify({
                             exceptions:
                                 'https://nodesecurity.io/advisories/577',
@@ -685,7 +686,7 @@ describe('Integration tests', () => {
                     (err) =>
                         /* prettier-ignore */
                         nodeInfos.npmAuditHasJsonReporter
-                            ? assert(err.message.indexOf(`Vulnerability found in ${chalk.red.bold('lodash@4.16.4')}`) > -1)
+                            ? assert(err.message.indexOf(`Vulnerability found in ${chalk.red.bold('lodash')}`) > -1)
                             : assert(err.message.indexOf('Cannot check vulnerable dependencies') > -1)
                 ));
 
@@ -715,7 +716,7 @@ describe('Integration tests', () => {
 
     if (nodeInfos.npmAuditHasJsonReporter) {
         describe('Node security project audit when npm version is >= 6.1.0', () => {
-            it('Should respect exceptions configured in .nsprc file', () =>
+            it('Should ignore vulnerabilities configured in .auditignorefile', () =>
                 exec('git checkout master')
                     .then(() => pkgd())
                     .then((pkgInfo) => {
@@ -723,12 +724,8 @@ describe('Integration tests', () => {
                         pkgInfo.cfg.dependencies['lodash'] = '4.16.4';
                         writeFile('package.json', JSON.stringify(pkgInfo.cfg));
                         writeFile(
-                            '.nsprc',
-                            JSON.stringify({
-                                exceptions: [
-                                    'https://nodesecurity.io/advisories/577',
-                                ],
-                            })
+                            '.auditignore',
+                            ['https://nodesecurity.io/advisories/577'].join(EOL)
                         );
                     })
                     .then(() =>
@@ -779,42 +776,6 @@ describe('Integration tests', () => {
                         pkgInfo.cfg.dependencies = {
                             ms: '0.7.1',
                         };
-                        writeFile('package.json', JSON.stringify(pkgInfo.cfg));
-                    })
-                    .then(() =>
-                        publish(
-                            getTestOptions({
-                                set: {
-                                    publishCommand: echoPublishCommand,
-                                    validations: {
-                                        vulnerableDependencies: true,
-                                    },
-                                },
-                            })
-                        )
-                    ));
-
-            it(`Should not fail on transitive dependency inside ${packageName}`, () =>
-                exec('git checkout master')
-                    .then(() => pkgd())
-                    .then((pkgInfo) => {
-                        pkgInfo.cfg.dependencies = {};
-                        // TODO: resolve vulnerability on 'ban-sensitive-files' dependency
-                        // pkgInfo.cfg.dependencies['ban-sensitive-files'] = '1.9.2';
-                        pkgInfo.cfg.dependencies['chalk'] = '2.4.1';
-                        pkgInfo.cfg.dependencies['cp-sugar'] = '^1.0.0';
-                        pkgInfo.cfg.dependencies['elegant-status'] = '1.1.0';
-                        pkgInfo.cfg.dependencies['globby'] = '8.0.1';
-                        pkgInfo.cfg.dependencies['inquirer'] = '4.0.2';
-                        pkgInfo.cfg.dependencies['lodash'] = '4.17.10';
-                        pkgInfo.cfg.dependencies['node-emoji'] = '1.8.1';
-                        // TODO: resolve vulnerability on 'nsp' dependency
-                        // pkgInfo.cfg.dependencies['nsp'] = '3.2.1';
-                        pkgInfo.cfg.dependencies['pinkie-promise'] = '^2.0.1';
-                        pkgInfo.cfg.dependencies['pkgd'] = '^1.1.2';
-                        pkgInfo.cfg.dependencies['promisify-event'] = '^1.0.0';
-                        pkgInfo.cfg.dependencies['read-pkg'] = '3.0.0';
-                        pkgInfo.cfg.dependencies['semver'] = '5.5.0';
                         writeFile('package.json', JSON.stringify(pkgInfo.cfg));
                     })
                     .then(() =>

@@ -2,7 +2,10 @@
 
 /* eslint-disable no-unused-vars */
 const should = require('should');
-const nodeInfos = require('../lib/utils/get-node-infos').getNodeInfosSync();
+const mkdirp = require('mkdirp');
+const del = require('del');
+const pathJoin = require('path').join;
+const writeFile = require('fs').writeFileSync;
 const validation = require('../lib/validations/vulnerable-dependencies');
 const requireUncached = require('import-fresh');
 const showValidationErrors = require('../lib/utils/show-validation-errors');
@@ -10,7 +13,6 @@ const lineSeparator = '----------------------------------';
 
 describe('Vulnerability validation when npm is < 6.1.0', () => {
     let nativeCanRun;
-
     before(() => {
         nativeCanRun = validation.canRun;
         validation.canRun = () => false;
@@ -72,8 +74,11 @@ describe('Vulnerability validation when npm is < 6.1.0', () => {
 
 describe('Vulnerability validation when npm is >= 6.1.0', () => {
     let nativeCanRun;
-
+    let originalWorkingDirectory;
+    let projectDir;
     before(() => {
+        originalWorkingDirectory = process.cwd();
+        mkdirp('test/tmp/audit');
         nativeCanRun = validation.canRun;
         validation.canRun = () => true;
         return Promise.resolve();
@@ -82,10 +87,19 @@ describe('Vulnerability validation when npm is >= 6.1.0', () => {
         validation.canRun = nativeCanRun;
         return Promise.resolve();
     });
-    beforeEach(() =>
-        console.log(`${lineSeparator} begin test ${lineSeparator}`));
-    afterEach(() =>
-        console.log(`${lineSeparator} end test ${lineSeparator}\n`));
+    beforeEach(() => {
+        console.log(`${lineSeparator} begin test ${lineSeparator}`);
+        projectDir = pathJoin(__dirname, 'tmp', 'audit');
+        del.sync(pathJoin(projectDir, 'package.json'));
+        del.sync(pathJoin(projectDir, 'package-lock.json'));
+        del.sync(pathJoin(projectDir, '.auditignore'));
+        process.chdir(projectDir);
+    });
+
+    afterEach(() => {
+        process.chdir(originalWorkingDirectory);
+        console.log(`${lineSeparator} end test ${lineSeparator}\n`);
+    });
 
     it('Should default to true when there is no configuration file', () => {
         // Given all validations are loaded
@@ -108,6 +122,10 @@ describe('Vulnerability validation when npm is >= 6.1.0', () => {
                 dependencies: {},
             },
         };
+        writeFile(
+            pathJoin(projectDir, 'package.json'),
+            JSON.stringify(pkgInfo.cfg, null, 2)
+        );
 
         // When
         return validations.validate(opts, pkgInfo);
@@ -126,6 +144,10 @@ describe('Vulnerability validation when npm is >= 6.1.0', () => {
                 },
             },
         };
+        writeFile(
+            pathJoin(projectDir, 'package.json'),
+            JSON.stringify(pkgInfo.cfg, null, 2)
+        );
 
         // When
         return validations.validate(opts, pkgInfo);
@@ -150,6 +172,10 @@ describe('Vulnerability validation when npm is >= 6.1.0', () => {
                 },
             };
             pkgInfo.cfg.dependencies[`${packageName}`] = `${packageVersion}`;
+            writeFile(
+                pathJoin(projectDir, 'package.json'),
+                JSON.stringify(pkgInfo.cfg, null, 2)
+            );
             // When
             return (
                 validations
@@ -161,9 +187,89 @@ describe('Vulnerability validation when npm is >= 6.1.0', () => {
                     .catch((err) => {
                         showValidationErrors(err);
                         err.message.should.containEql('Vulnerability found in');
-                        err.message.should.containEql(`${dependency}`);
+                        err.message.should.containEql(`${packageName}`);
                     })
             );
         });
+    });
+});
+
+describe('Vulnerability validation', () => {
+    let nativeCanRun;
+    let nativeProcessCwd;
+    let nativeProcessChdir;
+    before(() => {
+        nativeCanRun = validation.canRun;
+        validation.canRun = () => true;
+        nativeProcessCwd = process.cwd;
+        nativeProcessChdir = process.chdir;
+        return Promise.resolve();
+    });
+    after(() => {
+        validation.canRun = nativeCanRun;
+        process.cwd = nativeProcessCwd;
+        process.chdir = nativeProcessChdir;
+        return Promise.resolve();
+    });
+    beforeEach(() =>
+        console.log(`${lineSeparator} begin test ${lineSeparator}`));
+    afterEach(() => {
+        process.cwd = nativeProcessCwd;
+        process.chdir = nativeProcessChdir;
+        console.log(`${lineSeparator} end test ${lineSeparator}\n`);
+    });
+
+    it('Should catch the error when validation throws an error', () => {
+        // Given validation is enabled in configuration file
+        const validations = requireUncached('../lib/validations');
+        const opts = {
+            vulnerableDependencies: true,
+        };
+        const uncaughtErrorMessage =
+            'Uncaught error in vulnerability validation';
+        process.cwd = () => {
+            // should throw an error inside the validation.run() method
+            throw new Error(uncaughtErrorMessage);
+        };
+        // When
+        return (
+            validations
+                .validate(opts)
+                // Then
+                .then(() => {
+                    throw new Error('Promise rejection expected');
+                })
+                .catch((err) => {
+                    showValidationErrors(err);
+                    err.message.should.containEql(uncaughtErrorMessage);
+                })
+        );
+    });
+
+    it('Should catch the error when audit analyzer throws an error', () => {
+        // Given validation is enabled in configuration file
+        const validations = requireUncached('../lib/validations');
+        const opts = {
+            vulnerableDependencies: true,
+        };
+        const uncaughtErrorMessage = 'Uncaught error in npm audit analyzer';
+        process.chdir = () => {
+            // should throw an error inside the audit() method
+            throw new Error(uncaughtErrorMessage);
+        };
+
+        // When
+        return (
+            validations
+                .validate(opts)
+                // Then
+                .then(() => {
+                    throw new Error('Promise rejection expected');
+                })
+                .catch((err) => {
+                    showValidationErrors(err);
+                    err.message.should.containEql(uncaughtErrorMessage);
+                })
+        );
     });
 });
