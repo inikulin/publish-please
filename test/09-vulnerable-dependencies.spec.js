@@ -112,7 +112,7 @@ describe('Vulnerability validation when npm is >= 6.1.0', () => {
         // Then
         defaultParam.should.be.true();
     });
-    it('Should run with no error message when validation is enabled in configuration file and there is no vulnerability', () => {
+    it('Should run with no error message when npm >= 6.1.0 and validation is enabled in configuration file and there is no vulnerability', () => {
         // Given validation is enabled in configuration file
         const validations = requireUncached('../lib/validations');
         const opts = {
@@ -129,8 +129,17 @@ describe('Vulnerability validation when npm is >= 6.1.0', () => {
         );
 
         // When
-        return validations.validate(opts, pkgInfo);
-        // Then validation pass without error
+        return (
+            validations
+                .validate(opts, pkgInfo)
+                // Then validation pass without error
+                .catch((err) => {
+                    showValidationErrors(err);
+                    if (nodeInfos.npmAuditHasJsonReporter) {
+                        throw new Error('Promise rejection not expected');
+                    }
+                })
+        );
     });
     it('Should not run when validation is disabled in configuration file', () => {
         // Given validation is disabled in configuration file
