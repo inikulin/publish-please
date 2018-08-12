@@ -258,11 +258,13 @@ function getDefaultOptionsFor(projectDir) {
 
 function getIgnoredVulnerabilities(options) {
     try {
-        const auditIgnoreFile = path.resolve(
+        const auditIgnoreFile = pathJoin(
             options.directoryToAudit,
             '.auditignore'
         );
         const content = readFile(auditIgnoreFile).toString();
+        console.log('found .auditignore file with content:');
+        console.log(content);
         return content
             .split(EOL)
             .filter((vulnerabilityUri) =>
@@ -270,6 +272,7 @@ function getIgnoredVulnerabilities(options) {
             )
             .map((vulnerabilityUri) => vulnerabilityUri.split('/').pop());
     } catch (error) {
+        console.log(error.message);
         return [];
     }
 }
