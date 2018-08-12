@@ -46,7 +46,7 @@ module.exports = {
                             return;
                         }
                         if (auditErrorFoundIn(result)) {
-                            reject(elegantSummary(result.error.summary));
+                            reject(summaryErrorOf(result.error));
                             return;
                         }
                         resolve();
@@ -74,6 +74,11 @@ function summaryOf(vulnerability) {
         vulnerability.path,
         '>'
     )}`;
+    return summary;
+}
+
+function summaryErrorOf(error) {
+    const summary = elegantSummary(error.summary);
     return summary;
 }
 
