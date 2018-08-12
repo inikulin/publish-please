@@ -16,8 +16,9 @@ const exec = require('cp-sugar').exec;
 const lineSeparator = '----------------------------------';
 
 if (nodeInfos.npmAuditHasJsonReporter) {
-    describe('npm audit analyzer when npm is >= 6.1.0', () => {
+    describe.only('npm audit analyzer when npm is >= 6.1.0', () => {
         let originalWorkingDirectory;
+        let projectDir;
 
         before(() => {
             originalWorkingDirectory = process.cwd();
@@ -25,7 +26,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
         });
         beforeEach(() => {
             console.log(`${lineSeparator} begin test ${lineSeparator}`);
-            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
+            projectDir = pathJoin(__dirname, 'tmp', 'audit');
             del.sync(pathJoin(projectDir, 'package.json'));
             del.sync(pathJoin(projectDir, 'package-lock.json'));
             del.sync(pathJoin(projectDir, '.auditignore'));
@@ -41,7 +42,6 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                 name: 'testing-repo',
                 dependencies: 'yo123',
             };
-            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
             writeFile(
                 pathJoin(projectDir, 'package.json'),
                 JSON.stringify(pkg, null, 2)
@@ -76,7 +76,6 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                 name: 'testing-repo',
                 scripts: {},
             };
-            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
             writeFile(
                 pathJoin(projectDir, 'package.json'),
                 JSON.stringify(pkg, null, 2)
@@ -117,7 +116,6 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                 name: 'testing-repo',
                 scripts: {},
             };
-            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
             writeFile(
                 pathJoin(projectDir, 'package.json'),
                 JSON.stringify(pkg, null, 2)
@@ -145,7 +143,6 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                 name: 'testing-repo',
                 dependencies: {},
             };
-            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
             writeFile(
                 pathJoin(projectDir, 'package.json'),
                 JSON.stringify(pkg, null, 2)
@@ -171,7 +168,6 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                 name: 'testing-repo',
                 scripts: {},
             };
-            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
             writeFile(
                 pathJoin(projectDir, 'package.json'),
                 JSON.stringify(pkg, null, 2)
@@ -227,7 +223,6 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                     ms: '0.7.0',
                 },
             };
-            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
             writeFile(
                 pathJoin(projectDir, 'package.json'),
                 JSON.stringify(pkg, null, 2)
@@ -330,7 +325,6 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                     nsp: '3.2.1',
                 },
             };
-            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
             writeFile(
                 pathJoin(projectDir, 'package.json'),
                 JSON.stringify(pkg, null, 2)
@@ -463,7 +457,6 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                     lodash: '4.16.4',
                 },
             };
-            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
             writeFile(
                 pathJoin(projectDir, 'package.json'),
                 JSON.stringify(pkg, null, 2)
@@ -565,7 +558,6 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                     ms: '0.7.0',
                 },
             };
-            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
             writeFile(
                 pathJoin(projectDir, 'package.json'),
                 JSON.stringify(pkg, null, 2)
@@ -618,7 +610,6 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                     nsp: '3.2.1',
                 },
             };
-            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
             writeFile(
                 pathJoin(projectDir, 'package.json'),
                 JSON.stringify(pkg, null, 2)
@@ -785,7 +776,6 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                     nsp: '3.2.1',
                 },
             };
-            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
             writeFile(
                 pathJoin(projectDir, 'package.json'),
                 JSON.stringify(pkg, null, 2)
