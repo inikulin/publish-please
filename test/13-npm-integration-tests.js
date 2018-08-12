@@ -52,7 +52,7 @@ describe('npm integration tests', () => {
                     )
                 )
                 .then(() => process.chdir('testing-repo'))
-                .then(() => copy('../.auditignore', '.auditignore'))
+                .then(() => copy('../.auditignore', './.auditignore'))
                 .then(() => console.log(`tests will run in ${process.cwd()}`))
                 .then(() => (process.env.PUBLISH_PLEASE_TEST_MODE = true));
         }
