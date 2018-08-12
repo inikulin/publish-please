@@ -14,7 +14,7 @@ describe('npm audit analyzer', () => {
     let originalWorkingDirectory;
     before(() => {
         originalWorkingDirectory = process.cwd();
-        mkdirp('test/tmp/audit');
+        mkdirp.sync('test/tmp/audit');
     });
     beforeEach(() => {
         console.log(`${lineSeparator} begin test ${lineSeparator}`);

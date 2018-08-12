@@ -41,7 +41,7 @@ describe('Config execution', () => {
             'y\r', // Is this OK?
         ];
         const projectDir = pathJoin(__dirname, 'tmp');
-        mkdirp(projectDir);
+        mkdirp.sync(projectDir);
         const opts = config.getCurrentOpts(projectDir);
 
         // When

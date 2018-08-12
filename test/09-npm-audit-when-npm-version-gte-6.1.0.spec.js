@@ -16,13 +16,13 @@ const exec = require('cp-sugar').exec;
 const lineSeparator = '----------------------------------';
 
 if (nodeInfos.npmAuditHasJsonReporter) {
-    describe.only('npm audit analyzer when npm is >= 6.1.0', () => {
+    describe('npm audit analyzer when npm is >= 6.1.0', () => {
         let originalWorkingDirectory;
         let projectDir;
 
         before(() => {
             originalWorkingDirectory = process.cwd();
-            mkdirp('test/tmp/audit');
+            mkdirp.sync('test/tmp/audit');
         });
         beforeEach(() => {
             console.log(`${lineSeparator} begin test ${lineSeparator}`);
@@ -138,7 +138,6 @@ if (nodeInfos.npmAuditHasJsonReporter) {
 
         it('Should create auto-generated log files in a temp folder to prevent further validations to fail', () => {
             // Given
-            const tempDir = require('osenv').tmpdir();
             const pkg = {
                 name: 'testing-repo',
                 dependencies: {},

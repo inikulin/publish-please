@@ -79,7 +79,7 @@ describe('Vulnerability validation when npm is >= 6.1.0', () => {
     let projectDir;
     before(() => {
         originalWorkingDirectory = process.cwd();
-        mkdirp('test/tmp/audit');
+        mkdirp.sync('test/tmp/audit');
         nativeCanRun = validation.canRun;
         validation.canRun = () => true;
         return Promise.resolve();

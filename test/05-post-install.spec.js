@@ -59,7 +59,7 @@ describe('Post-Install Execution', () => {
         process.env[
             'npm_config_argv'
         ] = `{"remain":["${packageName}"],"cooked":["install","--save-dev","${packageName}"],"original":["install","--save-dev","${packageName}"]}`;
-        mkdirp('test/tmp');
+        mkdirp.sync('test/tmp');
         const projectDir = pathJoin(__dirname, 'tmp');
         del.sync(pathJoin(projectDir, 'package.json'));
 
@@ -74,7 +74,7 @@ describe('Post-Install Execution', () => {
         process.env[
             'npm_config_argv'
         ] = `{"remain":["${packageName}"],"cooked":["install","--save-dev","${packageName}"],"original":["install","--save-dev","${packageName}"]}`;
-        mkdirp('test/tmp');
+        mkdirp.sync('test/tmp');
         const pkg = {
             name: 'testing-repo',
             scripts: {},
@@ -111,7 +111,7 @@ describe('Post-Install Execution', () => {
         process.env[
             'npm_config_argv'
         ] = `{"remain":["${packageName}"],"cooked":["install","--save-dev","${packageName}"],"original":["install","--save-dev","${packageName}"]}`;
-        mkdirp('test/tmp');
+        mkdirp.sync('test/tmp');
         const pkg = {
             name: 'testing-repo',
         };
@@ -147,7 +147,7 @@ describe('Post-Install Execution', () => {
         process.env[
             'npm_config_argv'
         ] = `{"remain":["${packageName}"],"cooked":["install","--save-dev","${packageName}"],"original":["install","--save-dev","${packageName}"]}`;
-        mkdirp('test/tmp');
+        mkdirp.sync('test/tmp');
         const existingPrePublishScript = 'npm run my-pre-publish-script';
         const existingPrePublishOnlyScript =
             'npm run my-pre-publish-only-script';
@@ -184,7 +184,7 @@ describe('Post-Install Execution', () => {
         process.env[
             'npm_config_argv'
         ] = `{"remain":["${packageName}"],"cooked":["install","--save-dev","${packageName}"],"original":["install","--save-dev","${packageName}"]}`;
-        mkdirp('test/tmp');
+        mkdirp.sync('test/tmp');
         const existingPrePublishScript = 'npm run my-pre-publish-script';
         const pkg = {
             name: 'testing-repo',
@@ -216,7 +216,7 @@ describe('Post-Install Execution', () => {
         process.env[
             'npm_config_argv'
         ] = `{"remain":["${packageName}"],"cooked":["install","--save-dev","${packageName}"],"original":["install","--save-dev","${packageName}"]}`;
-        mkdirp('test/tmp');
+        mkdirp.sync('test/tmp');
         const existingPrePublishScript = 'npm run my-pre-publish-script';
         const pkg = {
             name: 'testing-repo',

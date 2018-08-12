@@ -16,7 +16,7 @@ describe('Pre-Install Execution', () => {
     let output;
 
     before(() => {
-        mkdirp('test/tmp');
+        mkdirp.sync('test/tmp');
     });
 
     beforeEach(() => {

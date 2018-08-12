@@ -16,7 +16,7 @@ if (!nodeInfos.npmAuditHasJsonReporter) {
 
         before(() => (originalWorkingDirectory = process.cwd()));
         beforeEach(() => {
-            mkdirp('test/tmp/audit');
+            mkdirp.sync('test/tmp/audit');
             const projectDir = pathJoin(__dirname, 'tmp', 'audit');
             del.sync(pathJoin(projectDir, 'package.json'));
             del.sync(pathJoin(projectDir, 'package-lock.json'));
