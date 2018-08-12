@@ -164,10 +164,6 @@ module.exports.removePackageLockFrom = removePackageLockFrom;
 function removeIgnoredVulnerabilities(response, options) {
     try {
         const ignoredVulnerabilities = getIgnoredVulnerabilities(options);
-        console.log('ignored vulnerabilities found:');
-        console.log(ignoredVulnerabilities);
-        console.log('');
-        console.log('');
         if (ignoredVulnerabilities && ignoredVulnerabilities.length === 0) {
             return response;
         }
@@ -269,7 +265,7 @@ function getIgnoredVulnerabilities(options) {
         const content = readFile(auditIgnoreFile).toString();
         return content
             .split(EOL)
-            .filter((vulnerabilityUri) => vulnerabilityUri.includes('https'))
+            .filter((vulnerabilityUri) => vulnerabilityUri.includes('https://'))
             .map((vulnerabilityUri) => vulnerabilityUri.split('/').pop())
             .map((id) => id.replace('\n', ''))
             .map((id) => id.replace('\r', ''))

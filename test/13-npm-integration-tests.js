@@ -194,7 +194,7 @@ describe('npm integration tests', () => {
             });
     });
 
-    it.only('Should be able to run publish-please in dry mode after installing locally', () => {
+    it('Should be able to run publish-please in dry mode after installing locally', () => {
         return Promise.resolve()
             .then(() => {
                 console.log('> setting .auditignore with content:');
