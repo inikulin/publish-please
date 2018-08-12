@@ -267,17 +267,14 @@ function getIgnoredVulnerabilities(options) {
             '.auditignore'
         );
         const content = readFile(auditIgnoreFile).toString();
-        console.log('found .auditignore file with content:');
-        console.log(content);
         return content
             .split(EOL)
-            .filter((vulnerabilityUri) => {
-                console.log(`vulnerabilityUri: ${vulnerabilityUri}`);
-                return vulnerabilityUri.includes('https');
-            })
-            .map((vulnerabilityUri) => vulnerabilityUri.split('/').pop());
+            .filter((vulnerabilityUri) => vulnerabilityUri.includes('https'))
+            .map((vulnerabilityUri) => vulnerabilityUri.split('/').pop())
+            .map((id) => id.replace('\n', ''))
+            .map((id) => id.replace('\r', ''))
+            .map((id) => id.trim());
     } catch (error) {
-        console.log(error.message);
         return [];
     }
 }
