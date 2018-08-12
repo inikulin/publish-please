@@ -52,6 +52,7 @@ describe('npm integration tests', () => {
                     )
                 )
                 .then(() => process.chdir('testing-repo'))
+                .then(() => copy('../.auditignore', '.auditignore'))
                 .then(() => console.log(`tests will run in ${process.cwd()}`))
                 .then(() => (process.env.PUBLISH_PLEASE_TEST_MODE = true));
         }
@@ -64,6 +65,7 @@ describe('npm integration tests', () => {
                 )
             )
             .then(() => process.chdir('testing-repo'))
+            .then(() => copy('../.auditignore', '.auditignore'))
             .then(() => console.log(`tests will run in ${process.cwd()}`))
             .then(() => (process.env.PUBLISH_PLEASE_TEST_MODE = true));
     });
@@ -71,11 +73,9 @@ describe('npm integration tests', () => {
     after(() => delete process.env.PUBLISH_PLEASE_TEST_MODE);
 
     beforeEach(() =>
-        colorGitOutput()
-            .then(() =>
-                console.log(`${lineSeparator} begin test ${lineSeparator}`)
-            )
-            .then(() => copy('../.auditignore', '.auditignore')));
+        colorGitOutput().then(() =>
+            console.log(`${lineSeparator} begin test ${lineSeparator}`)
+        ));
 
     afterEach(() => {
         const projectDir = process.cwd();
@@ -194,7 +194,7 @@ describe('npm integration tests', () => {
             });
     });
 
-    it('Should be able to run publish-please in dry mode after installing locally', () => {
+    it.only('Should be able to run publish-please in dry mode after installing locally', () => {
         return Promise.resolve()
             .then(() => console.log(`> npm install --save-dev ${packageName}`))
             .then(() =>
