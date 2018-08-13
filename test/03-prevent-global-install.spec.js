@@ -1,12 +1,12 @@
 'use strict';
 
 /* eslint-disable no-unused-vars */
-/* eslint-disable no-global-assign */
 const should = require('should');
 const packageName = require('./utils/publish-please-version-under-test');
 const preventGlobalInstall = require('../lib/prevent-global-install');
 const rename = require('fs').renameSync;
 const pathJoin = require('path').join;
+const lineSeparator = '----------------------------------';
 
 describe('Prevent Global Install', () => {
     let nativeExit;
@@ -15,6 +15,7 @@ describe('Prevent Global Install', () => {
     let output;
 
     beforeEach(() => {
+        console.log(`${lineSeparator} begin test ${lineSeparator}`);
         exitCode = undefined;
         output = '';
         nativeExit = process.exit;
@@ -34,6 +35,7 @@ describe('Prevent Global Install', () => {
         process.exit = nativeExit;
         console.log = nativeConsoleLog;
         rename('./node_modules/chalk0', './node_modules/chalk');
+        console.log(`${lineSeparator} end test ${lineSeparator}\n`);
     });
     it(`Should not throw an error when chalk module is not found on 'npm install -g ${packageName}'`, () => {
         // Given

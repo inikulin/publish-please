@@ -1,9 +1,10 @@
 'use strict';
 
-const npxArgs = require('../lib/utils/get-npx-args');
 /* eslint-disable no-unused-vars */
 const should = require('should');
+const npxArgs = require('../lib/utils/get-npx-args');
 const pathJoin = require('path').join;
+const lineSeparator = '----------------------------------';
 
 describe('npx args parser util', () => {
     let originalArgv;
@@ -13,6 +14,12 @@ describe('npx args parser util', () => {
     });
     after(() => {
         process.argv = originalArgv;
+    });
+    beforeEach(() => {
+        console.log(`${lineSeparator} begin test ${lineSeparator}`);
+    });
+    afterEach(() => {
+        console.log(`${lineSeparator} end test ${lineSeparator}\n`);
     });
     it('Should parse even if process does not exist', () => {
         // Given

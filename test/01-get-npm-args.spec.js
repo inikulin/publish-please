@@ -1,12 +1,19 @@
 'use strict';
 
-const npmArgs = require('../lib/utils/get-npm-args');
 /* eslint-disable no-unused-vars */
 const should = require('should');
+const npmArgs = require('../lib/utils/get-npm-args');
 const packageName = require('./utils/publish-please-version-under-test');
 const pathJoin = require('path').join;
+const lineSeparator = '----------------------------------';
 
 describe('npm args parser util', () => {
+    beforeEach(() => {
+        console.log(`${lineSeparator} begin test ${lineSeparator}`);
+    });
+    afterEach(() => {
+        console.log(`${lineSeparator} end test ${lineSeparator}\n`);
+    });
     it('Should return an empty object when process.env is undefined', () => {
         // Given
         const processEnv = undefined;
