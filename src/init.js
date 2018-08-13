@@ -107,7 +107,7 @@ function onInstall(projectDir) {
         return true;
     }
 
-    (function runInstallationSteps() {
+    return (function runInstallationSteps() {
         const cfg = readCfg();
 
         if (!cfg) {
@@ -124,7 +124,7 @@ function onInstall(projectDir) {
             reportHooksAdded();
             const config = require('./config');
             const opts = config.getCurrentOpts(projectDir);
-            config.configurePublishPlease
+            return config.configurePublishPlease
                 .with(opts)
                 .inProject(projectDir)
                 .then(reportCompletion);
@@ -134,5 +134,5 @@ function onInstall(projectDir) {
 
 module.exports = function init(projectDir) {
     projectDir = projectDir ? projectDir : getProjectDir();
-    onInstall(projectDir);
+    return onInstall(projectDir);
 };
