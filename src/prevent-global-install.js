@@ -3,7 +3,8 @@
 const NO_GLOBAL_INSTALL_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !! Starting from v2.0.0 publish-please can't be installed globally.          !!
-!! Use local installation instead : 'npm install --save-dev publish-please'. !!
+!! Use local installation instead : 'npm install --save-dev publish-please', !!
+!! Or use npx if you do not want to install publish-please as a dependency.  !!
 !! (learn more: https://github.com/inikulin/publish-please#readme).          !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 `;
