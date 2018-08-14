@@ -78,8 +78,8 @@ npm run publish-please
         ```
     - you may perform vulnerabilities check only for a specific vulnerability level: `critical`, `high`, `moderate` or `low`. 
     To do this create an `audit.opts` file in the root of your project with content like the following:
-        ```yaml
-        --audit-level high
+        ```sh
+        --audit-level=high
         ```
         The above example will enable to report only vulnerabilities of level `critical` and `high`
 
