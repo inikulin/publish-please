@@ -76,7 +76,13 @@ npm run publish-please
         https://nodesecurity.io/advisories/12
         https://nodesecurity.io/advisories/577
         ```
- 
+    - you may perform vulnerabilities check only for a specific vulnerability level: `critical`, `high`, `moderate` or `low`. 
+    To do this create an `audit.opts` file in the root of your project with content like the following:
+        ```yaml
+        --audit-level high
+        ```
+        The above example will enable to report only vulnerabilities of level `critical` and `high`
+
 
 ### Running in dry mode
 
