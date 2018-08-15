@@ -222,6 +222,45 @@ describe('npm audit analyzer', () => {
         });
     });
 
+    [
+        audit.auditLevel.low,
+        audit.auditLevel.moderate,
+        audit.auditLevel.high,
+        audit.auditLevel.critical,
+    ].forEach((auditLevel) => {
+        it(`Should get '--audit-level ${auditLevel}'  option set in audit.opts file with different EOLs`, () => {
+            // Given
+            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
+            const auditOptions = `
+                --debug\r
+                # set audit level
+                \r
+                --audit-level  ${auditLevel} \n\r 
+                --json\n
+                \r
+                \n
+            `;
+            writeFile(pathJoin(projectDir, 'audit.opts'), auditOptions);
+            const options = {
+                directoryToAudit: projectDir,
+                auditLogFilepath: pathJoin(projectDir, 'audit.log'),
+                createLockLogFilepath: pathJoin(
+                    projectDir,
+                    'create-package-lock.log'
+                ),
+            };
+
+            // When
+            const result = audit.getNpmAuditOptions(options);
+
+            // Then
+            const expected = {
+                '--audit-level': auditLevel,
+            };
+            result.should.containDeep(expected);
+        });
+    });
+
     it('Should get default audit-level option when option is set with invalid value in audit.opts file', () => {
         // Given
         const projectDir = pathJoin(__dirname, 'tmp', 'audit');
