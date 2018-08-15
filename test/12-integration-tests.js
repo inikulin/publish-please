@@ -100,7 +100,7 @@ describe('Integration tests', () => {
     after(() => delete process.env.PUBLISH_PLEASE_TEST_MODE);
 
     beforeEach(() =>
-        colorGitOutput().then(
+        colorGitOutput().then(() =>
             console.log(`${lineSeparator} begin test ${lineSeparator}`)
         ));
 
@@ -108,13 +108,13 @@ describe('Integration tests', () => {
         const projectDir = process.cwd();
         if (projectDir.includes('testing-repo')) {
             return exec('git reset --hard HEAD')
-                .then(exec('git clean -f -d'))
-                .then(
+                .then(() => exec('git clean -f -d'))
+                .then(() =>
                     console.log(`${lineSeparator} end test ${lineSeparator}\n`)
                 );
         }
         console.log('protecting publish-please project against git reset');
-        return Promise.resolve().then(process.chdir('testing-repo'));
+        return Promise.resolve().then(() => process.chdir('testing-repo'));
     });
 
     describe('package.json', () => {
