@@ -80,13 +80,13 @@ describe('npm integration tests', () => {
         const projectDir = process.cwd();
         if (projectDir.includes('testing-repo')) {
             return exec('git reset --hard HEAD')
-                .then(exec('git clean -f -d'))
-                .then(
+                .then(() => exec('git clean -f -d'))
+                .then(() =>
                     console.log(`${lineSeparator} end test ${lineSeparator}\n`)
                 );
         }
         console.log('protecting publish-please project against git reset');
-        return Promise.resolve().then(process.chdir('testing-repo'));
+        return Promise.resolve().then(() => process.chdir('testing-repo'));
     });
 
     it('Should not install globally', () => {
