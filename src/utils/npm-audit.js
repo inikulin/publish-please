@@ -295,12 +295,9 @@ function getNpmAuditOptions(options) {
         const content = readFile(auditOptionsFile).toString();
 
         return content
-            .split(EOL)
+            .split(/EOL|\n|\r/)
             .filter((commandLineOption) =>
                 commandLineOption.includes('--audit-level')
-            )
-            .map((commandLineOption) =>
-                commandLineOption.replace(/[\n,\r]/g, '')
             )
             .map((commandLineOption) => commandLineOption.replace(/[\t]/g, ' '))
             .map((commandLineOption) => commandLineOption.trim())
