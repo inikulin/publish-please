@@ -274,3 +274,123 @@ function getIgnoredVulnerabilities(options) {
         return [];
     }
 }
+
+/**
+ * exported for testing purposes
+ */
+module.exports.getNpmAuditOptions = getNpmAuditOptions;
+
+/**
+ * Get all command-line options defined in the audit.opts file.
+ * This method is for the moment restricted to read the --audit-level option only
+ * @param {DefaultOptions} options - default options of this module
+ * @returns {NpmAuditOptions}
+ */
+function getNpmAuditOptions(options) {
+    try {
+        const auditOptionsFile = pathJoin(
+            options.directoryToAudit,
+            'audit.opts'
+        );
+        const content = readFile(auditOptionsFile).toString();
+
+        return content
+            .split(EOL)
+            .filter((commandLineOption) =>
+                commandLineOption.includes('--audit-level')
+            )
+            .map((commandLineOption) =>
+                commandLineOption.replace(/[\n,\r]/g, '')
+            )
+            .map((commandLineOption) => commandLineOption.replace(/[\t]/g, ' '))
+            .map((commandLineOption) => commandLineOption.trim())
+            .reduce((result, commandLineOption) => {
+                const keyValue = getNpmAuditOptionFrom(commandLineOption);
+                if (keyValue.key) {
+                    result[keyValue.key] = keyValue.value;
+                }
+                enforceValidValueForAuditLevelIn(result);
+                return result;
+            }, defaultNpmAuditOptions);
+    } catch (error) {
+        return defaultNpmAuditOptions;
+    }
+}
+
+/**
+ * @enum {string}
+ */
+const auditLevel = {
+    low: 'low',
+    moderate: 'moderate',
+    high: 'high',
+    critical: 'critical',
+};
+/**
+ * exported for testing purposes
+ */
+module.exports.auditLevel = auditLevel;
+
+/**
+ * @typedef NpmAuditOptions
+ * @type {Object}
+ * @property {string} ['--audit-level'] - audit level option
+ */
+
+/**
+ * Default options used when they are missing in audit.opts file
+ * or when the audit.opts file is missing.
+ * @type {NpmAuditOptions}
+ */
+const defaultNpmAuditOptions = {
+    '--audit-level': auditLevel.low,
+};
+
+/**
+ * @typedef KeyValue
+ * @type {Object}
+ * @property {string} key - key part of the key-value object
+ * @property {string} value - value part of the key-value object
+ */
+/**
+ * Extract the key and value of an npm-audit command-line option
+ * @param {string} option - npm audit comman-line option
+ * @returns {KeyValue}
+ */
+function getNpmAuditOptionFrom(option) {
+    if (!option) {
+        return {
+            key: undefined,
+            value: undefined,
+        };
+    }
+    if (option.includes('=')) {
+        const parts = option.split('=').map((part) => part.trim());
+        return {
+            key: parts[0],
+            value: parts[1] ? parts[1] : true,
+        };
+    }
+    const parts = option.split(' ').filter((part) => part && part.length > 0);
+    return {
+        key: parts[0],
+        value: parts[1] ? parts[1] : true,
+    };
+}
+
+function enforceValidValueForAuditLevelIn(npmAuditOptions) {
+    if (npmAuditOptions && npmAuditOptions['--audit-level']) {
+        const value = npmAuditOptions['--audit-level'];
+        // prettier-ignore
+        switch (value) {
+        case auditLevel.low:
+        case auditLevel.moderate:
+        case auditLevel.high:
+        case auditLevel.critical:
+            return;
+        default:
+            npmAuditOptions['--audit-level'] = auditLevel.low;
+            return;
+        }
+    }
+}
