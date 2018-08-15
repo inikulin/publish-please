@@ -7,7 +7,6 @@ const unlink = require('fs').unlinkSync;
 const sep = require('path').sep;
 const tempFolder = require('osenv').tmpdir();
 const path = require('path');
-const EOL = require('os').EOL;
 
 // npm audit error codes
 /**
@@ -264,11 +263,9 @@ function getIgnoredVulnerabilities(options) {
         );
         const content = readFile(auditIgnoreFile).toString();
         return content
-            .split(EOL)
+            .split(/\n|\r/)
             .filter((vulnerabilityUri) => vulnerabilityUri.includes('https://'))
             .map((vulnerabilityUri) => vulnerabilityUri.split('/').pop())
-            .map((id) => id.replace('\n', ''))
-            .map((id) => id.replace('\r', ''))
             .map((id) => id.trim());
     } catch (error) {
         return [];
@@ -295,7 +292,7 @@ function getNpmAuditOptions(options) {
         const content = readFile(auditOptionsFile).toString();
 
         return content
-            .split(/EOL|\n|\r/)
+            .split(/\n|\r/)
             .filter((commandLineOption) =>
                 commandLineOption.includes('--audit-level')
             )
