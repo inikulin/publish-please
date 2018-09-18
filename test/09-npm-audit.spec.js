@@ -10,7 +10,7 @@ const EOL = require('os').EOL;
 const audit = require('../lib//utils/npm-audit');
 const lineSeparator = '----------------------------------';
 
-describe.only('npm audit analyzer', () => {
+describe('npm audit analyzer', () => {
     let originalWorkingDirectory;
     before(() => {
         originalWorkingDirectory = process.cwd();
