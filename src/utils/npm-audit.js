@@ -430,3 +430,36 @@ function getLevelsToAudit(options) {
  * exported for testing purposes
  */
 module.exports.getLevelsToAudit = getLevelsToAudit;
+
+/**
+ * Remove, from npm audit command response, the vulnerabilities whose level is below the one defined in audit.opts file
+ * @param {*} response - result of the npm audit command (eventually modified by previous middlewares execution)
+ * @param {DefaultOptions} options - options
+ * @returns {*} returns a new response object that is a deep copy of input response minus ignored levels
+ */
+function removeIgnoredLevels(response, options) {
+    try {
+        const filteredLevels = getLevelsToAudit(options);
+        if (filteredLevels && filteredLevels.indexOf(auditLevel.low) > 0) {
+            return response;
+        }
+
+        const filteredResponse = JSON.parse(JSON.stringify(response, null, 2));
+
+        // TODO: write code to remove ignored levels
+
+        return filteredResponse;
+    } catch (error) {
+        if (response) {
+            response.internalErrors = response.internalErrors || [];
+            response.internalErrors.push(error);
+            return response;
+        }
+        return response;
+    }
+}
+
+/**
+ * exported for testing purposes
+ */
+module.exports.removeIgnoredLevels = removeIgnoredLevels;
