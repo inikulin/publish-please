@@ -342,7 +342,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                     action: 'update',
                                     module: 'lodash',
                                     depth: 3,
-                                    target: '4.17.10',
+                                    target: '4.17.11',
                                     resolves: [
                                         {
                                             id: 577,
@@ -473,7 +473,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                 {
                                     action: 'install',
                                     module: 'lodash',
-                                    target: '4.17.10',
+                                    target: '4.17.11',
                                     isMajor: false,
                                     resolves: [
                                         {
@@ -631,7 +631,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                 {
                                     action: 'install',
                                     module: 'lodash',
-                                    target: '4.17.10',
+                                    target: '4.17.11',
                                     isMajor: false,
                                     resolves: [
                                         {
@@ -647,7 +647,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                     action: 'update',
                                     module: 'lodash',
                                     depth: 3,
-                                    target: '4.17.10',
+                                    target: '4.17.11',
                                     resolves: [
                                         {
                                             id: 577,
@@ -800,7 +800,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                 {
                                     action: 'install',
                                     module: 'lodash',
-                                    target: '4.17.10',
+                                    target: '4.17.11',
                                     isMajor: false,
                                     resolves: [
                                         {
@@ -816,7 +816,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                     action: 'update',
                                     module: 'lodash',
                                     depth: 3,
-                                    target: '4.17.10',
+                                    target: '4.17.11',
                                     resolves: [
                                         {
                                             id: 577,
