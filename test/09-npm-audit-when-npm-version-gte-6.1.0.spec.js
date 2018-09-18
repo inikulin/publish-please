@@ -30,6 +30,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
             del.sync(pathJoin(projectDir, 'package.json'));
             del.sync(pathJoin(projectDir, 'package-lock.json'));
             del.sync(pathJoin(projectDir, '.auditignore'));
+            del.sync(pathJoin(projectDir, 'audit.opts'));
         });
         afterEach(() => {
             process.chdir(originalWorkingDirectory);

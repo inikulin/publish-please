@@ -388,3 +388,45 @@ function enforceValidValueForAuditLevelIn(npmAuditOptions) {
         }
     }
 }
+
+/**
+ * Get Audit levels that should be kept in the response given by npm audit command execution
+ * @param {DefaultOptions} options - default options of this module
+ * @returns {[string]}
+ */
+function getLevelsToAudit(options) {
+    const auditOptions = getNpmAuditOptions(options);
+    const auditLevelOption =
+        auditOptions && auditOptions['--audit-level']
+            ? auditOptions['--audit-level']
+            : auditLevel.low;
+
+    const filteredLevels = [];
+    // prettier-ignore
+    switch (auditLevelOption) {
+    case auditLevel.critical:
+        filteredLevels.push(auditLevel.critical);
+        break;
+    case auditLevel.high:
+        filteredLevels.push(auditLevel.high);
+        filteredLevels.push(auditLevel.critical);
+        break;
+    case auditLevel.moderate:
+        filteredLevels.push(auditLevel.moderate);
+        filteredLevels.push(auditLevel.high);
+        filteredLevels.push(auditLevel.critical);
+        break;
+    default:
+        filteredLevels.push(auditLevel.low);
+        filteredLevels.push(auditLevel.moderate);
+        filteredLevels.push(auditLevel.high);
+        filteredLevels.push(auditLevel.critical);
+    }
+
+    return filteredLevels;
+}
+
+/**
+ * exported for testing purposes
+ */
+module.exports.getLevelsToAudit = getLevelsToAudit;

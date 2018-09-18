@@ -10,7 +10,7 @@ const EOL = require('os').EOL;
 const audit = require('../lib//utils/npm-audit');
 const lineSeparator = '----------------------------------';
 
-describe('npm audit analyzer', () => {
+describe.only('npm audit analyzer', () => {
     let originalWorkingDirectory;
     before(() => {
         originalWorkingDirectory = process.cwd();
@@ -343,5 +343,149 @@ describe('npm audit analyzer', () => {
             '--audit-level': audit.auditLevel.low,
         };
         result.should.containDeep(expected);
+    });
+
+    it('Should get all levels when audit-level option is set with no value in audit.opts file', () => {
+        // Given
+        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
+        const auditOptions = `
+            --debug
+            --audit-level    
+            --json
+        `;
+        writeFile(pathJoin(projectDir, 'audit.opts'), auditOptions);
+        const options = {
+            directoryToAudit: projectDir,
+            auditLogFilepath: pathJoin(projectDir, 'audit.log'),
+            createLockLogFilepath: pathJoin(
+                projectDir,
+                'create-package-lock.log'
+            ),
+        };
+
+        // When
+        const result = audit.getLevelsToAudit(options);
+
+        // Then
+        const expected = [
+            audit.auditLevel.low,
+            audit.auditLevel.moderate,
+            audit.auditLevel.high,
+            audit.auditLevel.critical,
+        ];
+        result.should.eql(expected);
+    });
+
+    it('Should get levels [critical,high,moderate,low] when audit-level option is set to low in audit.opts file', () => {
+        // Given
+        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
+        const auditOptions = `
+            --debug
+            --audit-level=low    
+            --json
+        `;
+        writeFile(pathJoin(projectDir, 'audit.opts'), auditOptions);
+        const options = {
+            directoryToAudit: projectDir,
+            auditLogFilepath: pathJoin(projectDir, 'audit.log'),
+            createLockLogFilepath: pathJoin(
+                projectDir,
+                'create-package-lock.log'
+            ),
+        };
+
+        // When
+        const result = audit.getLevelsToAudit(options);
+
+        // Then
+        const expected = [
+            audit.auditLevel.low,
+            audit.auditLevel.moderate,
+            audit.auditLevel.high,
+            audit.auditLevel.critical,
+        ];
+        result.should.eql(expected);
+    });
+
+    it('Should get levels [critical,high,moderate] when audit-level option is set to moderate in audit.opts file', () => {
+        // Given
+        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
+        const auditOptions = `
+            --debug
+            --audit-level=moderate    
+            --json
+        `;
+        writeFile(pathJoin(projectDir, 'audit.opts'), auditOptions);
+        const options = {
+            directoryToAudit: projectDir,
+            auditLogFilepath: pathJoin(projectDir, 'audit.log'),
+            createLockLogFilepath: pathJoin(
+                projectDir,
+                'create-package-lock.log'
+            ),
+        };
+
+        // When
+        const result = audit.getLevelsToAudit(options);
+
+        // Then
+        const expected = [
+            audit.auditLevel.moderate,
+            audit.auditLevel.high,
+            audit.auditLevel.critical,
+        ];
+        result.should.eql(expected);
+    });
+
+    it('Should get levels [critical,high] when audit-level option is set to high in audit.opts file', () => {
+        // Given
+        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
+        const auditOptions = `
+            --debug
+            --audit-level=high    
+            --json
+        `;
+        writeFile(pathJoin(projectDir, 'audit.opts'), auditOptions);
+        const options = {
+            directoryToAudit: projectDir,
+            auditLogFilepath: pathJoin(projectDir, 'audit.log'),
+            createLockLogFilepath: pathJoin(
+                projectDir,
+                'create-package-lock.log'
+            ),
+        };
+
+        // When
+        const result = audit.getLevelsToAudit(options);
+
+        // Then
+        const expected = [audit.auditLevel.high, audit.auditLevel.critical];
+        result.should.eql(expected);
+    });
+
+    it('Should get levels [critical] when audit-level option is set to critical in audit.opts file', () => {
+        // Given
+        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
+        const auditOptions = `
+            --debug
+            --audit-level=critical    
+            --json
+        `;
+        writeFile(pathJoin(projectDir, 'audit.opts'), auditOptions);
+        const options = {
+            directoryToAudit: projectDir,
+            auditLogFilepath: pathJoin(projectDir, 'audit.log'),
+            createLockLogFilepath: pathJoin(
+                projectDir,
+                'create-package-lock.log'
+            ),
+        };
+
+        // When
+        const result = audit.getLevelsToAudit(options);
+
+        // Then
+        const expected = [audit.auditLevel.critical];
+        result.should.eql(expected);
     });
 });
