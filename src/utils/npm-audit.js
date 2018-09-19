@@ -435,19 +435,70 @@ module.exports.getLevelsToAudit = getLevelsToAudit;
  * Remove, from npm audit command response, the vulnerabilities whose level is below the one defined in audit.opts file
  * @param {*} response - result of the npm audit command (eventually modified by previous middlewares execution)
  * @param {DefaultOptions} options - options
- * @returns {*} returns a new response object that is a deep copy of input response minus ignored levels
+ * @returns {*} returns a new response object that is a deep copy of input response minus ignored levels.
+ * when --audit-level=low, this method does nothing and returns input response.
  */
 function removeIgnoredLevels(response, options) {
     try {
         const filteredLevels = getLevelsToAudit(options);
-        if (filteredLevels && filteredLevels.indexOf(auditLevel.low) > 0) {
+        if (filteredLevels && filteredLevels.indexOf(auditLevel.low) >= 0) {
             return response;
         }
 
         const filteredResponse = JSON.parse(JSON.stringify(response, null, 2));
+        const ignoredVulnerabilities = [];
 
-        // TODO: write code to remove ignored levels
+        const advisories = filteredResponse.advisories;
+        for (const key in advisories) {
+            const advisory = advisories[key];
+            if (
+                advisory &&
+                advisory.severity &&
+                advisory.id &&
+                filteredLevels.indexOf(advisory.severity) < 0
+            ) {
+                ignoredVulnerabilities.push(advisory.id);
+            }
+        }
 
+        ignoredVulnerabilities.forEach((ignoredVulnerabilityId) => {
+            delete filteredResponse.advisories[`${ignoredVulnerabilityId}`];
+        });
+
+        const severities = {};
+        for (const key in advisories) {
+            const advisory = advisories[key];
+            if (advisory && advisory.severity && advisory.id) {
+                severities[`${advisory.id}`] = advisory.severity;
+            }
+        }
+
+        filteredResponse.actions = filteredResponse.actions
+            .map((action) => {
+                action.resolves = action.resolves.filter(
+                    (resolve) => ignoredVulnerabilities.indexOf(resolve.id) < 0
+                );
+                return action;
+            })
+            .filter((action) => action.resolves.length > 0);
+
+        const vulnerabilitiesMetadata = {
+            info: 0,
+            low: 0,
+            moderate: 0,
+            high: 0,
+            critical: 0,
+        };
+
+        filteredResponse.actions.forEach((action) => {
+            action.resolves.forEach((resolve) => {
+                if (resolve && resolve.id) {
+                    vulnerabilitiesMetadata[severities[`${resolve.id}`]] += 1;
+                }
+            });
+        });
+
+        filteredResponse.metadata.vulnerabilities = vulnerabilitiesMetadata;
         return filteredResponse;
     } catch (error) {
         if (response) {
