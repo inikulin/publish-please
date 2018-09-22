@@ -34,7 +34,11 @@ module.exports = function audit(projectDir) {
             )
             .then((response) => {
                 if (packageLockHasBeenFound(response)) {
-                    return removeIgnoredVulnerabilities(response, options);
+                    return Promise.resolve(response)
+                        .then((result) =>
+                            removeIgnoredVulnerabilities(result, options)
+                        )
+                        .then((result) => removeIgnoredLevels(result, options));
                 }
 
                 const createLockFileCommand = `npm i --package-lock-only > ${
@@ -60,7 +64,8 @@ module.exports = function audit(projectDir) {
                     )
                     .then((result) =>
                         removeIgnoredVulnerabilities(result, options)
-                    );
+                    )
+                    .then((result) => removeIgnoredLevels(result, options));
             });
     } catch (error) {
         return Promise.reject(error.message);
@@ -95,6 +100,7 @@ function createResponseFromAuditLogOrFromError(logFilePath, err) {
     } catch (err2) {
         // prettier-ignore
         return {
+            // prettier-ignore
             error: {
                 summary: err && err.message
                     ? err.message
@@ -168,15 +174,18 @@ function removeIgnoredVulnerabilities(response, options) {
         }
         const filteredResponse = JSON.parse(JSON.stringify(response, null, 2));
 
+        /* prettier-ignore */
         filteredResponse.actions = filteredResponse.actions
-            .map((action) => {
-                action.resolves = action.resolves.filter(
-                    (resolve) =>
-                        ignoredVulnerabilities.indexOf(`${resolve.id}`) < 0
-                );
-                return action;
-            })
-            .filter((action) => action.resolves.length > 0);
+            ? filteredResponse.actions
+                .map((action) => {
+                    action.resolves = action.resolves.filter(
+                        (resolve) =>
+                            ignoredVulnerabilities.indexOf(`${resolve.id}`) < 0
+                    );
+                    return action;
+                })
+                .filter((action) => action.resolves.length > 0)
+            : [];
 
         ignoredVulnerabilities.forEach(
             (ignoredVulnerability) =>
@@ -298,14 +307,17 @@ function getNpmAuditOptions(options) {
             )
             .map((commandLineOption) => commandLineOption.replace(/[\t]/g, ' '))
             .map((commandLineOption) => commandLineOption.trim())
-            .reduce((result, commandLineOption) => {
-                const keyValue = getNpmAuditOptionFrom(commandLineOption);
-                if (keyValue.key) {
-                    result[keyValue.key] = keyValue.value;
-                }
-                enforceValidValueForAuditLevelIn(result);
-                return result;
-            }, defaultNpmAuditOptions);
+            .reduce(
+                (result, commandLineOption) => {
+                    const keyValue = getNpmAuditOptionFrom(commandLineOption);
+                    if (keyValue.key) {
+                        result[keyValue.key] = keyValue.value;
+                    }
+                    enforceValidValueForAuditLevelIn(result);
+                    return result;
+                },
+                { '--audit-level': 'low' }
+            );
     } catch (error) {
         return defaultNpmAuditOptions;
     }
@@ -448,7 +460,7 @@ function removeIgnoredLevels(response, options) {
         const filteredResponse = JSON.parse(JSON.stringify(response, null, 2));
         const ignoredVulnerabilities = [];
 
-        const advisories = filteredResponse.advisories;
+        const advisories = filteredResponse.advisories || {};
         for (const key in advisories) {
             const advisory = advisories[key];
             if (
@@ -473,14 +485,17 @@ function removeIgnoredLevels(response, options) {
             }
         }
 
+        /* prettier-ignore */
         filteredResponse.actions = filteredResponse.actions
-            .map((action) => {
-                action.resolves = action.resolves.filter(
-                    (resolve) => ignoredVulnerabilities.indexOf(resolve.id) < 0
-                );
-                return action;
-            })
-            .filter((action) => action.resolves.length > 0);
+            ? filteredResponse.actions
+                .map((action) => {
+                    action.resolves = action.resolves.filter(
+                        (resolve) => ignoredVulnerabilities.indexOf(resolve.id) < 0
+                    );
+                    return action;
+                })
+                .filter((action) => action.resolves.length > 0)
+            : [];
 
         const vulnerabilitiesMetadata = {
             info: 0,

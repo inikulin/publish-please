@@ -22,11 +22,11 @@ if (nodeInfos.npmAuditHasJsonReporter) {
 
         before(() => {
             originalWorkingDirectory = process.cwd();
-            mkdirp.sync('test/tmp/audit');
+            projectDir = pathJoin(__dirname, 'tmp', 'audit02');
+            mkdirp.sync(projectDir);
         });
         beforeEach(() => {
             console.log(`${lineSeparator} begin test ${lineSeparator}`);
-            projectDir = pathJoin(__dirname, 'tmp', 'audit');
             del.sync(pathJoin(projectDir, 'package.json'));
             del.sync(pathJoin(projectDir, 'package-lock.json'));
             del.sync(pathJoin(projectDir, '.auditignore'));

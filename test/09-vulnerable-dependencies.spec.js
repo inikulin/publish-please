@@ -10,6 +10,7 @@ const validation = require('../lib/validations/vulnerable-dependencies');
 const requireUncached = require('import-fresh');
 const showValidationErrors = require('../lib/utils/show-validation-errors');
 const nodeInfos = require('../lib/utils/get-node-infos').getNodeInfosSync();
+const chalk = require('chalk');
 const lineSeparator = '----------------------------------';
 
 describe('Vulnerability validation when npm is < 6.1.0', () => {
@@ -17,11 +18,9 @@ describe('Vulnerability validation when npm is < 6.1.0', () => {
     before(() => {
         nativeCanRun = validation.canRun;
         validation.canRun = () => false;
-        return Promise.resolve();
     });
     after(() => {
         validation.canRun = nativeCanRun;
-        return Promise.resolve();
     });
     beforeEach(() =>
         console.log(`${lineSeparator} begin test ${lineSeparator}`));
@@ -79,21 +78,20 @@ describe('Vulnerability validation when npm is >= 6.1.0', () => {
     let projectDir;
     before(() => {
         originalWorkingDirectory = process.cwd();
-        mkdirp.sync('test/tmp/audit');
+        projectDir = pathJoin(__dirname, 'tmp', 'audit05');
+        mkdirp.sync(projectDir);
         nativeCanRun = validation.canRun;
         validation.canRun = () => true;
-        return Promise.resolve();
     });
     after(() => {
         validation.canRun = nativeCanRun;
-        return Promise.resolve();
     });
     beforeEach(() => {
         console.log(`${lineSeparator} begin test ${lineSeparator}`);
-        projectDir = pathJoin(__dirname, 'tmp', 'audit');
         del.sync(pathJoin(projectDir, 'package.json'));
         del.sync(pathJoin(projectDir, 'package-lock.json'));
         del.sync(pathJoin(projectDir, '.auditignore'));
+        del.sync(pathJoin(projectDir, 'audit.opts'));
         process.chdir(projectDir);
     });
 
@@ -120,6 +118,7 @@ describe('Vulnerability validation when npm is >= 6.1.0', () => {
         };
         const pkgInfo = {
             cfg: {
+                name: 'testing-repo',
                 dependencies: {},
             },
         };
@@ -149,6 +148,7 @@ describe('Vulnerability validation when npm is >= 6.1.0', () => {
         };
         const pkgInfo = {
             cfg: {
+                name: 'testing-repo',
                 dependencies: {
                     ms: '0.7.0', // vunerable dependency
                 },
@@ -165,51 +165,152 @@ describe('Vulnerability validation when npm is >= 6.1.0', () => {
         // Then nothing executes
     });
 
-    ['publish-please@2.4.1', 'testcafe@0.19.2', 'ms@0.7.0'].forEach(function(
-        dependency
-    ) {
+    it("Should report transitive vulnerabilities on 'publish-please@2.4.1' dependency when validation is enabled in configuration file", () => {
+        // Given validation is enabled in configuration file
+        const dependency = 'publish-please@2.4.1';
         const packageName = dependency.split('@')[0];
         const packageVersion = dependency.split('@')[1];
-        it(`Should report vulnerability on '${dependency}' dependency when validation is enabled in configuration file`, () => {
-            // Given validation is enabled in configuration file
-            const validations = requireUncached('../lib/validations');
-            const opts = {
-                vulnerableDependencies: true,
-            };
-            const pkgInfo = {
-                cfg: {
-                    dependencies: {},
-                },
-            };
-            pkgInfo.cfg.dependencies[`${packageName}`] = `${packageVersion}`;
-            writeFile(
-                pathJoin(projectDir, 'package.json'),
-                JSON.stringify(pkgInfo.cfg, null, 2)
-            );
-            // When
-            return (
-                validations
-                    .validate(opts, pkgInfo)
-                    // Then
-                    .then(() => {
-                        throw new Error('Promise rejection expected');
-                    })
-                    .catch((err) => {
-                        showValidationErrors(err);
-                        if (nodeInfos.npmAuditHasJsonReporter) {
-                            err.message.should.containEql(
-                                'Vulnerability found in'
-                            );
-                            err.message.should.containEql(`${packageName}`);
-                            return;
-                        }
-
+        const validations = requireUncached('../lib/validations');
+        const opts = {
+            vulnerableDependencies: true,
+        };
+        const pkgInfo = {
+            cfg: {
+                name: 'testing-repo',
+                dependencies: {},
+            },
+        };
+        pkgInfo.cfg.dependencies[`${packageName}`] = `${packageVersion}`;
+        writeFile(
+            pathJoin(projectDir, 'package.json'),
+            JSON.stringify(pkgInfo.cfg, null, 2)
+        );
+        // When
+        return (
+            validations
+                .validate(opts, pkgInfo)
+                // Then
+                .then(() => {
+                    throw new Error('Promise rejection expected');
+                })
+                .catch((err) => {
+                    showValidationErrors(err);
+                    if (nodeInfos.npmAuditHasJsonReporter) {
+                        err.message.should.containEql('Vulnerability found in');
+                        err.message.should.containEql(`${packageName}`);
                         err.message.should.containEql(
-                            'Command failed: npm audit '
+                            `-> ${chalk.red.bold('lodash')}`
                         );
-                    })
-            );
-        });
+                        err.message.should.containEql(
+                            `-> ${chalk.red.bold('https-proxy-agent')}`
+                        );
+                        err.message.should.containEql(
+                            `-> ${chalk.red.bold('hoek')}`
+                        );
+                        err.message.should.containEql(
+                            `-> ${chalk.red.bold('moment')}`
+                        );
+                        err.message.should.containEql(
+                            `-> ${chalk.red.bold('deep-extend')}`
+                        );
+                        return;
+                    }
+
+                    err.message.should.containEql('Command failed: npm audit ');
+                })
+        );
+    });
+
+    it("Should report vulnerability on 'ms@0.7.0' as direct dependency when validation is enabled in configuration file", () => {
+        // Given validation is enabled in configuration file
+        const dependency = 'ms@0.7.0';
+        const packageName = dependency.split('@')[0];
+        const packageVersion = dependency.split('@')[1];
+        const validations = requireUncached('../lib/validations');
+        const opts = {
+            vulnerableDependencies: true,
+        };
+        const pkgInfo = {
+            cfg: {
+                name: 'testing-repo',
+                dependencies: {},
+            },
+        };
+        pkgInfo.cfg.dependencies[`${packageName}`] = `${packageVersion}`;
+        writeFile(
+            pathJoin(projectDir, 'package.json'),
+            JSON.stringify(pkgInfo.cfg, null, 2)
+        );
+        // When
+        return (
+            validations
+                .validate(opts, pkgInfo)
+                // Then
+                .then(() => {
+                    throw new Error('Promise rejection expected');
+                })
+                .catch((err) => {
+                    showValidationErrors(err);
+                    if (nodeInfos.npmAuditHasJsonReporter) {
+                        err.message.should.containEql('Vulnerability found in');
+                        err.message.should.containEql(`${packageName}`);
+                        err.message.should.containEql(
+                            `${chalk.red.bold('ms')}`
+                        );
+                        err.message.should.not.containEql('->');
+                        return;
+                    }
+
+                    err.message.should.containEql('Command failed: npm audit ');
+                })
+        );
+    });
+
+    it("Should report vulnerability on 'testcafe@0.19.2' dependency when validation is enabled in configuration file", () => {
+        // Given validation is enabled in configuration file
+        const dependency = 'testcafe@0.19.2';
+        const packageName = dependency.split('@')[0];
+        const packageVersion = dependency.split('@')[1];
+        const validations = requireUncached('../lib/validations');
+        const opts = {
+            vulnerableDependencies: true,
+        };
+        const pkgInfo = {
+            cfg: {
+                name: 'testing-repo',
+                dependencies: {},
+            },
+        };
+        pkgInfo.cfg.dependencies[`${packageName}`] = `${packageVersion}`;
+        writeFile(
+            pathJoin(projectDir, 'package.json'),
+            JSON.stringify(pkgInfo.cfg, null, 2)
+        );
+        // When
+        return (
+            validations
+                .validate(opts, pkgInfo)
+                // Then
+                .then(() => {
+                    throw new Error('Promise rejection expected');
+                })
+                .catch((err) => {
+                    showValidationErrors(err);
+                    if (nodeInfos.npmAuditHasJsonReporter) {
+                        err.message.should.containEql('Vulnerability found in');
+                        err.message.should.containEql(
+                            `-> ${chalk.red.bold('lodash')}`
+                        );
+                        err.message.should.containEql(
+                            `-> ${chalk.red.bold('atob')}`
+                        );
+                        err.message.should.containEql(`${packageName}`);
+                        return;
+                    }
+
+                    err.message.should.containEql('Command failed: npm audit ');
+                })
+        );
     });
 });
 
@@ -225,14 +326,12 @@ describe('Vulnerability validation', () => {
         nativeProcessCwd = process.cwd;
         nativeProcessChdir = process.chdir;
         nativeJsonParse = JSON.parse;
-        return Promise.resolve();
     });
     after(() => {
         validation.canRun = nativeCanRun;
         process.cwd = nativeProcessCwd;
         process.chdir = nativeProcessChdir;
         JSON.parse = nativeJsonParse;
-        return Promise.resolve();
     });
     beforeEach(() =>
         console.log(`${lineSeparator} begin test ${lineSeparator}`));

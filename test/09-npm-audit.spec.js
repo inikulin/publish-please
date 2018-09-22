@@ -7,18 +7,19 @@ const mkdirp = require('mkdirp');
 const del = require('del');
 const writeFile = require('fs').writeFileSync;
 const EOL = require('os').EOL;
-const audit = require('../lib//utils/npm-audit');
+const audit = require('../lib/utils/npm-audit');
 const lineSeparator = '----------------------------------';
 
 describe('npm audit analyzer', () => {
     let originalWorkingDirectory;
+    let projectDir;
     before(() => {
         originalWorkingDirectory = process.cwd();
-        mkdirp.sync('test/tmp/audit');
+        projectDir = pathJoin(__dirname, 'tmp', 'audit04');
+        mkdirp.sync(projectDir);
     });
     beforeEach(() => {
         console.log(`${lineSeparator} begin test ${lineSeparator}`);
-        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
         del.sync(pathJoin(projectDir, 'package.json'));
         del.sync(pathJoin(projectDir, 'package-lock.json'));
         del.sync(pathJoin(projectDir, '.auditignore'));
@@ -28,9 +29,9 @@ describe('npm audit analyzer', () => {
         process.chdir(originalWorkingDirectory);
         console.log(`${lineSeparator} end test ${lineSeparator}\n`);
     });
+    after(() => console.log(`cwd is restored to: ${process.cwd()}`));
     it('Should handle errors when auto-generated package-lock.json cannot be deleted', () => {
         // Given
-        const projectDir = null;
         const response = {
             yo: 123,
             actions: ['yo123'],
@@ -42,7 +43,7 @@ describe('npm audit analyzer', () => {
         };
 
         // When
-        const result = audit.removePackageLockFrom(projectDir, response);
+        const result = audit.removePackageLockFrom(null, response);
 
         // Then
         result.should.containDeep(response);
@@ -52,7 +53,6 @@ describe('npm audit analyzer', () => {
 
     it('Should handle errors when removing ignored vulnerabilities', () => {
         // Given
-        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
         const auditIgnore = ['https://nodesecurity.io/advisories/46'];
         writeFile(pathJoin(projectDir, '.auditignore'), auditIgnore.join(EOL));
 
@@ -81,7 +81,6 @@ describe('npm audit analyzer', () => {
 
     it('Should handle errors when removing ignored vulnerabilities but response is null', () => {
         // Given
-        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
         const auditIgnore = ['https://nodesecurity.io/advisories/46'];
         writeFile(pathJoin(projectDir, '.auditignore'), auditIgnore.join(EOL));
 
@@ -105,8 +104,6 @@ describe('npm audit analyzer', () => {
 
     it('Should set audit-level option to low when there is no audit.opts file', () => {
         // Given
-        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
-
         const options = {
             directoryToAudit: projectDir,
             auditLogFilepath: pathJoin(projectDir, 'audit.log'),
@@ -128,7 +125,6 @@ describe('npm audit analyzer', () => {
 
     it('Should set audit-level option to low when audit.opts file is empty', () => {
         // Given
-        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
         const auditOptions = `
 
         `;
@@ -160,7 +156,6 @@ describe('npm audit analyzer', () => {
     ].forEach((auditLevel) => {
         it(`Should get '--audit-level=${auditLevel}'  option set in audit.opts file`, () => {
             // Given
-            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
             const auditOptions = `
                 --debug
                 --audit-level = ${auditLevel}  
@@ -195,7 +190,6 @@ describe('npm audit analyzer', () => {
     ].forEach((auditLevel) => {
         it(`Should get '--audit-level ${auditLevel}'  option set in audit.opts file`, () => {
             // Given
-            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
             const auditOptions = `
                 --debug
                 --audit-level  ${auditLevel}  
@@ -230,7 +224,6 @@ describe('npm audit analyzer', () => {
     ].forEach((auditLevel) => {
         it(`Should get '--audit-level ${auditLevel}'  option set in audit.opts file with different EOLs`, () => {
             // Given
-            const projectDir = pathJoin(__dirname, 'tmp', 'audit');
             const auditOptions = `
                 --debug\r
                 # set audit level
@@ -263,7 +256,6 @@ describe('npm audit analyzer', () => {
 
     it('Should get default audit-level option when option is set with invalid value in audit.opts file', () => {
         // Given
-        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
         const auditOptions = `
             --debug
             --audit-level = yo123  
@@ -291,7 +283,6 @@ describe('npm audit analyzer', () => {
 
     it('Should get default audit-level option when option is set with empty value in audit.opts file', () => {
         // Given
-        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
         const auditOptions = `
             --debug
             --audit-level =   
@@ -319,7 +310,6 @@ describe('npm audit analyzer', () => {
 
     it('Should get default audit-level option when option is set with no value in audit.opts file', () => {
         // Given
-        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
         const auditOptions = `
             --debug
             --audit-level    
@@ -347,7 +337,6 @@ describe('npm audit analyzer', () => {
 
     it('Should get all levels when audit-level option is set with no value in audit.opts file', () => {
         // Given
-        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
         const auditOptions = `
             --debug
             --audit-level    
@@ -378,7 +367,6 @@ describe('npm audit analyzer', () => {
 
     it('Should get levels [critical,high,moderate,low] when audit-level option is set to low in audit.opts file', () => {
         // Given
-        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
         const auditOptions = `
             --debug
             --audit-level=low    
@@ -409,7 +397,6 @@ describe('npm audit analyzer', () => {
 
     it('Should get levels [critical,high,moderate] when audit-level option is set to moderate in audit.opts file', () => {
         // Given
-        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
         const auditOptions = `
             --debug
             --audit-level=moderate    
@@ -439,7 +426,6 @@ describe('npm audit analyzer', () => {
 
     it('Should get levels [critical,high] when audit-level option is set to high in audit.opts file', () => {
         // Given
-        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
         const auditOptions = `
             --debug
             --audit-level=high    
@@ -465,7 +451,6 @@ describe('npm audit analyzer', () => {
 
     it('Should get levels [critical] when audit-level option is set to critical in audit.opts file', () => {
         // Given
-        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
         const auditOptions = `
             --debug
             --audit-level=critical    
@@ -491,7 +476,6 @@ describe('npm audit analyzer', () => {
 
     it('Should not filter response when option --audit-level is set with no value in audit.opts file', () => {
         // Given
-        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
         const auditOptions = `
             --debug
             --audit-level    
@@ -836,7 +820,6 @@ describe('npm audit analyzer', () => {
 
     it('Should not filter response when option --audit-level is set to "low" in audit.opts file', () => {
         // Given
-        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
         const auditOptions = `
             --debug
             --audit-level=low    
@@ -1181,7 +1164,6 @@ describe('npm audit analyzer', () => {
 
     it('Should remove [low] vulnerabilities from response when option --audit-level is set to "moderate" in audit.opts file', () => {
         // Given
-        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
         const auditOptions = `
             --debug
             --audit-level=moderate    
@@ -1323,7 +1305,6 @@ describe('npm audit analyzer', () => {
 
     it('Should remove [low, moderate] vulnerabilities from response when option --audit-level is set to "high" in audit.opts file', () => {
         // Given
-        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
         const auditOptions = `
             --debug
             --audit-level=high    
@@ -1444,7 +1425,6 @@ describe('npm audit analyzer', () => {
 
     it('Should remove [low, moderate, high] vulnerabilities from response when option --audit-level is set to "critical" in audit.opts file', () => {
         // Given
-        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
         const auditOptions = `
             --debug
             --audit-level=critical    
@@ -1584,7 +1564,6 @@ describe('npm audit analyzer', () => {
 
     it('Should remove [low, moderate, high] and keep [critical] vulnerabilities from response when option --audit-level is set to "critical" in audit.opts file', () => {
         // Given
-        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
         const auditOptions = `
             --debug
             --audit-level=critical    
@@ -1764,7 +1743,6 @@ describe('npm audit analyzer', () => {
 
     it('Should remove [low, moderate] and keep [critical, high] vulnerabilities from response when option --audit-level is set to "high" in audit.opts file', () => {
         // Given
-        const projectDir = pathJoin(__dirname, 'tmp', 'audit');
         const auditOptions = `
             --debug
             --audit-level=high    
