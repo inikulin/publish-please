@@ -663,8 +663,7 @@ describe('Integration tests', () => {
                     writeFile(
                         '.auditignore',
                         JSON.stringify({
-                            exceptions:
-                                'https://nodesecurity.io/advisories/577',
+                            exceptions: 'https://npmjs.com/advisories/577',
                         })
                     );
                 })
@@ -725,7 +724,7 @@ describe('Integration tests', () => {
                         writeFile('package.json', JSON.stringify(pkgInfo.cfg));
                         writeFile(
                             '.auditignore',
-                            ['https://nodesecurity.io/advisories/577'].join(EOL)
+                            ['https://npmjs.com/advisories/577'].join(EOL)
                         );
                     })
                     .then(() =>

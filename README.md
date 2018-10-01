@@ -16,7 +16,7 @@ There are numerous ways to "shoot yourself in the foot" using `npm publish`. The
 
  - Run tests or build steps before publishing (because `prepublish` is [broken](https://medium.com/greenkeeper-blog/what-is-npm-s-prepublish-and-why-is-it-so-confusing-a948373e6be1#.a40w9sdy6)).
  - Perform check for the [sensitive data](#sensitive-information-audit) in your package to be sure that you didn't leak it by accident (Further reading: [Do not underestimate credentials leaks](https://github.com/ChALkeR/notes/blob/master/Do-not-underestimate-credentials-leaks.md)).
- - Perform check for vulnerable dependencies using [Node Security Project](https://nodesecurity.io/) data.
+ - Perform check for vulnerable dependencies using `npm audit` data.
  - Check that you are in the correct git branch.
  - Check that git tag matches version specified in the `package.json`.
  - Check that there are no uncommitted changes in the working tree.
@@ -73,8 +73,8 @@ npm run publish-please
     - you may prevent specific vulnerabilities to be reported by publish-please by creating a `.auditignore` file in the root of your project with content like the following:
 
         ```yaml
-        https://nodesecurity.io/advisories/12
-        https://nodesecurity.io/advisories/577
+        https://npmjs.com/advisories/12
+        https://npmjs.com/advisories/577
         ```
     - you may perform vulnerabilities check only for a specific vulnerability level: `critical`, `high`, `moderate` or `low`. 
     To do this create an `audit.opts` file in the root of your project with content like the following:

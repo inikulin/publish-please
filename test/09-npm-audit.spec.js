@@ -53,7 +53,7 @@ describe('npm audit analyzer', () => {
 
     it('Should handle errors when removing ignored vulnerabilities', () => {
         // Given
-        const auditIgnore = ['https://nodesecurity.io/advisories/46'];
+        const auditIgnore = ['https://npmjs.com/advisories/46'];
         writeFile(pathJoin(projectDir, '.auditignore'), auditIgnore.join(EOL));
 
         const options = {
@@ -81,7 +81,7 @@ describe('npm audit analyzer', () => {
 
     it('Should handle errors when removing ignored vulnerabilities but response is null', () => {
         // Given
-        const auditIgnore = ['https://nodesecurity.io/advisories/46'];
+        const auditIgnore = ['https://npmjs.com/advisories/46'];
         writeFile(pathJoin(projectDir, '.auditignore'), auditIgnore.join(EOL));
 
         const options = {
@@ -582,7 +582,7 @@ describe('npm audit analyzer', () => {
                         exploitability: 2,
                         affected_components: '',
                     },
-                    url: 'https://nodesecurity.io/advisories/46',
+                    url: 'https://npmjs.com/advisories/46',
                 },
                 '577': {
                     findings: [
@@ -632,7 +632,7 @@ describe('npm audit analyzer', () => {
                         exploitability: 1,
                         affected_components: '',
                     },
-                    url: 'https://nodesecurity.io/advisories/577',
+                    url: 'https://npmjs.com/advisories/577',
                 },
             },
             muted: [],
@@ -747,7 +747,7 @@ describe('npm audit analyzer', () => {
                         exploitability: 2,
                         affected_components: '',
                     },
-                    url: 'https://nodesecurity.io/advisories/46',
+                    url: 'https://npmjs.com/advisories/46',
                 },
                 '577': {
                     findings: [
@@ -797,7 +797,7 @@ describe('npm audit analyzer', () => {
                         exploitability: 1,
                         affected_components: '',
                     },
-                    url: 'https://nodesecurity.io/advisories/577',
+                    url: 'https://npmjs.com/advisories/577',
                 },
             },
             muted: [],
@@ -926,7 +926,7 @@ describe('npm audit analyzer', () => {
                         exploitability: 2,
                         affected_components: '',
                     },
-                    url: 'https://nodesecurity.io/advisories/46',
+                    url: 'https://npmjs.com/advisories/46',
                 },
                 '577': {
                     findings: [
@@ -976,7 +976,7 @@ describe('npm audit analyzer', () => {
                         exploitability: 1,
                         affected_components: '',
                     },
-                    url: 'https://nodesecurity.io/advisories/577',
+                    url: 'https://npmjs.com/advisories/577',
                 },
             },
             muted: [],
@@ -1091,7 +1091,7 @@ describe('npm audit analyzer', () => {
                         exploitability: 2,
                         affected_components: '',
                     },
-                    url: 'https://nodesecurity.io/advisories/46',
+                    url: 'https://npmjs.com/advisories/46',
                 },
                 '577': {
                     findings: [
@@ -1141,7 +1141,7 @@ describe('npm audit analyzer', () => {
                         exploitability: 1,
                         affected_components: '',
                     },
-                    url: 'https://nodesecurity.io/advisories/577',
+                    url: 'https://npmjs.com/advisories/577',
                 },
             },
             muted: [],

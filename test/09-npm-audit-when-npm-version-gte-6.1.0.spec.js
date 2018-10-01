@@ -292,8 +292,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                         exploitability: 2,
                                         affected_components: '',
                                     },
-                                    url:
-                                        'https://nodesecurity.io/advisories/46',
+                                    url: 'https://npmjs.com/advisories/46',
                                 },
                             },
                             muted: [],
@@ -425,8 +424,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                         exploitability: 1,
                                         affected_components: '',
                                     },
-                                    url:
-                                        'https://nodesecurity.io/advisories/577',
+                                    url: 'https://npmjs.com/advisories/577',
                                 },
                             },
                             muted: [],
@@ -526,8 +524,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                         exploitability: 1,
                                         affected_components: '',
                                     },
-                                    url:
-                                        'https://nodesecurity.io/advisories/577',
+                                    url: 'https://npmjs.com/advisories/577',
                                 },
                             },
                             muted: [],
@@ -562,7 +559,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                 pathJoin(projectDir, 'package.json'),
                 JSON.stringify(pkg, null, 2)
             );
-            const auditIgnore = ['https://nodesecurity.io/advisories/46'];
+            const auditIgnore = ['https://npmjs.com/advisories/46'];
             writeFile(
                 pathJoin(projectDir, '.auditignore'),
                 auditIgnore.join(EOL)
@@ -614,7 +611,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                 pathJoin(projectDir, 'package.json'),
                 JSON.stringify(pkg, null, 2)
             );
-            const auditIgnore = ['https://nodesecurity.io/advisories/46'];
+            const auditIgnore = ['https://npmjs.com/advisories/46'];
             writeFile(
                 pathJoin(projectDir, '.auditignore'),
                 auditIgnore.join(EOL)
@@ -739,8 +736,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                         exploitability: 1,
                                         affected_components: '',
                                     },
-                                    url:
-                                        'https://nodesecurity.io/advisories/577',
+                                    url: 'https://npmjs.com/advisories/577',
                                 },
                             },
                             muted: [],
@@ -780,7 +776,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                 pathJoin(projectDir, 'package.json'),
                 JSON.stringify(pkg, null, 2)
             );
-            const auditIgnore = ['https://nodesecurity.io/advisories/46'];
+            const auditIgnore = ['https://npmjs.com/advisories/46'];
             writeFile(
                 pathJoin(projectDir, '.auditignore'),
                 auditIgnore.join(EOL)
@@ -908,8 +904,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                         exploitability: 1,
                                         affected_components: '',
                                     },
-                                    url:
-                                        'https://nodesecurity.io/advisories/577',
+                                    url: 'https://npmjs.com/advisories/577',
                                 },
                             },
                             muted: [],

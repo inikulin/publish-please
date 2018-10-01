@@ -195,9 +195,7 @@ describe('npx integration tests with npm audit', () => {
                     writeFile('audit.opts', auditOptions);
                 })
                 .then(() => {
-                    const auditIgnore = [
-                        'https://nodesecurity.io/advisories/566',
-                    ];
+                    const auditIgnore = ['https://npmjs.com/advisories/566'];
                     writeFile('.auditignore', auditIgnore.join(EOL));
                 })
                 .then(() => console.log(`> npx ${packageName}`))
