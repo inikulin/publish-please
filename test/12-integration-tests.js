@@ -4,6 +4,7 @@
 const should = require('should');
 
 const assert = require('assert');
+const EOL = require('os').EOL;
 const del = require('del');
 const writeFile = require('fs').writeFileSync;
 const readFile = require('fs').readFileSync;
@@ -19,8 +20,7 @@ const requireUncached = require('import-fresh');
 const packageName = require('./utils/publish-please-version-under-test');
 const nodeInfos = require('../lib/utils/get-node-infos').getNodeInfosSync();
 const shouldUsePrePublishOnlyScript = nodeInfos.shouldUsePrePublishOnlyScript;
-const lineSeparator =
-    '---------------------------------------------------------------------';
+const lineSeparator = '----------------------------------';
 
 /* eslint-disable max-nested-callbacks */
 describe('Integration tests', () => {
@@ -93,24 +93,28 @@ describe('Integration tests', () => {
                     'git clone https://github.com/inikulin/testing-repo.git testing-repo'
                 )
             )
-            .then(() => exec('npm run package'))
             .then(() => process.chdir('testing-repo'))
             .then(() => (process.env.PUBLISH_PLEASE_TEST_MODE = true));
     });
 
     after(() => delete process.env.PUBLISH_PLEASE_TEST_MODE);
 
-    beforeEach(() => colorGitOutput().then(console.log(lineSeparator)));
+    beforeEach(() =>
+        colorGitOutput().then(() =>
+            console.log(`${lineSeparator} begin test ${lineSeparator}`)
+        ));
 
     afterEach(() => {
         const projectDir = process.cwd();
         if (projectDir.includes('testing-repo')) {
             return exec('git reset --hard HEAD')
-                .then(exec('git clean -f -d'))
-                .then(console.log(lineSeparator));
+                .then(() => exec('git clean -f -d'))
+                .then(() =>
+                    console.log(`${lineSeparator} end test ${lineSeparator}\n`)
+                );
         }
         console.log('protecting publish-please project against git reset');
-        return Promise.resolve().then(process.chdir('testing-repo'));
+        return Promise.resolve().then(() => process.chdir('testing-repo'));
     });
 
     describe('package.json', () => {
@@ -572,8 +576,12 @@ describe('Integration tests', () => {
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) =>
-                    assert(err.message.indexOf('Vulnerability found') > -1)
+                .catch(
+                    (err) =>
+                        /* prettier-ignore */
+                        nodeInfos.npmAuditHasJsonReporter
+                            ? assert(err.message.indexOf('Vulnerability found') > -1)
+                            : assert(err.message.indexOf('Cannot check vulnerable dependencies') > -1)
                 ));
         ['publish-please@2.4.1', 'testcafe@0.19.2'].forEach(function(
             dependency
@@ -602,11 +610,12 @@ describe('Integration tests', () => {
                     .then(() => {
                         throw new Error('Promise rejection expected');
                     })
-                    .catch((err) =>
-                        assert(
-                            // prettier-ignore
-                            err.message.indexOf(`Vulnerability found in ${chalk.bold(dependency)}`) > -1
-                        )
+                    .catch(
+                        (err) =>
+                            /* prettier-ignore */
+                            nodeInfos.npmAuditHasJsonReporter
+                                ? assert(err.message.indexOf(`Vulnerability found in ${name}`) > -1)
+                                : assert(err.message.indexOf('Cannot check vulnerable dependencies') > -1)
                     ));
         });
 
@@ -635,15 +644,16 @@ describe('Integration tests', () => {
                     .then(() => {
                         throw new Error('Promise rejection expected');
                     })
-                    .catch((err) =>
-                        assert(
-                            // prettier-ignore
-                            err.message.indexOf(`Vulnerability found in ${chalk.red.bold(dependency)}`) > -1
-                        )
+                    .catch(
+                        (err) =>
+                            /* prettier-ignore */
+                            nodeInfos.npmAuditHasJsonReporter
+                                ? assert(err.message.indexOf(`Vulnerability found in ${chalk.red.bold(name)}`) > -1)
+                                : assert(err.message.indexOf('Cannot check vulnerable dependencies') > -1)
                     ));
         });
 
-        it('Should respect exceptions configured in .nsprc file', () =>
+        it('Should ignore vulnerabilities configured in .auditignore file when this file has a bad format', () =>
             exec('git checkout master')
                 .then(() => pkgd())
                 .then((pkgInfo) => {
@@ -651,39 +661,9 @@ describe('Integration tests', () => {
                     pkgInfo.cfg.dependencies['lodash'] = '4.16.4';
                     writeFile('package.json', JSON.stringify(pkgInfo.cfg));
                     writeFile(
-                        '.nsprc',
+                        '.auditignore',
                         JSON.stringify({
-                            exceptions: [
-                                'https://nodesecurity.io/advisories/577',
-                            ],
-                        })
-                    );
-                })
-                .then(() =>
-                    publish(
-                        getTestOptions({
-                            set: {
-                                publishCommand: echoPublishCommand,
-                                validations: {
-                                    vulnerableDependencies: true,
-                                },
-                            },
-                        })
-                    )
-                ));
-
-        it('Should skip exceptions configured in .nsprc file with bad format', () =>
-            exec('git checkout master')
-                .then(() => pkgd())
-                .then((pkgInfo) => {
-                    pkgInfo.cfg.dependencies = {};
-                    pkgInfo.cfg.dependencies['lodash'] = '4.16.4';
-                    writeFile('package.json', JSON.stringify(pkgInfo.cfg));
-                    writeFile(
-                        '.nsprc',
-                        JSON.stringify({
-                            exceptions:
-                                'https://nodesecurity.io/advisories/577',
+                            exceptions: 'https://npmjs.com/advisories/577',
                         })
                     );
                 })
@@ -701,126 +681,13 @@ describe('Integration tests', () => {
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) =>
-                    assert(
-                        // prettier-ignore
-                        err.message.indexOf(`Vulnerability found in ${chalk.red.bold('lodash@4.16.4')}`) > -1
-                    )
+                .catch(
+                    (err) =>
+                        /* prettier-ignore */
+                        nodeInfos.npmAuditHasJsonReporter
+                            ? assert(err.message.indexOf(`Vulnerability found in ${chalk.red.bold('lodash')}`) > -1)
+                            : assert(err.message.indexOf('Cannot check vulnerable dependencies') > -1)
                 ));
-
-        ['lodash@4.17.5', 'ms@0.7.1'].forEach(function(dependency) {
-            const name = dependency.split('@')[0];
-            const version = dependency.split('@')[1];
-            it(`Should not fail on ${dependency} as a direct dependency`, () =>
-                exec('git checkout master')
-                    .then(() => pkgd())
-                    .then((pkgInfo) => {
-                        pkgInfo.cfg.dependencies = {};
-                        pkgInfo.cfg.dependencies[`${name}`] = `${version}`;
-                        writeFile('package.json', JSON.stringify(pkgInfo.cfg));
-                    })
-                    .then(() =>
-                        publish(
-                            getTestOptions({
-                                set: {
-                                    publishCommand: echoPublishCommand,
-                                    validations: {
-                                        vulnerableDependencies: true,
-                                    },
-                                },
-                            })
-                        )
-                    ));
-        });
-
-        it('Should not fail if there is no vulnerable dependency', () =>
-            exec('git checkout master')
-                .then(() => pkgd())
-                .then((pkgInfo) => {
-                    pkgInfo.cfg.dependencies = {
-                        ms: '0.7.1',
-                    };
-                    writeFile('package.json', JSON.stringify(pkgInfo.cfg));
-                })
-                .then(() =>
-                    publish(
-                        getTestOptions({
-                            set: {
-                                publishCommand: echoPublishCommand,
-                                validations: {
-                                    vulnerableDependencies: true,
-                                },
-                            },
-                        })
-                    )
-                ));
-
-        it(`Should not fail on transitive dependency inside ${packageName}`, () =>
-            exec('git checkout master')
-                .then(() => pkgd())
-                .then((pkgInfo) => {
-                    pkgInfo.cfg.dependencies = {};
-                    // TODO: resolve vulnerability on 'ban-sensitive-files' dependency
-                    // pkgInfo.cfg.dependencies['ban-sensitive-files'] = '1.9.2';
-                    pkgInfo.cfg.dependencies['chalk'] = '2.4.1';
-                    pkgInfo.cfg.dependencies['cp-sugar'] = '^1.0.0';
-                    pkgInfo.cfg.dependencies['elegant-status'] = '1.1.0';
-                    pkgInfo.cfg.dependencies['globby'] = '8.0.1';
-                    pkgInfo.cfg.dependencies['inquirer'] = '4.0.2';
-                    pkgInfo.cfg.dependencies['lodash'] = '4.17.10';
-                    pkgInfo.cfg.dependencies['node-emoji'] = '1.8.1';
-                    // TODO: resolve vulnerability on 'nsp' dependency
-                    // pkgInfo.cfg.dependencies['nsp'] = '3.2.1';
-                    pkgInfo.cfg.dependencies['pinkie-promise'] = '^2.0.1';
-                    pkgInfo.cfg.dependencies['pkgd'] = '^1.1.2';
-                    pkgInfo.cfg.dependencies['promisify-event'] = '^1.0.0';
-                    pkgInfo.cfg.dependencies['read-pkg'] = '3.0.0';
-                    pkgInfo.cfg.dependencies['semver'] = '5.5.0';
-                    writeFile('package.json', JSON.stringify(pkgInfo.cfg));
-                })
-                .then(() =>
-                    publish(
-                        getTestOptions({
-                            set: {
-                                publishCommand: echoPublishCommand,
-                                validations: {
-                                    vulnerableDependencies: true,
-                                },
-                            },
-                        })
-                    )
-                ));
-
-        it('Should fail with two errors on lodash@4.16.4 and ms@0.7.0', () =>
-            exec('git checkout master')
-                .then(() => pkgd())
-                .then((pkgInfo) => {
-                    pkgInfo.cfg.dependencies = {
-                        ms: '0.7.0',
-                        lodash: '4.16.4',
-                    };
-                    writeFile('package.json', JSON.stringify(pkgInfo.cfg));
-                })
-                .then(() =>
-                    publish(
-                        getTestOptions({
-                            set: {
-                                validations: {
-                                    vulnerableDependencies: true,
-                                },
-                            },
-                        })
-                    )
-                )
-                .then(() => {
-                    throw new Error('Promise rejection expected');
-                })
-                .catch((err) => {
-                    const errors = err.message
-                        .split('\n')
-                        .filter((msg) => msg.startsWith('  * '));
-                    return assert(errors.length === 2);
-                }));
 
         it('Should not perform check if vulnerableDependencies-validation is disabled', () =>
             exec('git checkout master')
@@ -845,6 +712,118 @@ describe('Integration tests', () => {
                     )
                 ));
     });
+
+    if (nodeInfos.npmAuditHasJsonReporter) {
+        describe('Node security project audit when npm version is >= 6.1.0', () => {
+            it('Should ignore vulnerabilities configured in .auditignorefile', () =>
+                exec('git checkout master')
+                    .then(() => pkgd())
+                    .then((pkgInfo) => {
+                        pkgInfo.cfg.dependencies = {};
+                        pkgInfo.cfg.dependencies['lodash'] = '4.16.4';
+                        writeFile('package.json', JSON.stringify(pkgInfo.cfg));
+                        writeFile(
+                            '.auditignore',
+                            ['https://npmjs.com/advisories/577'].join(EOL)
+                        );
+                    })
+                    .then(() =>
+                        publish(
+                            getTestOptions({
+                                set: {
+                                    publishCommand: echoPublishCommand,
+                                    validations: {
+                                        vulnerableDependencies: true,
+                                    },
+                                },
+                            })
+                        )
+                    ));
+
+            ['lodash@4.17.5', 'ms@0.7.1'].forEach(function(dependency) {
+                const name = dependency.split('@')[0];
+                const version = dependency.split('@')[1];
+                it(`Should not fail on ${dependency} as a direct dependency`, () =>
+                    exec('git checkout master')
+                        .then(() => pkgd())
+                        .then((pkgInfo) => {
+                            pkgInfo.cfg.dependencies = {};
+                            pkgInfo.cfg.dependencies[`${name}`] = `${version}`;
+                            writeFile(
+                                'package.json',
+                                JSON.stringify(pkgInfo.cfg)
+                            );
+                        })
+                        .then(() =>
+                            publish(
+                                getTestOptions({
+                                    set: {
+                                        publishCommand: echoPublishCommand,
+                                        validations: {
+                                            vulnerableDependencies: true,
+                                        },
+                                    },
+                                })
+                            )
+                        ));
+            });
+
+            it('Should not fail if there is no vulnerable dependency', () =>
+                exec('git checkout master')
+                    .then(() => pkgd())
+                    .then((pkgInfo) => {
+                        pkgInfo.cfg.dependencies = {
+                            ms: '0.7.1',
+                        };
+                        writeFile('package.json', JSON.stringify(pkgInfo.cfg));
+                    })
+                    .then(() =>
+                        publish(
+                            getTestOptions({
+                                set: {
+                                    publishCommand: echoPublishCommand,
+                                    validations: {
+                                        vulnerableDependencies: true,
+                                    },
+                                },
+                            })
+                        )
+                    ));
+
+            it('Should fail with two errors on lodash@4.16.4 and ms@0.7.0', () =>
+                exec('git checkout master')
+                    .then(() => pkgd())
+                    .then((pkgInfo) => {
+                        pkgInfo.cfg.dependencies = {
+                            ms: '0.7.0',
+                            lodash: '4.16.4',
+                        };
+                        writeFile('package.json', JSON.stringify(pkgInfo.cfg));
+                    })
+                    .then(() =>
+                        publish(
+                            getTestOptions({
+                                set: {
+                                    validations: {
+                                        vulnerableDependencies: true,
+                                    },
+                                },
+                            })
+                        )
+                    )
+                    .then(() => {
+                        throw new Error('Promise rejection expected');
+                    })
+                    .catch((err) => {
+                        /* prettier-ignore */
+                        const errors = err.message
+                            .split('\n')
+                            .filter((msg) => msg.startsWith('  * '));
+
+                        return assert(errors.length === 2);
+                    }));
+        });
+    }
 
     describe('Prepublish script', () => {
         it('Should fail if prepublish script fail', () =>
@@ -1167,15 +1146,15 @@ describe('Integration tests', () => {
     });
 
     describe('Confirmation', () => {
-        describe('Passed', () => {
-            let confirmCalled = false;
+        let confirmCalled = false;
 
+        describe('Passed', () => {
             before(() => {
                 mockConfirm = () => {
                     confirmCalled = true;
-
                     return Promise.resolve(true);
                 };
+                return Promise.resolve();
             });
 
             beforeEach(() => (confirmCalled = false));
@@ -1240,357 +1219,6 @@ describe('Integration tests', () => {
                         assert.strictEqual(npmCmd, '');
                         assert.throws(() => readFile('test-file'));
                     }));
-        });
-    });
-
-    describe('Package installation', () => {
-        it(`Should not install ${packageName} globally`, () => {
-            return exec(
-                `npm install -g ../${packageName.replace('@', '-')}.tgz`
-            )
-                .then(() => {
-                    throw new Error('Promise rejection expected');
-                })
-                .catch((err) =>
-                    assert(err.message.indexOf('node lib/pre-install.js') > -1)
-                );
-        });
-
-        it(`Should install ${packageName} locally`, () => {
-            return exec(
-                `npm install --save-dev ../${packageName.replace('@', '-')}.tgz`
-            ).then(() => {
-                const cfg = JSON.parse(readFile('package.json').toString());
-
-                assert.strictEqual(
-                    cfg.scripts['publish-please'],
-                    'publish-please'
-                );
-                assert.strictEqual(
-                    cfg.scripts[prepublishKey],
-                    'publish-please guard'
-                );
-                const publishrc = JSON.parse(readFile('.publishrc').toString());
-                assert(publishrc.confirm);
-                assert.strictEqual(publishrc.prePublishScript, 'npm test');
-                assert.strictEqual(publishrc.postPublishScript, '');
-                assert.strictEqual(publishrc.publishCommand, 'npm publish');
-                assert.strictEqual(publishrc.publishTag, 'latest');
-                assert.strictEqual(publishrc.validations.branch, 'master');
-                assert(publishrc.validations.uncommittedChanges);
-                assert(publishrc.validations.untrackedFiles);
-                assert(publishrc.validations.vulnerableDependencies);
-                assert(publishrc.validations.sensitiveData);
-                assert(publishrc.validations.gitTag);
-                assert.strictEqual(publishrc.validations.branch, 'master');
-            });
-        });
-
-        it(`Should be able to use publish-please just after installing ${packageName} locally`, () => {
-            return exec(
-                /* prettier-ignore */
-                `npm install --save-dev ../${packageName.replace('@','-')}.tgz`
-            )
-                .then(() => exec('npm run publish-please > ./publish.log'))
-                .then(() => {
-                    const publishLog = readFile('./publish.log').toString();
-                    console.log(publishLog);
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Running pre-publish script'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Running validations'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Error: no test specified'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Checking for the vulnerable dependencies'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Checking for the uncommitted changes'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Checking for the untracked files'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Checking for the sensitive data in the working tree'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Validating branch'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Validating git tag'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('ERRORS'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('* There are uncommitted changes in the working tree.'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('* There are untracked files in the working tree.'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes("* Latest commit doesn't have git tag."));
-                });
-        });
-
-        it(`Should be able to use publish-please in dry mode just after installing ${packageName} locally`, () => {
-            return exec(
-                /* prettier-ignore */
-                `npm install --save-dev ../${packageName.replace('@','-')}.tgz`
-            )
-                .then(() => {
-                    const publishrc = JSON.parse(
-                        readFile('.publishrc').toString()
-                    );
-                    publishrc.validations.uncommittedChanges = false;
-                    publishrc.validations.untrackedFiles = false;
-                    publishrc.validations.gitTag = false;
-                    writeFile('.publishrc', JSON.stringify(publishrc));
-                    return publishrc;
-                })
-                .then(() =>
-                    exec('npm run publish-please --dry-run > ./publish.log')
-                )
-                .then(() => {
-                    const publishLog = readFile('./publish.log').toString();
-                    console.log(publishLog);
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Running pre-publish script'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Running validations'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Release info'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('testing-repo-1.3.77.tgz'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes("run 'npm pack' to have more details on the package"));
-                });
-        });
-    });
-
-    describe('npx usage', () => {
-        it(`Should be able to use publish-please in dry mode (with no .publishrc config file) with 'npx ${packageName} --dry-run'`, () => {
-            return Promise.resolve()
-                .then(() => {
-                    const pkg = JSON.parse(readFile('package.json').toString());
-                    const scripts = {};
-                    scripts.test = 'echo "running tests ..."';
-                    pkg.scripts = scripts;
-                    writeFile('package.json', JSON.stringify(pkg, null, 2));
-                })
-                .then(() => console.log(`> npx ${packageName} --dry-run`))
-                .then(() =>
-                    exec(
-                        /* prettier-ignore */
-                        `npx ../${packageName.replace('@','-')}.tgz --dry-run > ./publish01.log`
-                    )
-                )
-                .then(() => {
-                    const publishLog = readFile('./publish01.log').toString();
-                    console.log(publishLog);
-                    /* prettier-ignore */
-                    assert(publishLog.includes('dry mode activated'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Running pre-publish script'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('running tests ...'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Running validations'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('ERRORS'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('There are uncommitted changes in the working tree.'));
-                });
-        });
-
-        it(`Should be able to use publish-please in dry mode (with existing .publishrc config file) with 'npx ${packageName} --dry-run'`, () => {
-            return Promise.resolve()
-                .then(() => {
-                    const pkg = JSON.parse(readFile('package.json').toString());
-                    const scripts = {};
-                    scripts.test = 'echo "running tests ..."';
-                    pkg.scripts = scripts;
-                    writeFile('package.json', JSON.stringify(pkg, null, 2));
-                })
-                .then(() => {
-                    writeFile(
-                        '.publishrc',
-                        JSON.stringify({
-                            confirm: true,
-                            validations: {
-                                vulnerableDependencies: true,
-                                sensitiveData: false,
-                                uncommittedChanges: false,
-                                untrackedFiles: false,
-                                branch: 'master',
-                                gitTag: false,
-                            },
-                            publishTag: 'latest',
-                            prePublishScript:
-                                'echo "running script defined in .publishrc ..."',
-                            postPublishScript: false,
-                        })
-                    );
-                })
-                .then(() => console.log(`> npx ${packageName} --dry-run`))
-                .then(() =>
-                    exec(
-                        /* prettier-ignore */
-                        `npx ../${packageName.replace('@','-')}.tgz --dry-run > ./publish02.log`
-                    )
-                )
-                .then(() => {
-                    const publishLog = readFile('./publish02.log').toString();
-                    console.log(publishLog);
-                    /* prettier-ignore */
-                    assert(publishLog.includes('dry mode activated'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Running pre-publish script'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('running script defined in .publishrc ...'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Running validations'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Checking for the vulnerable dependencies'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Validating branch'));
-                    /* prettier-ignore */
-                    assert(!publishLog.includes('ERRORS'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Release info'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('testing-repo-1.3.77.tgz'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes("run 'npm pack' to have more details on the package"));
-                });
-        });
-
-        it(`Should be able to configure publish-please with 'npx ${packageName} config'`, () => {
-            return Promise.resolve()
-                .then(() => console.log(`> npx ${packageName} config`))
-                .then(() =>
-                    exec(
-                        /* prettier-ignore */
-                        `npx ../${packageName.replace('@','-')}.tgz config > ./publish03.log`
-                    )
-                )
-                .then(() => {
-                    const publishLog = readFile('./publish03.log').toString();
-                    console.log(publishLog);
-                })
-                .then(() => {
-                    const publishrc = JSON.parse(
-                        readFile('.publishrc').toString()
-                    );
-                    publishrc.confirm.should.be.true();
-                    publishrc.prePublishScript.should.equal('npm test');
-                    publishrc.postPublishScript.should.equal('');
-                    publishrc.publishCommand.should.equal('npm publish');
-                    publishrc.publishTag.should.equal('latest');
-                    publishrc.validations.branch.should.equal('master');
-                    publishrc.validations.uncommittedChanges.should.be.true();
-                    publishrc.validations.untrackedFiles.should.be.true();
-                    publishrc.validations.vulnerableDependencies.should.be.true();
-                    publishrc.validations.sensitiveData.should.be.true();
-                    publishrc.validations.gitTag.should.be.true();
-                    publishrc.validations.branch.should.equal('master');
-                });
-        });
-
-        it(`Should be able to start the publishing workflow with 'npx ${packageName}' (no .publishrc config file)`, () => {
-            return Promise.resolve()
-                .then(() => console.log(`> npx ${packageName}`))
-                .then(() =>
-                    exec(
-                        /* prettier-ignore */
-                        `npx ../${packageName.replace('@','-')}.tgz > ./publish04.log`
-                    )
-                )
-                .then(() => {
-                    const publishLog = readFile('./publish04.log').toString();
-                    console.log(publishLog);
-                    return publishLog;
-                })
-                .then((publishLog) => {
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Running pre-publish script'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Error: no test specified'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Running validations'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Checking for the vulnerable dependencies'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Checking for the uncommitted changes'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Checking for the untracked files'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Checking for the sensitive data in the working tree'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Validating branch'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Validating git tag'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('ERRORS'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('* There are untracked files in the working tree.'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes("* Latest commit doesn't have git tag."));
-                });
-        });
-
-        it(`Should be able to run the publishing workflow with 'npx ${packageName}' (with .publishrc config file)`, () => {
-            return Promise.resolve()
-                .then(() => {
-                    const pkg = JSON.parse(readFile('package.json').toString());
-                    const scripts = {};
-                    scripts.test = 'echo "running tests ..."';
-                    pkg.scripts = scripts;
-                    writeFile('package.json', JSON.stringify(pkg, null, 2));
-                })
-                .then(() => {
-                    writeFile(
-                        '.publishrc',
-                        JSON.stringify({
-                            confirm: false,
-                            validations: {
-                                vulnerableDependencies: true,
-                                sensitiveData: true,
-                                uncommittedChanges: false,
-                                untrackedFiles: false,
-                                branch: 'master',
-                                gitTag: false,
-                            },
-                            publishTag: 'latest',
-                            prePublishScript:
-                                'echo "running script defined in .publishrc ..."',
-                            postPublishScript: false,
-                        })
-                    );
-                })
-                .then(() => console.log(`> npx ${packageName}`))
-                .then(() =>
-                    exec(
-                        /* prettier-ignore */
-                        `npx ../${packageName.replace('@','-')}.tgz > ./publish05.log`
-                    )
-                )
-                .then(() => {
-                    const publishLog = readFile('./publish05.log').toString();
-                    console.log(publishLog);
-                    return publishLog;
-                })
-                .then((publishLog) => {
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Running pre-publish script'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('running script defined in .publishrc ...'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Running validations'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Checking for the vulnerable dependencies'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Checking for the sensitive data in the working tree'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Validating branch'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Release info'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('ERRORS'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('Command `npm` exited with code'));
-                });
         });
     });
 });

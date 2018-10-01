@@ -15,7 +15,7 @@ module.exports = {
             currentVal
         );
     },
-
+    canRun: () => true,
     run(_, pkgInfo) {
         return exec('git describe --exact-match --tags HEAD')
             .catch(() => {

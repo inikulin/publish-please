@@ -27,9 +27,19 @@ function runValidation(validation, param, pkgInfo, errs) {
         });
 }
 
+function skipValidation(validation, errs) {
+    const done = elegantStatus(validation.statusText);
+    return Promise.resolve()
+        .then(() => errs.push(validation.whyCannotRun()))
+        .then(() => done(false));
+}
+
 module.exports = {
     DEFAULT_OPTIONS: validations.reduce((opts, validation) => {
-        opts[validation.option] = validation.defaultParam;
+        opts[validation.option] = validation.canRun()
+            ? validation.defaultParam
+            : false;
+
         return opts;
     }, {}),
 
@@ -52,13 +62,17 @@ module.exports = {
 
         return validationsToRun
             .reduce((validationChain, validation) => {
-                return validationChain.then(() =>
-                    runValidation(
-                        validation,
-                        opts[validation.option],
-                        pkgInfo,
-                        errs
-                    )
+                return validationChain.then(
+                    () =>
+                        // prettier-ignore
+                        validation.canRun()
+                            ? runValidation(
+                                validation,
+                                opts[validation.option],
+                                pkgInfo,
+                                errs
+                            )
+                            : skipValidation(validation, errs)
                 );
             }, Promise.resolve())
             .then(() => {

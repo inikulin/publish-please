@@ -1,11 +1,11 @@
 'use strict';
 
 const pathJoin = require('path').join;
-const nsp = require('nsp');
+const audit = require('../utils/npm-audit');
 const confirm = require('../utils/inquires').confirm;
 const Promise = require('pinkie-promise');
-const readPkg = require('read-pkg');
 const chalk = require('chalk');
+const nodeInfos = require('../utils/get-node-infos').getNodeInfosSync();
 
 module.exports = {
     option: 'vulnerableDependencies',
@@ -18,87 +18,76 @@ module.exports = {
             currentVal
         );
     },
-
+    canRun() {
+        // prettier-ignore
+        return nodeInfos && nodeInfos.npmAuditHasJsonReporter
+            ? true
+            : false;
+    },
+    whyCannotRun() {
+        return `Cannot check vulnerable dependencies because npm version is ${
+            nodeInfos.npmVersion
+        }. Either upgrade npm to version 6.1.0 or above, or disable this validation in the configuration file`;
+    },
     run() {
         return new Promise((resolve, reject) => {
-            const projectDir = pathJoin(process.cwd());
-            const defaultArgs = nsp.sanitizeParameters({});
-            const args = {
-                baseUrl: defaultArgs.baseUrl,
-                proxy: defaultArgs.proxy,
-                reporter: 'summary',
-                'warn-only': false,
-                path: projectDir,
-                pkg: readPkg.sync(projectDir, { normalize: false }),
-                offline: false,
-                exceptions: Array.isArray(defaultArgs.exceptions)
-                    ? defaultArgs.exceptions
-                    : [],
-            };
-
-            nsp
-                .check(args)
-                .then((result) => {
-                    if (vulnerabilitiesFoundIn(result)) {
-                        const errs = result.data
-                            .map((vulnerability) => summaryOf(vulnerability))
-                            .sort();
-                        reject(errs);
-                        return;
-                    }
-                    resolve();
-                })
-                .catch((err) => {
-                    reject(err);
-                });
+            try {
+                const projectDir = pathJoin(process.cwd());
+                audit(projectDir)
+                    .then((result) => {
+                        if (vulnerabilitiesFoundIn(result)) {
+                            const errs = [];
+                            result.actions.forEach((action) => {
+                                action.resolves.forEach((vulnerability) => {
+                                    errs.push(summaryOf(vulnerability));
+                                });
+                            });
+                            reject(errs.sort());
+                            return;
+                        }
+                        if (auditErrorFoundIn(result)) {
+                            reject(summaryErrorOf(result.error));
+                            return;
+                        }
+                        resolve();
+                    })
+                    .catch((err) => {
+                        reject(err);
+                    });
+            } catch (error) {
+                reject(error.message);
+            }
         });
     },
 };
 
 function vulnerabilitiesFoundIn(result) {
-    return result && result.data && result.data.length > 0;
+    return result && Array.isArray(result.actions) && result.actions.length > 0;
+}
+
+function auditErrorFoundIn(result) {
+    return result && result.error && result.error.summary;
 }
 
 function summaryOf(vulnerability) {
-    const vulnerablePackageName = `${vulnerability.module ||
-        'undefined'}@${vulnerability.version || '?.?.?'}`;
-    const vulnerablePackagePath =
-        vulnerability.path && vulnerability.path.length >= 2
-            ? vulnerability.path.slice(1)
-            : [];
-
-    const rootPackageName =
-        vulnerablePackagePath.length >= 1
-            ? vulnerablePackagePath[0]
-            : vulnerablePackageName;
-
-    const recommendation = vulnerability.recommendation
-        ? vulnerability.recommendation.replace('\n', '\n\t')
-        : '';
-
-    const vulnerabilityIsDirectDependency =
-        vulnerablePackageName === rootPackageName;
-    // prettier-ignore
-    const summary = vulnerabilityIsDirectDependency
-        ? `Vulnerability found in ${elegant(rootPackageName)}\n\t${recommendation}\n\tAdvisory: ${vulnerability.advisory || ''}`
-        : `Vulnerability found in ${chalk.bold(rootPackageName)}\n\tinside ${elegant(vulnerablePackagePath)}\n\t${vulnerability.recommendation || ''}\n\tAdvisory: ${vulnerability.advisory || ''}`;
+    const summary = `Vulnerability found in ${elegantPath(
+        vulnerability.path,
+        '>'
+    )}`;
     return summary;
 }
 
-function elegant(pathOrName) {
-    return Array.isArray(pathOrName)
-        ? elegantPath(pathOrName)
-        : elegantName(pathOrName);
+function summaryErrorOf(error) {
+    const summary = elegantSummary(error.summary);
+    return summary;
 }
 
-function elegantPath(path) {
-    // prettier-ignore
-    const lastIndex = path && path.length
-        ? path.length - 1
-        : -1;
+function elegantPath(path, sep) {
+    const packages = path.split(sep);
+    const lastIndex = packages.length - 1;
 
     // prettier-ignore
-    const result = path
+    const result = packages
         .map((item, index) => {
             return index === lastIndex
                 ? chalk.red.bold(item)
@@ -108,6 +97,10 @@ function elegantPath(path) {
     return result;
 }
 
-function elegantName(name) {
-    return chalk.red.bold(name);
+function elegantSummary(summary) {
+    const result = summary
+        .split('\n')
+        .map((line, index) => (index === 0 ? line : `\t${line}`))
+        .join('\n');
+    return result;
 }

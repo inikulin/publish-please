@@ -12,6 +12,7 @@ const getOptions = require('../publish-options').getOptions;
 const assertNode6PublishingPrerequisite = require('./publish-prerequisites')
     .assertNode6PublishingPrerequisite;
 const executionContext = require('../utils/execution-context');
+const showValidationErrors = require('../utils/show-validation-errors');
 
 const ADVISORY_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -53,9 +54,7 @@ module.exports = function(opts, projectDir) {
         )
         .then((ok) => ok && publish('npm pack').then(() => reportAdvisory()))
         .catch((err) => {
-            console.log(chalk.red.bold('ERRORS'));
-            console.log(err.message);
-            console.log('');
+            showValidationErrors(err);
             if (executionContext && executionContext.isInTestMode()) {
                 return Promise.reject(err);
             }

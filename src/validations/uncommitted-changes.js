@@ -14,7 +14,7 @@ module.exports = {
             currentVal
         );
     },
-
+    canRun: () => true,
     run() {
         return exec('git status --porcelain').then((result) => {
             if (/^([ADRM]| [ADRM])/m.test(result))

@@ -45,7 +45,7 @@ describe('Publish-please CLI Options', () => {
 
         originalArgv = process.argv.map((arg) => arg);
 
-        // patch the .publisrc file to make sure publishing will fail
+        // patch the .publishrc file to make sure publishing will fail
         const publishrc = JSON.parse(readFile('.publishrc').toString());
         publishrc.prePublishScript =
             "echo 'npm test started by publish-please'";
@@ -81,6 +81,7 @@ describe('Publish-please CLI Options', () => {
             '{"remain":[],"cooked":["run","publish-please","--dry-run"],"original":["run","publish-please","--dry-run"]}';
         const publishrc = JSON.parse(readFile('.publishrc').toString());
         publishrc.confirm = false;
+        publishrc.validations.vulnerableDependencies = false;
         publishrc.validations.uncommittedChanges = false;
         publishrc.validations.untrackedFiles = false;
         publishrc.validations.gitTag = false;
@@ -159,6 +160,7 @@ describe('Publish-please CLI Options', () => {
         ];
         const publishrc = JSON.parse(readFile('.publishrc').toString());
         publishrc.confirm = false;
+        publishrc.validations.vulnerableDependencies = false;
         publishrc.validations.uncommittedChanges = false;
         publishrc.validations.untrackedFiles = false;
         publishrc.validations.gitTag = false;

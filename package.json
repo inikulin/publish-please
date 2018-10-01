@@ -1,6 +1,6 @@
 {
   "name": "publish-please",
-  "version": "3.2.0",
+  "version": "4.0.0",
   "description": "Safe and highly functional replacement for `npm publish`.",
   "main": "./lib/index.js",
   "bin": {
@@ -19,6 +19,7 @@
     "mocha-with-coverage": "istanbul cover -x test node_modules/mocha/bin/_mocha test",
     "check-coverage": "istanbul check-coverage --statements 96 --lines 96 --branches 81 --functions 96",
     "test": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage && npm run check-coverage",
+    "test-with-no-coverage-check": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage",
     "preinstall": "node lib/pre-install.js",
     "postinstall": "node lib/post-install.js",
     "package": "rimraf package && rimraf publish-please*.tgz && npm pack",
@@ -59,7 +60,7 @@
     "inquirer": "4.0.2",
     "lodash": "4.17.10",
     "node-emoji": "1.8.1",
-    "nsp": "3.2.1",
+    "osenv": "0.1.5",
     "pinkie-promise": "^2.0.1",
     "pkgd": "^1.1.2",
     "promisify-event": "^1.0.0",

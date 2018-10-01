@@ -16,7 +16,7 @@ There are numerous ways to "shoot yourself in the foot" using `npm publish`. The
 
  - Run tests or build steps before publishing (because `prepublish` is [broken](https://medium.com/greenkeeper-blog/what-is-npm-s-prepublish-and-why-is-it-so-confusing-a948373e6be1#.a40w9sdy6)).
  - Perform check for the [sensitive data](#sensitive-information-audit) in your package to be sure that you didn't leak it by accident (Further reading: [Do not underestimate credentials leaks](https://github.com/ChALkeR/notes/blob/master/Do-not-underestimate-credentials-leaks.md)).
- - Perform check for vulnerable dependencies using [Node Security Project](https://nodesecurity.io/) data.
+ - Perform check for vulnerable dependencies using `npm audit` data.
  - Check that you are in the correct git branch.
  - Check that git tag matches version specified in the `package.json`.
  - Check that there are no uncommitted changes in the working tree.
@@ -25,7 +25,7 @@ There are numerous ways to "shoot yourself in the foot" using `npm publish`. The
  - Get release summary and publishing confirmation.
  - Configure publishing using built-in configuration wizard.
 
-## Getting started ( [or use npx directly](#Running-publish-please-with-npx) )
+## Getting started ( [or use npx directly](#running-publish-please-with-npx) )
 
 Setup process of *publish-please* is quite trivial - just run
 ```shell
@@ -69,9 +69,20 @@ npm run publish-please
  - **gitTag** - Check that git tag matches version specified in the `package.json`. Default: `true`.
  - **branch** - Check that current branch matches the specified branch. Default: `master`.
  - **sensitiveData** - Perform [audit for the sensitive data](#sensitive-information-audit). Default: `true`.
- - **vulnerableDependencies** - Perform vulnerable dependencies check using [Node Security Project](https://nodesecurity.io/) data. Default: `true`.
-    - you may prevent specific vulnerabilities to be reported by publish-please by creating a [.nsprc file](https://github.com/nodesecurity/nsp#exceptions).
- 
+ - **vulnerableDependencies** - Perform vulnerable dependencies check using `npm audit`. Default: `true` if npm version is 6.1.0 or above, `false` otherwise.
+    - you may prevent specific vulnerabilities to be reported by publish-please by creating a `.auditignore` file in the root of your project with content like the following:
+
+        ```yaml
+        https://npmjs.com/advisories/12
+        https://npmjs.com/advisories/577
+        ```
+    - you may perform vulnerabilities check only for a specific vulnerability level: `critical`, `high`, `moderate` or `low`. 
+    To do this create an `audit.opts` file in the root of your project with content like the following:
+        ```sh
+        --audit-level=high
+        ```
+        The above example will enable to report only vulnerabilities of level `critical` and `high`
+
 
 ### Running in dry mode
 
