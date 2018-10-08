@@ -60,7 +60,6 @@ if (nodeInfos.npmPackHasJsonReporter) {
                                 {
                                     path: 'package.json',
                                     size: 67,
-                                    mode: 420,
                                 },
                             ],
                             entryCount: 1,
