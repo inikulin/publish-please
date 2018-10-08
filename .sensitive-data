@@ -1,0 +1,7 @@
+# Inspired from :
+#   https://github.com/github/gitignore
+#   https://github.com/inikulin/dmn
+#   https://github.com/bahmutov/ban-sensitive-files
+
+# Output of 'npm pack'
+*.tgz
