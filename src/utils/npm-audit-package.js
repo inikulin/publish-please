@@ -1,4 +1,5 @@
 const exec = require('cp-sugar').exec;
+const pathJoin = require('path').join;
 const readFile = require('fs').readFileSync;
 const sep = require('path').sep;
 const tempFolder = require('osenv').tmpdir();
@@ -63,3 +64,28 @@ function getDefaultOptionsFor(projectDir) {
         npmPackLogFilepath,
     };
 }
+
+function getDefaultSensitiveData() {
+    try {
+        const sensitiveDataFile = pathJoin(
+            __dirname,
+            '..',
+            '..',
+            '.sensitive-data'
+        );
+        const content = readFile(sensitiveDataFile).toString();
+        return content
+            .split(/\n|\r/)
+            .map((line) => line.replace(/[\t]/g, ' '))
+            .map((line) => line.trim())
+            .filter((line) => line && line.length > 0)
+            .filter((line) => !line.startsWith('#'));
+    } catch (error) {
+        return [];
+    }
+}
+
+/**
+ * exported for testing purposes
+ */
+module.exports.getDefaultSensitiveData = getDefaultSensitiveData;
