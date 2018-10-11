@@ -27,7 +27,14 @@ module.exports = {
                     .replace('* ', '')
             )
             .then((branch) => {
-                if (branch !== expected)
+                if (expected.match(/^\/.*\/$/)) {
+                    const regexp = new RegExp(
+                        expected.replace(/^\/(.*)\/$/, '$1')
+                    );
+                    if (!regexp.test(branch)) {
+                        throw `Expected branch to match ${expected}, but it was '${branch}'.`;
+                    }
+                } else if (branch !== expected)
                     throw `Expected branch to be '${expected}', but it was '${branch}'.`;
             });
     },
