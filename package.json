@@ -1,6 +1,6 @@
 {
   "name": "publish-please",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Safe and highly functional replacement for `npm publish`.",
   "main": "./lib/index.js",
   "bin": {
@@ -57,7 +57,7 @@
     "cp-sugar": "^1.0.0",
     "elegant-status": "1.1.0",
     "globby": "8.0.1",
-    "inquirer": "4.0.2",
+    "inquirer": "6.2.0",
     "lodash": "4.17.10",
     "node-emoji": "1.8.1",
     "osenv": "0.1.5",
