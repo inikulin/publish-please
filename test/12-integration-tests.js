@@ -228,7 +228,7 @@ describe('Integration tests', () => {
                         getTestOptions({
                             set: {
                                 validations: {
-                                    branch: '/(^master$|^release\\/)/',
+                                    branch: '/(^master$|^release$)/',
                                 },
                             },
                         })
@@ -240,7 +240,7 @@ describe('Integration tests', () => {
                 .catch((err) =>
                     assert.strictEqual(
                         err.message,
-                        "  * Expected branch to match /(^master$|^release\\/)/, but it was 'some-branch'."
+                        "  * Expected branch to match /(^master$|^release$)/, but it was 'some-branch'."
                     )
                 ));
 
@@ -280,14 +280,28 @@ describe('Integration tests', () => {
                 )
             ));
 
-        it('Should pass branch validation via RegExp', () =>
+        it('Should pass branch validation via RegExp (master branch)', () =>
             exec('git checkout master').then(() =>
                 publish(
                     getTestOptions({
                         set: {
                             publishCommand: echoPublishCommand,
                             validations: {
-                                branch: '/(^master$|^release\\/)/',
+                                branch: '/(^master$|^release$)/',
+                            },
+                        },
+                    })
+                )
+            ));
+
+        it('Should pass branch validation via RegExp (release branch)', () =>
+            exec('git checkout -b release').then(() =>
+                publish(
+                    getTestOptions({
+                        set: {
+                            publishCommand: echoPublishCommand,
+                            validations: {
+                                branch: '/(^master$|^release$)/',
                             },
                         },
                     })
