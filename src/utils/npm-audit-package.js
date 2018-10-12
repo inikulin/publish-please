@@ -18,9 +18,11 @@ module.exports = function auditPackage(projectDir) {
         const options = getDefaultOptionsFor(projectDir);
         process.chdir(options.directoryToPackage);
         const command = `npm pack --json > ${options.npmPackLogFilepath}`;
-        return exec(command).then(() =>
-            createResponseFromNpmPackLog(options.npmPackLogFilepath)
-        );
+        return exec(command)
+            .then(() =>
+                createResponseFromNpmPackLog(options.npmPackLogFilepath)
+            )
+            .then((response) => addSensitiveDataInfosIn(response));
     } catch (error) {
         return Promise.reject(error.message);
     }
@@ -54,11 +56,7 @@ function addSensitiveDataInfosIn(response) {
         const augmentedResponse = JSON.parse(JSON.stringify(response, null, 2));
         const files = augmentedResponse.files || [];
         files.forEach((file) => {
-            if (
-                file &&
-                file.path &&
-                globMatching.any(file.path, sensitiveData)
-            ) {
+            if (file && isSensitiveData(file.path, sensitiveData)) {
                 file.isSensitiveData = true;
                 return;
             }
@@ -82,6 +80,19 @@ function addSensitiveDataInfosIn(response) {
  * exported for testing purposes
  */
 module.exports.addSensitiveDataInfosIn = addSensitiveDataInfosIn;
+
+function isSensitiveData(filepath, sensitiveData) {
+    if (
+        filepath &&
+        globMatching.any(filepath, sensitiveData, {
+            matchBase: true,
+            nocase: true,
+        })
+    ) {
+        return true;
+    }
+    return false;
+}
 
 /**
  * @typedef DefaultOptions
