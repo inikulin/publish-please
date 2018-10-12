@@ -59,6 +59,7 @@
     "globby": "8.0.1",
     "inquirer": "6.2.0",
     "lodash": "4.17.10",
+    "micromatch": "3.1.10",
     "node-emoji": "1.8.1",
     "osenv": "0.1.5",
     "pinkie-promise": "^2.0.1",

@@ -4,6 +4,7 @@ const readFile = require('fs').readFileSync;
 const sep = require('path').sep;
 const tempFolder = require('osenv').tmpdir();
 const path = require('path');
+const globMatching = require('micromatch');
 
 /**
  * @inikulin: this module is developped with a TDD approach
@@ -40,6 +41,47 @@ function createResponseFromNpmPackLog(logFilePath) {
         };
     }
 }
+
+/**
+ * Add sensitive data infos for each file included in the package
+ * @param {*} response - result of the npm pack command (eventually modified by previous middlewares execution)
+ * @returns {*} returns a new response object that is a deep copy of input response
+ *              with each file being tagged with a new boolean property 'isSensitiveData'.
+ */
+function addSensitiveDataInfosIn(response) {
+    try {
+        const sensitiveData = getDefaultSensitiveData();
+        const augmentedResponse = JSON.parse(JSON.stringify(response, null, 2));
+        const files = augmentedResponse.files || [];
+        files.forEach((file) => {
+            if (
+                file &&
+                file.path &&
+                globMatching.any(file.path, sensitiveData)
+            ) {
+                file.isSensitiveData = true;
+                return;
+            }
+
+            if (file) {
+                file.isSensitiveData = false;
+            }
+        });
+        return augmentedResponse;
+    } catch (error) {
+        if (response) {
+            response.internalErrors = response.internalErrors || [];
+            response.internalErrors.push(error);
+            return response;
+        }
+        return response;
+    }
+}
+
+/**
+ * exported for testing purposes
+ */
+module.exports.addSensitiveDataInfosIn = addSensitiveDataInfosIn;
 
 /**
  * @typedef DefaultOptions
