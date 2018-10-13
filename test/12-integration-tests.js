@@ -320,14 +320,14 @@ describe('Integration tests', () => {
                     })
                 )
             ));
-        it('Should pass branch validation via simple RegExp (release branch)', () =>
-            exec('git checkout -b release').then(() =>
+        it('Should pass branch validation via simple RegExp (hotfix branch)', () =>
+            exec('git checkout -b hotfix').then(() =>
                 publish(
                     getTestOptions({
                         set: {
                             publishCommand: echoPublishCommand,
                             validations: {
-                                branch: '/(master|release)/',
+                                branch: '/(master|release|hotfix)/',
                             },
                         },
                     })
