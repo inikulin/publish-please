@@ -293,6 +293,19 @@ describe('Integration tests', () => {
                     })
                 )
             ));
+        it('Should pass branch validation via simple RegExp (master branch)', () =>
+            exec('git checkout master').then(() =>
+                publish(
+                    getTestOptions({
+                        set: {
+                            publishCommand: echoPublishCommand,
+                            validations: {
+                                branch: '/(master|release)/',
+                            },
+                        },
+                    })
+                )
+            ));
 
         it('Should pass branch validation via RegExp (release branch)', () =>
             exec('git checkout -b release').then(() =>
@@ -302,6 +315,19 @@ describe('Integration tests', () => {
                             publishCommand: echoPublishCommand,
                             validations: {
                                 branch: '/(^master$|^release$)/',
+                            },
+                        },
+                    })
+                )
+            ));
+        it('Should pass branch validation via simple RegExp (release branch)', () =>
+            exec('git checkout -b release').then(() =>
+                publish(
+                    getTestOptions({
+                        set: {
+                            publishCommand: echoPublishCommand,
+                            validations: {
+                                branch: '/(master|release)/',
                             },
                         },
                     })
