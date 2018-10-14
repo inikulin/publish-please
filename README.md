@@ -68,7 +68,7 @@ npm run publish-please
  - **untrackedFiles** - Check that there are no untracked files in the working tree. Default: `true`.
  - **gitTag** - Check that git tag matches version specified in the `package.json`. Default: `true`.
  - **branch** - Check that current branch matches the specified branch. Default: `master`.
-    - You may also set the branch as a regular expression to be able to use pubish-please in a multiple branches scenario like `master` and `release`:
+    - You may also set the branch as a regular expression to be able to use publish-please in a multiple branches scenario like `master` and `release`:
         ```js
         /(master|release)/
         ``` 
