@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Unrelased
 - replace `ban-sensitive-files` dependency with a custom validator 
 
+## [4.1.0] - 2018-10-13
+### Added
+- add branch validation via regular expression
+
 ## [4.0.1] - 2018-10-11
 ### Fixed
 - fix: config helper hangs on Windows after answering first question
