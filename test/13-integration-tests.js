@@ -221,6 +221,28 @@ describe('Integration tests', () => {
                     )
                 ));
 
+        it('Should validate the branch set in the configuration file via RegExp', () =>
+            exec('git checkout some-branch')
+                .then(() =>
+                    publish(
+                        getTestOptions({
+                            set: {
+                                validations: {
+                                    branch: '/(^master$|^release$)/',
+                                },
+                            },
+                        })
+                    )
+                )
+                .then(() => {
+                    throw new Error('Promise rejection expected');
+                })
+                .catch((err) =>
+                    assert.strictEqual(
+                        err.message,
+                        "  * Expected branch to match /(^master$|^release$)/, but it was 'some-branch'."
+                    )
+                ));
         it('Should expect the latest commit in the branch', () =>
             exec('git checkout 15a1ef78338cf1fa60c318828970b2b3e70004d1')
                 .then(() =>
@@ -257,6 +279,59 @@ describe('Integration tests', () => {
                 )
             ));
 
+        it('Should pass branch validation via RegExp (master branch)', () =>
+            exec('git checkout master').then(() =>
+                publish(
+                    getTestOptions({
+                        set: {
+                            publishCommand: echoPublishCommand,
+                            validations: {
+                                branch: '/(^master$|^release$)/',
+                            },
+                        },
+                    })
+                )
+            ));
+        it('Should pass branch validation via simple RegExp (master branch)', () =>
+            exec('git checkout master').then(() =>
+                publish(
+                    getTestOptions({
+                        set: {
+                            publishCommand: echoPublishCommand,
+                            validations: {
+                                branch: '/(master|release)/',
+                            },
+                        },
+                    })
+                )
+            ));
+
+        it('Should pass branch validation via RegExp (release branch)', () =>
+            exec('git checkout -b release').then(() =>
+                publish(
+                    getTestOptions({
+                        set: {
+                            publishCommand: echoPublishCommand,
+                            validations: {
+                                branch: '/(^master$|^release$)/',
+                            },
+                        },
+                    })
+                )
+            ));
+        it('Should pass branch validation via simple RegExp (hotfix branch)', () =>
+            exec('git checkout -b hotfix').then(() =>
+                publish(
+                    getTestOptions({
+                        set: {
+                            publishCommand: echoPublishCommand,
+                            validations: {
+                                branch: '/(master|release|hotfix)/',
+                            },
+                        },
+                    })
+                )
+            ));
         it('Should not validate if branch-validation is disabled', () =>
             exec('git checkout some-branch').then(() =>
                 publish(
