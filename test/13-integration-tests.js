@@ -243,6 +243,7 @@ describe('Integration tests', () => {
                         "  * Expected branch to match /(^master$|^release$)/, but it was 'some-branch'."
                     )
                 ));
+
         it('Should expect the latest commit in the branch', () =>
             exec('git checkout 15a1ef78338cf1fa60c318828970b2b3e70004d1')
                 .then(() =>
@@ -332,6 +333,7 @@ describe('Integration tests', () => {
                     })
                 )
             ));
+
         it('Should not validate if branch-validation is disabled', () =>
             exec('git checkout some-branch').then(() =>
                 publish(
