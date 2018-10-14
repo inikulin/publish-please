@@ -22,6 +22,7 @@ describe('npm package analyzer', () => {
         console.log(`${lineSeparator} begin test ${lineSeparator}`);
         del.sync(pathJoin(projectDir, 'package.json'));
         del.sync(pathJoin(projectDir, 'package-lock.json'));
+        del.sync(pathJoin(projectDir, '.publishrc'));
     });
     afterEach(() => {
         process.chdir(originalWorkingDirectory);
@@ -38,6 +39,133 @@ describe('npm package analyzer', () => {
         Array.isArray(result).should.be.true();
         result.length.should.equal(1);
     });
+
+    it('Should get no ignored files when publish-please has no configuration file', () => {
+        // Given
+        const options = audit.getDefaultOptionsFor(projectDir);
+        // When
+        const result = audit.getIgnoredSensitiveData(options);
+
+        // Then
+        Array.isArray(result).should.be.true();
+        result.length.should.equal(0);
+    });
+
+    it('Should get no ignored files from publish-please configuration file is not a valid json file', () => {
+        // Given
+        const config = '<bad json>';
+        writeFile(pathJoin(projectDir, '.publishrc'), config);
+        const options = audit.getDefaultOptionsFor(projectDir);
+        // When
+        const result = audit.getIgnoredSensitiveData(options);
+
+        // Then
+        Array.isArray(result).should.be.true();
+        result.length.should.equal(0);
+    });
+
+    it('Should get ignored files from publish-please configuration file', () => {
+        // Given
+        const config = {
+            validations: {
+                sensitiveData: {
+                    ignore: ['*.json', '*.txt'],
+                },
+            },
+            confirm: true,
+            publishCommand: 'npm publish',
+            publishTag: 'latest',
+            postPublishScript: false,
+        };
+        writeFile(
+            pathJoin(projectDir, '.publishrc'),
+            JSON.stringify(config, null, 2)
+        );
+        const options = audit.getDefaultOptionsFor(projectDir);
+        // When
+        const result = audit.getIgnoredSensitiveData(options);
+
+        // Then
+        const expected = ['*.json', '*.txt'];
+        Array.isArray(result).should.be.true();
+        result.length.should.equal(2);
+        result.should.containDeep(expected);
+    });
+
+    it('Should get no ignored files from publish-please configuration file when ignore section is empty', () => {
+        // Given
+        const config = {
+            validations: {
+                sensitiveData: {
+                    ignore: [],
+                },
+            },
+            confirm: true,
+            publishCommand: 'npm publish',
+            publishTag: 'latest',
+            postPublishScript: false,
+        };
+        writeFile(
+            pathJoin(projectDir, '.publishrc'),
+            JSON.stringify(config, null, 2)
+        );
+        const options = audit.getDefaultOptionsFor(projectDir);
+        // When
+        const result = audit.getIgnoredSensitiveData(options);
+
+        // Then
+        Array.isArray(result).should.be.true();
+        result.length.should.equal(0);
+    });
+
+    it('Should get no ignored files from publish-please configuration file when validation is disabled', () => {
+        // Given
+        const config = {
+            validations: {
+                sensitiveData: false,
+            },
+            confirm: true,
+            publishCommand: 'npm publish',
+            publishTag: 'latest',
+            postPublishScript: false,
+        };
+        writeFile(
+            pathJoin(projectDir, '.publishrc'),
+            JSON.stringify(config, null, 2)
+        );
+        const options = audit.getDefaultOptionsFor(projectDir);
+        // When
+        const result = audit.getIgnoredSensitiveData(options);
+
+        // Then
+        Array.isArray(result).should.be.true();
+        result.length.should.equal(0);
+    });
+
+    it('Should get no ignored files from publish-please configuration file when validation is enabled by default', () => {
+        // Given
+        const config = {
+            validations: {
+                sensitiveData: true,
+            },
+            confirm: true,
+            publishCommand: 'npm publish',
+            publishTag: 'latest',
+            postPublishScript: false,
+        };
+        writeFile(
+            pathJoin(projectDir, '.publishrc'),
+            JSON.stringify(config, null, 2)
+        );
+        const options = audit.getDefaultOptionsFor(projectDir);
+        // When
+        const result = audit.getIgnoredSensitiveData(options);
+
+        // Then
+        Array.isArray(result).should.be.true();
+        result.length.should.equal(0);
+    });
+
     it('Should do nothing if the package has no file in it', () => {
         // Given
         const npmPackResponse = {
@@ -57,6 +185,7 @@ describe('npm package analyzer', () => {
         Array.isArray(result.files).should.be.true();
         result.files.length.should.equal(0);
     });
+
     it('Should do nothing if the package has `undefined` files', () => {
         // Given
         const npmPackResponse = {
@@ -76,6 +205,7 @@ describe('npm package analyzer', () => {
         Array.isArray(result.files).should.be.false();
         (result.files === undefined).should.be.true();
     });
+
     it('Should add sensitiva data info on package.json file', () => {
         // Given
         const npmPackResponse = {
@@ -113,6 +243,7 @@ describe('npm package analyzer', () => {
         };
         result.should.containDeep(expected);
     });
+
     it('Should add sensitiva data info on tar file', () => {
         // Given
         const npmPackResponse = {

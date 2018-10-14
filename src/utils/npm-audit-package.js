@@ -118,6 +118,11 @@ function getDefaultOptionsFor(projectDir) {
     };
 }
 
+/**
+ * exported for testing purposes
+ */
+module.exports.getDefaultOptionsFor = getDefaultOptionsFor;
+
 function getDefaultSensitiveData() {
     try {
         const sensitiveDataFile = pathJoin(
@@ -142,3 +147,37 @@ function getDefaultSensitiveData() {
  * exported for testing purposes
  */
 module.exports.getDefaultSensitiveData = getDefaultSensitiveData;
+
+/**
+ * Get files that should be ignored within the npm package
+ * @param {DefaultOptions} options
+ * @returns {[string]} returns the list of files that should be ignored
+ */
+function getIgnoredSensitiveData(options) {
+    try {
+        const sensitiveDataIgnoreFile = pathJoin(
+            options.directoryToPackage,
+            '.publishrc'
+        );
+        const publishPleaseConfiguration = JSON.parse(
+            readFile(sensitiveDataIgnoreFile).toString()
+        );
+        const result =
+            publishPleaseConfiguration &&
+            publishPleaseConfiguration.validations &&
+            publishPleaseConfiguration.validations.sensitiveData &&
+            Array.isArray(
+                publishPleaseConfiguration.validations.sensitiveData.ignore
+            )
+                ? publishPleaseConfiguration.validations.sensitiveData.ignore
+                : [];
+        return result;
+    } catch (error) {
+        return [];
+    }
+}
+
+/**
+ * exported for testing purposes
+ */
+module.exports.getIgnoredSensitiveData = getIgnoredSensitiveData;
