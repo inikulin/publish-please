@@ -49,7 +49,8 @@
   "homepage": "https://github.com/inikulin/publish-please#readme",
   "files": [
     "lib",
-    "bin"
+    "bin",
+    ".sensitive-data"
   ],
   "dependencies": {
     "ban-sensitive-files": "1.9.2",
