@@ -22,7 +22,10 @@ module.exports = function auditPackage(projectDir) {
             .then(() =>
                 createResponseFromNpmPackLog(options.npmPackLogFilepath)
             )
-            .then((response) => addSensitiveDataInfosIn(response));
+            .then((response) => addSensitiveDataInfosIn(response))
+            .then((response) =>
+                updateSensitiveDataInfosOfIgnoredFilesIn(response, options)
+            );
     } catch (error) {
         return Promise.reject(error.message);
     }
@@ -85,6 +88,51 @@ function isSensitiveData(filepath, sensitiveData) {
     if (
         filepath &&
         globMatching.any(filepath, sensitiveData, {
+            matchBase: true,
+            nocase: true,
+        })
+    ) {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Update sensitive data infos for each ignored file included in the package
+ * @param {*} response - result of the npm pack command (eventually modified by previous middlewares execution)
+ * @returns {*} returns a new response object that is a deep copy of input response
+ *              with each ignored file being tagged with 'isSensitiveData=false'.
+ */
+function updateSensitiveDataInfosOfIgnoredFilesIn(response, options) {
+    try {
+        const ignoredData = getIgnoredSensitiveData(options);
+        const updatedResponse = JSON.parse(JSON.stringify(response, null, 2));
+        const files = updatedResponse.files || [];
+        files.forEach((file) => {
+            if (
+                file &&
+                file.isSensitiveData &&
+                isIgnoredData(file.path, ignoredData)
+            ) {
+                file.isSensitiveData = false;
+                return;
+            }
+        });
+        return updatedResponse;
+    } catch (error) {
+        if (response) {
+            response.internalErrors = response.internalErrors || [];
+            response.internalErrors.push(error);
+            return response;
+        }
+        return response;
+    }
+}
+
+function isIgnoredData(filepath, ignoredData) {
+    if (
+        filepath &&
+        globMatching.any(filepath, ignoredData, {
             matchBase: true,
             nocase: true,
         })

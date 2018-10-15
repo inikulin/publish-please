@@ -26,6 +26,7 @@ if (nodeInfos.npmPackHasJsonReporter) {
             console.log(`${lineSeparator} begin test ${lineSeparator}`);
             del.sync(pathJoin(projectDir, 'package.json'));
             del.sync(pathJoin(projectDir, 'package-lock.json'));
+            del.sync(pathJoin(projectDir, '.publishrc'));
             del.sync(pathJoin(projectDir, '*.tgz'));
             del.sync(pathJoin(projectDir, 'lib', '*.tgz'));
             del.sync(pathJoin(projectDir, 'lib', 'test', '*.tgz'));
@@ -121,6 +122,82 @@ if (nodeInfos.npmPackHasJsonReporter) {
                                     path: 'lib/test/yo345.tgz',
                                     size: 0,
                                     isSensitiveData: true,
+                                },
+                            ],
+                            entryCount: 4,
+                            bundled: [],
+                        };
+                        result.should.containDeep(expected);
+                    })
+            );
+        });
+
+        it('Should set ignored files as non sensitive data on files included in the package', () => {
+            // Given
+            const pkg = {
+                name: 'testing-repo',
+                version: '0.0.0',
+                scripts: {},
+            };
+            writeFile(
+                pathJoin(projectDir, 'package.json'),
+                JSON.stringify(pkg, null, 2)
+            );
+            const config = {
+                validations: {
+                    sensitiveData: {
+                        ignore: ['lib/**/*.tgz'],
+                    },
+                },
+                confirm: true,
+                publishCommand: 'npm publish',
+                publishTag: 'latest',
+                postPublishScript: false,
+            };
+            writeFile(
+                pathJoin(projectDir, '.publishrc'),
+                JSON.stringify(config, null, 2)
+            );
+            const npmignore = '.publishrc';
+            writeFile(pathJoin(projectDir, '.npmignore'), npmignore);
+
+            touch(pathJoin(projectDir, 'yo123.tgz'));
+            mkdirp.sync(pathJoin(projectDir, 'lib'));
+            touch(pathJoin(projectDir, 'lib', 'yo234.tgz'));
+            mkdirp.sync(pathJoin(projectDir, 'lib', 'test'));
+            touch(pathJoin(projectDir, 'lib', 'test', 'yo345.tgz'));
+            // When
+            return (
+                Promise.resolve()
+                    .then(() => auditPackage(projectDir))
+
+                    // Then
+                    .then((result) => {
+                        const expected = {
+                            id: 'testing-repo@0.0.0',
+                            name: 'testing-repo',
+                            version: '0.0.0',
+                            filename: 'testing-repo-0.0.0.tgz',
+                            files: [
+                                {
+                                    path: 'package.json',
+                                    size: 67,
+                                    isSensitiveData: false,
+                                },
+                                {
+                                    path: 'yo123.tgz',
+                                    size: 0,
+                                    isSensitiveData: true,
+                                },
+                                {
+                                    path: 'lib/yo234.tgz',
+                                    size: 0,
+                                    isSensitiveData: false,
+                                },
+                                {
+                                    path: 'lib/test/yo345.tgz',
+                                    size: 0,
+                                    isSensitiveData: false,
                                 },
                             ],
                             entryCount: 4,
