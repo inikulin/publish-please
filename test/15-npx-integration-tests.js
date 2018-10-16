@@ -210,7 +210,10 @@ describe('npx integration tests', () => {
                     ? publishrc.validations.vulnerableDependencies.should.be.true()
                     : publishrc.validations.vulnerableDependencies.should.be.false();
 
-                publishrc.validations.sensitiveData.should.be.true();
+                nodeInfos.npmPackHasJsonReporter
+                    ? publishrc.validations.sensitiveData.should.be.true()
+                    : publishrc.validations.sensitiveData.should.be.false();
+
                 publishrc.validations.gitTag.should.be.true();
                 publishrc.validations.branch.should.equal('master');
             });
@@ -244,11 +247,14 @@ describe('npx integration tests', () => {
                     : assert(!publishLog.includes('Checking for the vulnerable dependencies'));
 
                 /* prettier-ignore */
+                nodeInfos.npmPackHasJsonReporter
+                    ? assert(publishLog.includes('Checking for the sensitive and non-essential data in the npm package'))
+                    : assert(!publishLog.includes('Checking for the sensitive and non-essential data in the npm package'));
+
+                /* prettier-ignore */
                 assert(publishLog.includes('Checking for the uncommitted changes'));
                 /* prettier-ignore */
                 assert(publishLog.includes('Checking for the untracked files'));
-                /* prettier-ignore */
-                assert(publishLog.includes('Checking for the sensitive and non-essential data in the npm package'));
                 /* prettier-ignore */
                 assert(publishLog.includes('Validating branch'));
                 /* prettier-ignore */
@@ -271,7 +277,7 @@ describe('npx integration tests', () => {
                         confirm: false,
                         validations: {
                             vulnerableDependencies: false,
-                            sensitiveData: true,
+                            sensitiveData: false,
                             uncommittedChanges: false,
                             untrackedFiles: false,
                             branch: 'master',
@@ -303,8 +309,6 @@ describe('npx integration tests', () => {
                 assert(publishLog.includes('running script defined in .publishrc ...'));
                 /* prettier-ignore */
                 assert(publishLog.includes('Running validations'));
-                /* prettier-ignore */
-                assert(publishLog.includes('Checking for the sensitive and non-essential data in the npm package'));
                 /* prettier-ignore */
                 assert(publishLog.includes('Validating branch'));
                 /* prettier-ignore */

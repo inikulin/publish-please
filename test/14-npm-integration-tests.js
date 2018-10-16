@@ -140,7 +140,11 @@ describe('npm integration tests', () => {
                     ? assert(publishrc.validations.vulnerableDependencies === true)
                     : assert(publishrc.validations.vulnerableDependencies === false);
 
-                assert(publishrc.validations.sensitiveData);
+                /* prettier-ignore */
+                nodeInfos.npmPackHasJsonReporter
+                    ? assert(publishrc.validations.sensitiveData === true)
+                    : assert(publishrc.validations.sensitiveData === false);
+
                 assert(publishrc.validations.gitTag);
                 assert.strictEqual(publishrc.validations.branch, 'master');
             });
@@ -173,11 +177,14 @@ describe('npm integration tests', () => {
                     : assert(!publishLog.includes('Checking for the vulnerable dependencies'));
 
                 /* prettier-ignore */
+                nodeInfos.npmPackHasJsonReporter
+                    ? assert(publishLog.includes('Checking for the sensitive and non-essential data in the npm package'))
+                    : assert(!publishLog.includes('Checking for the sensitive and non-essential data in the npm package'));
+
+                /* prettier-ignore */
                 assert(publishLog.includes('Checking for the uncommitted changes'));
                 /* prettier-ignore */
                 assert(publishLog.includes('Checking for the untracked files'));
-                /* prettier-ignore */
-                assert(publishLog.includes('Checking for the sensitive and non-essential data in the npm package'));
                 /* prettier-ignore */
                 assert(publishLog.includes('Validating branch'));
                 /* prettier-ignore */
