@@ -5,10 +5,12 @@ const globby = require('globby');
 const confirm = require('../utils/inquires').confirm;
 const inputList = require('../utils/inquires').inputList;
 const Promise = require('pinkie-promise');
+const nodeInfos = require('../utils/get-node-infos').getNodeInfosSync();
 
 module.exports = {
     option: 'sensitiveData',
-    statusText: 'Checking for the sensitive data in the working tree',
+    statusText:
+        'Checking for the sensitive and non-essential data in the npm package',
     defaultParam: true,
     /* eslint-disable indent */
     configurator(currentVal) {
@@ -42,7 +44,17 @@ module.exports = {
             !!currentVal
         ).then((yes) => (yes ? configureIgnores() : false));
     },
-    canRun: () => true,
+    canRun() {
+        // prettier-ignore
+        return nodeInfos && nodeInfos.npmPackHasJsonReporter
+            ? true
+            : false;
+    },
+    whyCannotRun() {
+        return `Cannot check sensitive and non-essential data because npm version is ${
+            nodeInfos.npmVersion
+        }. Either upgrade npm to version 5.9.0 or above, or disable this validation in the configuration file`;
+    },
     run(opts, pkgInfo) {
         return Promise.resolve()
             .then(() => {

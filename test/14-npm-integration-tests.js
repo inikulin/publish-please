@@ -177,7 +177,7 @@ describe('npm integration tests', () => {
                 /* prettier-ignore */
                 assert(publishLog.includes('Checking for the untracked files'));
                 /* prettier-ignore */
-                assert(publishLog.includes('Checking for the sensitive data in the working tree'));
+                assert(publishLog.includes('Checking for the sensitive and non-essential data in the npm package'));
                 /* prettier-ignore */
                 assert(publishLog.includes('Validating branch'));
                 /* prettier-ignore */
