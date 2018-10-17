@@ -19,6 +19,7 @@ describe('Publish execution', () => {
         process.chdir(originalWorkingDirectory);
         console.log(`${lineSeparator} end test ${lineSeparator}\n`);
     });
+    after(() => console.log(`cwd is restored to: ${process.cwd()}`));
 
     it('Should throw an error if .publishrc is a bad json', () => {
         // Given .publishrc is a bad formatted json file
