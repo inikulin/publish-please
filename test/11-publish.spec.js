@@ -5,9 +5,15 @@ const pathJoin = require('path').join;
 const should = require('should');
 const writeFile = require('fs').writeFileSync;
 const getOptions = require('../lib/publish-options').getOptions;
+const lineSeparator = '----------------------------------';
 
 /* eslint-disable max-nested-callbacks */
 describe('Publish execution', () => {
+    beforeEach(() =>
+        console.log(`${lineSeparator} begin test ${lineSeparator}`));
+    afterEach(() =>
+        console.log(`${lineSeparator} end test ${lineSeparator}\n`));
+
     it('Should throw an error if .publishrc is a bad json', () => {
         // Given .publishrc is a bad formatted json file
         const opts = '<bad json>';

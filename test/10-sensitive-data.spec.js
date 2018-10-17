@@ -14,8 +14,10 @@ const chalk = require('chalk');
 const lineSeparator = '----------------------------------';
 
 describe('Sensitive data validation when npm is < 5.9.0', () => {
+    let originalWorkingDirectory;
     let nativeCanRun;
     before(() => {
+        originalWorkingDirectory = process.cwd();
         nativeCanRun = validation.canRun;
         validation.canRun = () => false;
     });
@@ -24,8 +26,11 @@ describe('Sensitive data validation when npm is < 5.9.0', () => {
     });
     beforeEach(() =>
         console.log(`${lineSeparator} begin test ${lineSeparator}`));
-    afterEach(() =>
-        console.log(`${lineSeparator} end test ${lineSeparator}\n`));
+    afterEach(() => {
+        process.chdir(originalWorkingDirectory);
+        console.log(`${lineSeparator} end test ${lineSeparator}\n`);
+    });
+    after(() => console.log(`cwd is restored to: ${process.cwd()}`));
 
     it('Should default to false when there is no configuration file', () => {
         // Given all validations are loaded

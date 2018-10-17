@@ -7,6 +7,7 @@ const should = require('should');
 const cli = require('../lib');
 const pathJoin = require('path').join;
 const packageName = require('./utils/publish-please-version-under-test');
+const lineSeparator = '----------------------------------';
 
 /** !!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  * These tests runs publish-please code on publish-please repo itself
@@ -29,6 +30,7 @@ describe('Publish-please CLI Options', () => {
         writeFile('.publishrc', JSON.stringify(originalConfiguration, null, 2));
     });
     beforeEach(() => {
+        console.log(`${lineSeparator} begin test ${lineSeparator}`);
         process.env.PUBLISH_PLEASE_TEST_MODE = true;
         exitCode = undefined;
         output = '';
@@ -58,6 +60,7 @@ describe('Publish-please CLI Options', () => {
         process.argv = originalArgv;
 
         writeFile('.publishrc', JSON.stringify(originalConfiguration, null, 2));
+        console.log(`${lineSeparator} end test ${lineSeparator}\n`);
     });
 
     it('Should execute dry-run workflow on `npm run publish-please --dry-run`', () => {
