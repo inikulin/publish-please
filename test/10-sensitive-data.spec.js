@@ -92,7 +92,7 @@ describe('Sensitive data validation when npm is >= 5.9.0', () => {
     });
     after(() => {
         validation.canRun = nativeCanRun;
-        after(() => console.log(`cwd is restored to: ${process.cwd()}`));
+        console.log(`cwd is restored to: ${process.cwd()}`);
     });
     beforeEach(() => {
         console.log(`${lineSeparator} begin test ${lineSeparator}`);
