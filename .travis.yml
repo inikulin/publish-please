@@ -1,3 +1,8 @@
+os:
+  - linux
+  - osx
+  - windows
+
 language: node_js
 sudo: false
 node_js:
