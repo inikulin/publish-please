@@ -1,11 +1,12 @@
 'use strict';
 
-const isSensitiveData = require('ban-sensitive-files');
-const globby = require('globby');
+// const isSensitiveData = require('ban-sensitive-files');
+// const globby = require('globby');
 const confirm = require('../utils/inquires').confirm;
 const inputList = require('../utils/inquires').inputList;
 const Promise = require('pinkie-promise');
 const nodeInfos = require('../utils/get-node-infos').getNodeInfosSync();
+const auditPackage = require('../utils/npm-audit-package');
 
 module.exports = {
     option: 'sensitiveData',
@@ -40,7 +41,7 @@ module.exports = {
         /* eslint-enable indent */
 
         return confirm(
-            'Would you like to verify that there is no sensitive data in your working tree?',
+            'Would you like to verify that there is no sensitive and non-essential data in the npm package?',
             !!currentVal
         ).then((yes) => (yes ? configureIgnores() : false));
     },
@@ -55,34 +56,62 @@ module.exports = {
             nodeInfos.npmVersion
         }. Either upgrade npm to version 5.9.0 or above, or disable this validation in the configuration file`;
     },
-    run(opts, pkgInfo) {
-        return Promise.resolve()
-            .then(() => {
-                if (opts && Array.isArray(opts.ignore))
-                    return globby(opts.ignore);
-
-                return [];
-            })
-            .then((ignore) => {
-                const errs = [];
-                const addErr = errs.push.bind(errs);
-
-                pkgInfo.files
-                    .filter((path) => ignore.indexOf(path) < 0)
-                    .forEach((path) => isSensitiveData(path, addErr));
-
-                if (errs.length) {
-                    const msg = errs
-                        .map((err) =>
-                            err
-                                .split(/\n/)
-                                .map((line) => '    ' + line)
-                                .join('\n')
-                        )
-                        .join('\n');
-
-                    throw 'Sensitive data found in the working tree:\n' + msg;
-                }
-            });
+    run() {
+        return new Promise((resolve, reject) => {
+            try {
+                const projectDir = process.cwd();
+                auditPackage(projectDir)
+                    .then((result) => {
+                        if (sensitivaDataFoundIn(result)) {
+                            const errs = [];
+                            result.files
+                                .filter((file) => file && file.isSensitiveData)
+                                .forEach((file) => {
+                                    errs.push(summaryOf(file.path));
+                                });
+                            reject(errs.sort());
+                            return;
+                        }
+                        if (auditErrorFoundIn(result)) {
+                            reject(summaryErrorOf(result.error));
+                            return;
+                        }
+                        resolve();
+                    })
+                    .catch((err) => {
+                        reject(err);
+                    });
+            } catch (error) {
+                reject(error.message);
+            }
+        });
     },
 };
+
+function sensitivaDataFoundIn(result) {
+    return Array.isArray(result.files)
+        ? result.files.filter((file) => file && file.isSensitiveData).length > 0
+        : false;
+}
+
+function summaryOf(sensitiveData) {
+    const summary = `Sensitive or non essential data found in npm package: ${sensitiveData}`;
+    return summary;
+}
+
+function auditErrorFoundIn(result) {
+    return result && result.error && result.error.summary;
+}
+
+function summaryErrorOf(error) {
+    const summary = elegantSummary(error.summary);
+    return summary;
+}
+
+function elegantSummary(summary) {
+    const result = summary
+        .split('\n')
+        .map((line, index) => (index === 0 ? line : `\t${line}`))
+        .join('\n');
+    return result;
+}

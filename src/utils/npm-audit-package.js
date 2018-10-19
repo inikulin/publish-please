@@ -7,8 +7,6 @@ const path = require('path');
 const globMatching = require('micromatch');
 
 /**
- * @inikulin: this module is developped with a TDD approach
- *            this means this code might look incomplete or even wrong
  * Audit the package that will be sent to the registry
  * @param {(string | undefined)} projectDir - project directory to be analyzed by npm-pack command
  * @returns {Object} returns an object with sensitive/non-essential files found in the package that will be sent to the registry
@@ -49,8 +47,8 @@ function createResponseFromNpmPackLog(logFilePath) {
 
 /**
  * Add sensitive data infos for each file included in the package
- * @param {*} response - result of the npm pack command (eventually modified by previous middlewares execution)
- * @returns {*} returns a new response object that is a deep copy of input response
+ * @param {Object} response - result of the npm pack command (eventually modified by previous middlewares execution)
+ * @returns {Object} returns a new response object that is a deep copy of input response
  *              with each file being tagged with a new boolean property 'isSensitiveData'.
  */
 function addSensitiveDataInfosIn(response) {
@@ -99,8 +97,8 @@ function isSensitiveData(filepath, sensitiveData) {
 
 /**
  * Update sensitive data infos for each ignored file included in the package
- * @param {*} response - result of the npm pack command (eventually modified by previous middlewares execution)
- * @returns {*} returns a new response object that is a deep copy of input response
+ * @param {Object} response - result of the npm pack command (eventually modified by previous middlewares execution)
+ * @returns {Object} returns a new response object that is a deep copy of input response
  *              with each ignored file being tagged with 'isSensitiveData=false'.
  */
 function updateSensitiveDataInfosOfIgnoredFilesIn(response, options) {

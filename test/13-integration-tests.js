@@ -551,9 +551,9 @@ describe('Integration tests', () => {
             exec('git checkout master')
                 .then(() => mkdir('test'))
                 .then(() => {
-                    writeFile('lib/schema.rb', 'test');
-                    writeFile('lib/database.yml', 'test');
-                    writeFile('test/database.yml', 'test');
+                    writeFile('lib/pack1.tgz', 'test');
+                    writeFile('lib/pack2.tgz', 'test');
+                    writeFile('test/pack3.tgz', 'test');
                 })
                 .then(() =>
                     publish(
@@ -573,16 +573,10 @@ describe('Integration tests', () => {
                     (err) =>
                         // prettier-ignore
                         nodeInfos.npmPackHasJsonReporter
-                            ? assert.strictEqual(
-                                err.message,
-                                '  * Sensitive data found in the working tree:\n' +
-                                '    invalid filename lib/database.yml\n' +
-                                '     - Potential Ruby On Rails database configuration file\n' +
-                                '     - Might contain database credentials.\n' +
-                                '    invalid filename lib/schema.rb\n' +
-                                '     - Ruby On Rails database schema file\n' +
-                                '     - Contains information on the database schema of a Ruby On Rails application.'
-                            )
+                            ? err.message.should.containEql('Sensitive or non essential data found in npm package: lib/pack1.tgz')
+                            && err.message.should.containEql('Sensitive or non essential data found in npm package: lib/pack2.tgz')
+                            && err.message.should.not.containEql('Sensitive or non essential data found in npm package: test/pack3.tgz')
+
                             : assert(
                                 err.message.indexOf(
                                     'Cannot check sensitive and non-essential data because npm version is'
