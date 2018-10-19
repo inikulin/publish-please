@@ -53,11 +53,9 @@
     ".sensitive-data"
   ],
   "dependencies": {
-    "ban-sensitive-files": "1.9.2",
     "chalk": "2.4.1",
     "cp-sugar": "^1.0.0",
     "elegant-status": "1.1.0",
-    "globby": "8.0.1",
     "inquirer": "6.2.0",
     "lodash": "4.17.10",
     "micromatch": "3.1.10",

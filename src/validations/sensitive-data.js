@@ -1,7 +1,5 @@
 'use strict';
 
-// const isSensitiveData = require('ban-sensitive-files');
-// const globby = require('globby');
 const confirm = require('../utils/inquires').confirm;
 const inputList = require('../utils/inquires').inputList;
 const Promise = require('pinkie-promise');
