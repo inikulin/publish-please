@@ -449,10 +449,10 @@ describe('Vulnerability validation', () => {
                 })
                 .catch((err) => {
                     showValidationErrors(err);
-                    err.message.should.containEql(jsonParseErrorMessage) ||
-                        err.message.should.containEql(
-                            'Command failed: npm audit'
-                        );
+                    (
+                        err.message.indexOf('Command failed: npm audit') > -1 ||
+                        err.message.indexOf(jsonParseErrorMessage) > -1
+                    ).should.be.true();
                 })
         );
     });
