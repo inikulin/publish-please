@@ -53,11 +53,11 @@ function createResponseFromNpmPackLog(logFilePath) {
  */
 function addSensitiveDataInfosIn(response) {
     try {
-        const sensitiveData = getDefaultSensitiveData();
+        const allSensitiveDataPatterns = getDefaultSensitiveData();
         const augmentedResponse = JSON.parse(JSON.stringify(response, null, 2));
         const files = augmentedResponse.files || [];
         files.forEach((file) => {
-            if (file && isSensitiveData(file.path, sensitiveData)) {
+            if (file && isSensitiveData(file.path, allSensitiveDataPatterns)) {
                 file.isSensitiveData = true;
                 return;
             }
@@ -82,10 +82,29 @@ function addSensitiveDataInfosIn(response) {
  */
 module.exports.addSensitiveDataInfosIn = addSensitiveDataInfosIn;
 
-function isSensitiveData(filepath, sensitiveData) {
+/**
+ * Check if file in filepath is sensitive data
+ * @param {string} filepath
+ * @param {DefaultSensitiveData} allSensitiveDataPatterns
+ */
+function isSensitiveData(filepath, allSensitiveDataPatterns) {
     if (
         filepath &&
-        globMatching.any(filepath, sensitiveData, {
+        allSensitiveDataPatterns &&
+        allSensitiveDataPatterns.ignoredData &&
+        globMatching.any(filepath, allSensitiveDataPatterns.ignoredData, {
+            matchBase: true,
+            nocase: true,
+        })
+    ) {
+        return false;
+    }
+
+    if (
+        filepath &&
+        allSensitiveDataPatterns &&
+        allSensitiveDataPatterns.sensitiveData &&
+        globMatching.any(filepath, allSensitiveDataPatterns.sensitiveData, {
             matchBase: true,
             nocase: true,
         })
@@ -169,6 +188,17 @@ function getDefaultOptionsFor(projectDir) {
  */
 module.exports.getDefaultOptionsFor = getDefaultOptionsFor;
 
+/**
+ * @typedef DefaultSensitiveData
+ * @type {Object}
+ * @property {[string]} sensitiveData - all patterns that defines sensitive data
+ * @property {[string]} ignoredData - all patterns that defines data that is not sensitive
+ */
+
+/**
+ * get all sensitive data from the '.sensitive-data' file
+ * @returns {DefaultSensitiveData}
+ */
 function getDefaultSensitiveData() {
     try {
         const sensitiveDataFile = pathJoin(
@@ -178,14 +208,31 @@ function getDefaultSensitiveData() {
             '.sensitive-data'
         );
         const content = readFile(sensitiveDataFile).toString();
-        return content
+        const allPatterns = content
             .split(/\n|\r/)
             .map((line) => line.replace(/[\t]/g, ' '))
             .map((line) => line.trim())
             .filter((line) => line && line.length > 0)
             .filter((line) => !line.startsWith('#'));
+
+        const sensitiveData = allPatterns.filter(
+            (pattern) => !pattern.startsWith('!')
+        );
+
+        const ignoredData = allPatterns
+            .filter((pattern) => pattern.startsWith('!'))
+            .map((pattern) => pattern.replace('!', ''))
+            .map((pattern) => pattern.trim());
+
+        return {
+            sensitiveData,
+            ignoredData,
+        };
     } catch (error) {
-        return [];
+        return {
+            sensitiveData: [],
+            ignoredData: [],
+        };
     }
 }
 

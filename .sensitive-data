@@ -5,3 +5,8 @@
 
 # Output of 'npm pack'
 *.tgz
+
+# Private SSH key
+*_rsa
+*_rsa.*
+!*_rsa.pub

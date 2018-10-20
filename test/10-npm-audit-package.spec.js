@@ -29,6 +29,11 @@ describe('npm package analyzer', () => {
         console.log(`${lineSeparator} end test ${lineSeparator}\n`);
     });
     after(() => console.log(`cwd is restored to: ${process.cwd()}`));
+
+    /**
+     * this test is a guard against changes in the .sensitive-data file.
+     * Any changes to this file will make this test failed
+     */
     it('Should get default list of sensitiva data', () => {
         // Given
 
@@ -36,8 +41,10 @@ describe('npm package analyzer', () => {
         const result = audit.getDefaultSensitiveData();
 
         // Then
-        Array.isArray(result).should.be.true();
-        result.length.should.equal(1);
+        Array.isArray(result.sensitiveData).should.be.true();
+        Array.isArray(result.ignoredData).should.be.true();
+        result.sensitiveData.length.should.equal(3);
+        result.ignoredData.length.should.equal(1);
     });
 
     it('Should get no ignored files when publish-please has no configuration file', () => {
@@ -286,6 +293,80 @@ describe('npm package analyzer', () => {
                 },
             ],
             entryCount: 2,
+            bundled: [],
+        };
+        result.should.containDeep(expected);
+    });
+
+    it('Should add sensitiva data info on private ssh key file', () => {
+        // Given
+        const npmPackResponse = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                },
+                {
+                    path: 'id_rsa',
+                    size: 123456,
+                },
+                {
+                    path: '/keys/yo_rsa',
+                    size: 123456,
+                },
+                {
+                    path: '/keys/foo_rsa.enc',
+                    size: 123456,
+                },
+                {
+                    path: '/keys/foo_rsa.pub',
+                    size: 123456,
+                },
+            ],
+            entryCount: 5,
+            bundled: [],
+        };
+        // When
+        const result = audit.addSensitiveDataInfosIn(npmPackResponse);
+
+        // Then
+        const expected = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                    isSensitiveData: false,
+                },
+                {
+                    path: 'id_rsa',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: '/keys/yo_rsa',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: '/keys/foo_rsa.enc',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: '/keys/foo_rsa.pub',
+                    size: 123456,
+                    isSensitiveData: false,
+                },
+            ],
+            entryCount: 5,
             bundled: [],
         };
         result.should.containDeep(expected);
