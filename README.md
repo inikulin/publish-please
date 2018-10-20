@@ -132,56 +132,9 @@ sensitive data in your packages.
 
 Performed for the following items:
 
+ - Log files
+ - Output of 'npm pack'
  - Private SSH key
- - Potential cryptographic private key
- - Potential cryptographic key bundle
- - Pidgin OTR private key
- - Shell command history file
- - MySQL client command history file
- - PostgreSQL client command history file
- - Ruby IRB console history file
- - Pidgin chat client account configuration file
- - Hexchat/XChat IRC client server list configuration file
- - Irssi IRC client configuration file
- - Recon-ng web reconnaissance framework API key database
- - DBeaver SQL database manager configuration file
- - Mutt e-mail client configuration file
- - S3cmd configuration file
- - T command-line Twitter client configuration file
- - OpenVPN client configuration file
- - Well, this is awkward... Gitrob configuration file
- - Shell configuration file
- - Shell profile configuration file
- - Shell command alias configuration file
- - Ruby On Rails secret token configuration file
- - OmniAuth configuration file
- - Carrierwave configuration file
- - Ruby On Rails database schema file
- - Potential Ruby On Rails database configuration file
- - Django configuration file
- - PHP configuration file
- - KeePass password manager database file
- - 1Password password manager database file
- - Apple Keychain database file
- - GNOME Keyring database file
- - Log file
- - Network traffic capture file
- - SQL dump file
- - GnuCash database file
- - Contains word: backup
- - Contains word: dump
- - Contains word: password
- - Contains words: private, key
- - Jenkins publish over SSH plugin file
- - Potential Jenkins credentials file
- - Apache htpasswd file
- - Configuration file for auto-login process
- - KDE Wallet Manager database file
- - Potential MediaWiki configuration file
- - Tunnelblick VPN configuration file
- - Rubygems credentials file
- - Potential MSBuild publish profile
- - PHP dotenv
 
 ## Upgrading to latest publish-please version
 

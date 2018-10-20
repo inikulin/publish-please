@@ -43,7 +43,7 @@ describe('npm package analyzer', () => {
         // Then
         Array.isArray(result.sensitiveData).should.be.true();
         Array.isArray(result.ignoredData).should.be.true();
-        result.sensitiveData.length.should.equal(5);
+        result.sensitiveData.length.should.equal(16);
         result.ignoredData.length.should.equal(2);
     });
 
@@ -315,15 +315,15 @@ describe('npm package analyzer', () => {
                     size: 123456,
                 },
                 {
-                    path: '/keys/yo_rsa',
+                    path: 'keys/yo_rsa',
                     size: 123456,
                 },
                 {
-                    path: '/keys/foo_rsa.enc',
+                    path: 'keys/foo_rsa.enc',
                     size: 123456,
                 },
                 {
-                    path: '/keys/foo_rsa.pub',
+                    path: 'keys/foo_rsa.pub',
                     size: 123456,
                 },
             ],
@@ -351,17 +351,17 @@ describe('npm package analyzer', () => {
                     isSensitiveData: true,
                 },
                 {
-                    path: '/keys/yo_rsa',
+                    path: 'keys/yo_rsa',
                     size: 123456,
                     isSensitiveData: true,
                 },
                 {
-                    path: '/keys/foo_rsa.enc',
+                    path: 'keys/foo_rsa.enc',
                     size: 123456,
                     isSensitiveData: true,
                 },
                 {
-                    path: '/keys/foo_rsa.pub',
+                    path: 'keys/foo_rsa.pub',
                     size: 123456,
                     isSensitiveData: false,
                 },
@@ -389,15 +389,15 @@ describe('npm package analyzer', () => {
                     size: 123456,
                 },
                 {
-                    path: '/keys/yo_dsa',
+                    path: 'keys/yo_dsa',
                     size: 123456,
                 },
                 {
-                    path: '/keys/foo_dsa.enc',
+                    path: 'keys/foo_dsa.enc',
                     size: 123456,
                 },
                 {
-                    path: '/keys/foo_dsa.pub',
+                    path: 'keys/foo_dsa.pub',
                     size: 123456,
                 },
             ],
@@ -425,22 +425,123 @@ describe('npm package analyzer', () => {
                     isSensitiveData: true,
                 },
                 {
-                    path: '/keys/yo_dsa',
+                    path: 'keys/yo_dsa',
                     size: 123456,
                     isSensitiveData: true,
                 },
                 {
-                    path: '/keys/foo_dsa.enc',
+                    path: 'keys/foo_dsa.enc',
                     size: 123456,
                     isSensitiveData: true,
                 },
                 {
-                    path: '/keys/foo_dsa.pub',
+                    path: 'keys/foo_dsa.pub',
                     size: 123456,
                     isSensitiveData: false,
                 },
             ],
             entryCount: 5,
+            bundled: [],
+        };
+        result.should.containDeep(expected);
+    });
+
+    it('Should add sensitiva data info on log files', () => {
+        // Given
+        const npmPackResponse = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                },
+                {
+                    path: 'yo.log',
+                    size: 123456,
+                },
+                {
+                    path: 'yo.svclog',
+                    size: 123456,
+                },
+                {
+                    path: 'logs/yo',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/logs/yo',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/yo.svclog',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/UpgradeLog-my-project.XML',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/foo.binlog',
+                    size: 123456,
+                },
+            ],
+            entryCount: 8,
+            bundled: [],
+        };
+        // When
+        const result = audit.addSensitiveDataInfosIn(npmPackResponse);
+
+        // Then
+        const expected = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                    isSensitiveData: false,
+                },
+                {
+                    path: 'yo.log',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'yo.svclog',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'logs/yo',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/logs/yo',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/yo.svclog',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/UpgradeLog-my-project.XML',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/foo.binlog',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+            ],
+            entryCount: 8,
             bundled: [],
         };
         result.should.containDeep(expected);

@@ -3,6 +3,24 @@
 #   https://github.com/inikulin/dmn
 #   https://github.com/bahmutov/ban-sensitive-files
 
+# Log Files
+*.log
+logs/**
+**/logs/**
+*.eventlog
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.svclog
+
+# Backup & report files from converting an old project file
+# to a newer Visual Studio version. Backup files are not needed,
+UpgradeLog*.XML
+UpgradeLog*.htm
+
+# MSBuild Binary and Structured Log
+*.binlog
+
 # Output of 'npm pack'
 *.tgz
 
