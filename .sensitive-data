@@ -10,3 +10,6 @@
 *_rsa
 *_rsa.*
 !*_rsa.pub
+*_dsa
+*_dsa.*
+!*_dsa.pub
