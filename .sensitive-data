@@ -4,6 +4,14 @@
 #   https://github.com/bahmutov/ban-sensitive-files
 
 #-----------------------
+# Demo Files
+#-----------------------
+demo/**
+**/demo/**
+demos/**
+**/demos/**
+
+#-----------------------
 # Log Files
 #-----------------------
 *.log
