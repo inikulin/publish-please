@@ -43,7 +43,7 @@ describe('npm package analyzer', () => {
         // Then
         Array.isArray(result.sensitiveData).should.be.true();
         Array.isArray(result.ignoredData).should.be.true();
-        result.sensitiveData.length.should.equal(16);
+        result.sensitiveData.length.should.equal(20);
         result.ignoredData.length.should.equal(2);
     });
 
@@ -542,6 +542,80 @@ describe('npm package analyzer', () => {
                 },
             ],
             entryCount: 8,
+            bundled: [],
+        };
+        result.should.containDeep(expected);
+    });
+
+    it('Should add sensitiva data info on eslint configuration files', () => {
+        // Given
+        const npmPackResponse = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                },
+                {
+                    path: '.eslintrc',
+                    size: 123456,
+                },
+                {
+                    path: '.eslintrc.json',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/.eslintrc.yaml',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/.eslintrc.yml',
+                    size: 123456,
+                },
+            ],
+            entryCount: 5,
+            bundled: [],
+        };
+        // When
+        const result = audit.addSensitiveDataInfosIn(npmPackResponse);
+
+        // Then
+        const expected = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                    isSensitiveData: false,
+                },
+                {
+                    path: '.eslintrc',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: '.eslintrc.json',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/.eslintrc.yaml',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/.eslintrc.yml',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+            ],
+            entryCount: 5,
             bundled: [],
         };
         result.should.containDeep(expected);

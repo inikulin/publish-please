@@ -3,7 +3,9 @@
 #   https://github.com/inikulin/dmn
 #   https://github.com/bahmutov/ban-sensitive-files
 
+#-----------------------
 # Log Files
+#-----------------------
 *.log
 logs/**
 **/logs/**
@@ -21,13 +23,27 @@ UpgradeLog*.htm
 # MSBuild Binary and Structured Log
 *.binlog
 
+#-----------------------
+# zip files
+#-----------------------
 # Output of 'npm pack'
 *.tgz
 
-# Private SSH key
+#-----------------------
+# Private SSH keys
+#-----------------------
 *_rsa
 *_rsa.*
 !*_rsa.pub
 *_dsa
 *_dsa.*
 !*_dsa.pub
+
+#-----------------------
+# Configuration files
+#-----------------------
+# eslint
+.eslintrc
+.eslintrc.json
+.eslintrc.yaml
+.eslintrc.yml
