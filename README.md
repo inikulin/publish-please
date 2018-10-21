@@ -137,6 +137,7 @@ Performed for the following items:
  - Log files
  - Private SSH key
  - Temp files
+ - Test files
  - Zip files
     - Output of 'npm pack'
 

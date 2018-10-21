@@ -55,3 +55,13 @@ tmp/**
 **/tmp/**
 temp/**
 **/temp/**
+
+#-----------------------
+# Test Files
+#-----------------------
+tests/**
+**/tests/**
+test/**
+**/test/**
+*.spec.js
+*.spec.ts
