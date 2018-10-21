@@ -133,11 +133,13 @@ sensitive data in your packages.
 Performed for the following items:
 
  - Configuration files
+    - CI
     - eslint
  - Demo files
  - Example files
  - Log files
  - Private SSH key
+ - Source files
  - Temp files
  - Test files
  - Zip files

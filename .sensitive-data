@@ -4,6 +4,20 @@
 #   https://github.com/bahmutov/ban-sensitive-files
 
 #-----------------------
+# Configuration files
+#-----------------------
+# eslint
+.eslintrc
+.eslintrc.json
+.eslintrc.yaml
+.eslintrc.yml
+
+# CI
+.travis.yml
+appveyor.yml
+**/appveyor.yml
+
+#-----------------------
 # Demo Files
 #-----------------------
 demo/**
@@ -39,11 +53,6 @@ UpgradeLog*.htm
 # MSBuild Binary and Structured Log
 *.binlog
 
-#-----------------------
-# zip files
-#-----------------------
-# Output of 'npm pack'
-*.tgz
 
 #-----------------------
 # Private SSH keys
@@ -55,19 +64,12 @@ UpgradeLog*.htm
 *_dsa.*
 !*_dsa.pub
 
-#-----------------------
-# Configuration files
-#-----------------------
-# eslint
-.eslintrc
-.eslintrc.json
-.eslintrc.yaml
-.eslintrc.yml
 
-# CI
-.travis.yml
-appveyor.yml
-**/appveyor.yml
+#-----------------------
+# src Files
+#-----------------------
+src/**
+**/src/**
 
 #-----------------------
 # Temp Files
@@ -86,3 +88,9 @@ test/**
 **/test/**
 *.spec.js
 *.spec.ts
+
+#-----------------------
+# zip files
+#-----------------------
+# Output of 'npm pack'
+*.tgz

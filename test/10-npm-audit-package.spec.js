@@ -43,7 +43,7 @@ describe('npm package analyzer', () => {
         // Then
         Array.isArray(result.sensitiveData).should.be.true();
         Array.isArray(result.ignoredData).should.be.true();
-        result.sensitiveData.length.should.equal(41);
+        result.sensitiveData.length.should.equal(43);
         result.ignoredData.length.should.equal(2);
     });
 
@@ -1368,6 +1368,80 @@ describe('npm package analyzer', () => {
                 },
                 {
                     path: 'lib/appveyor.yml',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+            ],
+            entryCount: 5,
+            bundled: [],
+        };
+        result.should.containDeep(expected);
+    });
+
+    it('Should add sensitiva data info on src files', () => {
+        // Given
+        const npmPackResponse = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                },
+                {
+                    path: 'src/yo',
+                    size: 123456,
+                },
+                {
+                    path: 'src/yo.js',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/src/yo',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/src/yo.js',
+                    size: 123456,
+                },
+            ],
+            entryCount: 5,
+            bundled: [],
+        };
+        // When
+        const result = audit.addSensitiveDataInfosIn(npmPackResponse);
+
+        // Then
+        const expected = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                    isSensitiveData: false,
+                },
+                {
+                    path: 'src/yo',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'src/yo.js',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/src/yo',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/src/yo.js',
                     size: 123456,
                     isSensitiveData: true,
                 },
