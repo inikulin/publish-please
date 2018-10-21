@@ -64,6 +64,11 @@ UpgradeLog*.htm
 .eslintrc.yaml
 .eslintrc.yml
 
+# CI
+.travis.yml
+appveyor.yml
+**/appveyor.yml
+
 #-----------------------
 # Temp Files
 #-----------------------
