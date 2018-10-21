@@ -132,9 +132,13 @@ sensitive data in your packages.
 
 Performed for the following items:
 
+ - Configuration files
+    - eslint
  - Log files
- - Output of 'npm pack'
  - Private SSH key
+ - Temp files
+ - Zip files
+    - Output of 'npm pack'
 
 ## Upgrading to latest publish-please version
 

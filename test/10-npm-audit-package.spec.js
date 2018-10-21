@@ -43,7 +43,7 @@ describe('npm package analyzer', () => {
         // Then
         Array.isArray(result.sensitiveData).should.be.true();
         Array.isArray(result.ignoredData).should.be.true();
-        result.sensitiveData.length.should.equal(20);
+        result.sensitiveData.length.should.equal(24);
         result.ignoredData.length.should.equal(2);
     });
 
@@ -611,6 +611,154 @@ describe('npm package analyzer', () => {
                 },
                 {
                     path: 'lib/.eslintrc.yml',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+            ],
+            entryCount: 5,
+            bundled: [],
+        };
+        result.should.containDeep(expected);
+    });
+
+    it('Should add sensitiva data info on temp files (tmp)', () => {
+        // Given
+        const npmPackResponse = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                },
+                {
+                    path: 'tmp/yo',
+                    size: 123456,
+                },
+                {
+                    path: 'tmp/yo.123',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/tmp/yo',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/tmp/yo.123',
+                    size: 123456,
+                },
+            ],
+            entryCount: 5,
+            bundled: [],
+        };
+        // When
+        const result = audit.addSensitiveDataInfosIn(npmPackResponse);
+
+        // Then
+        const expected = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                    isSensitiveData: false,
+                },
+                {
+                    path: 'tmp/yo',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'tmp/yo.123',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/tmp/yo',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/tmp/yo.123',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+            ],
+            entryCount: 5,
+            bundled: [],
+        };
+        result.should.containDeep(expected);
+    });
+
+    it('Should add sensitiva data info on temp files (temp)', () => {
+        // Given
+        const npmPackResponse = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                },
+                {
+                    path: 'temp/yo',
+                    size: 123456,
+                },
+                {
+                    path: 'temp/yo.123',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/temp/yo',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/temp/yo.123',
+                    size: 123456,
+                },
+            ],
+            entryCount: 5,
+            bundled: [],
+        };
+        // When
+        const result = audit.addSensitiveDataInfosIn(npmPackResponse);
+
+        // Then
+        const expected = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                    isSensitiveData: false,
+                },
+                {
+                    path: 'temp/yo',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'temp/yo.123',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/temp/yo',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/temp/yo.123',
                     size: 123456,
                     isSensitiveData: true,
                 },

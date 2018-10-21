@@ -47,3 +47,11 @@ UpgradeLog*.htm
 .eslintrc.json
 .eslintrc.yaml
 .eslintrc.yml
+
+#-----------------------
+# Temp Files
+#-----------------------
+tmp/**
+**/tmp/**
+temp/**
+**/temp/**
