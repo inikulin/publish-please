@@ -135,6 +135,7 @@ Performed for the following items:
  - Configuration files
     - eslint
  - Demo files
+ - Example files
  - Log files
  - Private SSH key
  - Temp files
