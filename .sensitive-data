@@ -17,6 +17,10 @@
 appveyor.yml
 **/appveyor.yml
 
+# Visual Studio Code
+.vscode/**
+**/.vscode/**
+
 #-----------------------
 # Coverage Files
 #-----------------------
