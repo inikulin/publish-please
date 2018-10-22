@@ -135,6 +135,7 @@ Performed for the following items:
  - Configuration files
     - CI
     - eslint
+ - Coverage files
  - Demo files
  - Example files
  - Log files

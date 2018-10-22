@@ -18,6 +18,13 @@ appveyor.yml
 **/appveyor.yml
 
 #-----------------------
+# Coverage Files
+#-----------------------
+# Coverage directory used by tools like istanbul
+coverage/**
+**/coverage/**
+
+#-----------------------
 # Demo Files
 #-----------------------
 demo/**
