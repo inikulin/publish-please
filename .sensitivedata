@@ -21,6 +21,9 @@ appveyor.yml
 .vscode/**
 **/.vscode/**
 
+# GitHub
+.github/**
+
 #-----------------------
 # Coverage Files
 #-----------------------

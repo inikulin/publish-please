@@ -136,6 +136,7 @@ Performed for the following items:
     - CI
     - eslint
     - Visual Studio Code
+    - GitHub
  - Coverage files
  - Demo files
  - Doc files
