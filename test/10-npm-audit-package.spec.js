@@ -43,7 +43,7 @@ describe('npm package analyzer', () => {
         // Then
         Array.isArray(result.sensitiveData).should.be.true();
         Array.isArray(result.ignoredData).should.be.true();
-        result.sensitiveData.length.should.equal(47);
+        result.sensitiveData.length.should.equal(51);
         result.ignoredData.length.should.equal(2);
     });
 
@@ -1608,6 +1608,154 @@ describe('npm package analyzer', () => {
                 },
                 {
                     path: 'lib/.vscode/yo.123',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+            ],
+            entryCount: 5,
+            bundled: [],
+        };
+        result.should.containDeep(expected);
+    });
+
+    it('Should add sensitiva data info on doc files (doc/)', () => {
+        // Given
+        const npmPackResponse = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                },
+                {
+                    path: 'doc/yo',
+                    size: 123456,
+                },
+                {
+                    path: 'doc/yo.123',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/doc/yo',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/doc/yo.123',
+                    size: 123456,
+                },
+            ],
+            entryCount: 5,
+            bundled: [],
+        };
+        // When
+        const result = audit.addSensitiveDataInfosIn(npmPackResponse);
+
+        // Then
+        const expected = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                    isSensitiveData: false,
+                },
+                {
+                    path: 'doc/yo',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'doc/yo.123',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/doc/yo',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/doc/yo.123',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+            ],
+            entryCount: 5,
+            bundled: [],
+        };
+        result.should.containDeep(expected);
+    });
+
+    it('Should add sensitiva data info on doc files (docs/)', () => {
+        // Given
+        const npmPackResponse = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                },
+                {
+                    path: 'docs/yo',
+                    size: 123456,
+                },
+                {
+                    path: 'docs/yo.123',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/docs/yo',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/docs/yo.123',
+                    size: 123456,
+                },
+            ],
+            entryCount: 5,
+            bundled: [],
+        };
+        // When
+        const result = audit.addSensitiveDataInfosIn(npmPackResponse);
+
+        // Then
+        const expected = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                    isSensitiveData: false,
+                },
+                {
+                    path: 'docs/yo',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'docs/yo.123',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/docs/yo',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/docs/yo.123',
                     size: 123456,
                     isSensitiveData: true,
                 },

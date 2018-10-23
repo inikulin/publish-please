@@ -138,6 +138,7 @@ Performed for the following items:
     - Visual Studio Code
  - Coverage files
  - Demo files
+ - Doc files
  - Example files
  - Log files
  - Private SSH key
