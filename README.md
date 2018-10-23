@@ -72,7 +72,7 @@ npm run publish-please
         ```js
         /(master|release)/
         ``` 
- - **sensitiveData** - Perform [audit for the sensitive data](#sensitive-information-audit). Default: `true`.
+ - **sensitive and non essential Data** - Perform [audit for the sensitive data](#sensitive-and-non-essential-data-audit). Default: `true` if npm version is 5.9.0 or above, `false` otherwise.
  - **vulnerableDependencies** - Perform vulnerable dependencies check using `npm audit`. Default: `true` if npm version is 6.1.0 or above, `false` otherwise.
     - you may prevent specific vulnerabilities to be reported by publish-please by creating a `.auditignore` file in the root of your project with content like the following:
 
@@ -130,7 +130,7 @@ npx publish-please config
 **Important note:** tool provides some very basic sensitive data check. Do not rely on it fully. Always perform manual checks for the
 sensitive data in your packages.
 
-Performed for the following items:
+Performed for the following items (see [.sensitivedata file](.sensitivedata) for more details):
 
  - Benchmark files
  - Configuration files
