@@ -177,16 +177,11 @@ module.exports.getDefaultOptionsFor = getDefaultOptionsFor;
  */
 
 /**
- * get all sensitive data from the '.sensitive-data' file
+ * get all sensitive data from the '.sensitivedata' file
  * @returns {DefaultSensitiveData}
  */
 function getDefaultSensitiveData() {
-    const sensitiveDataFile = pathJoin(
-        __dirname,
-        '..',
-        '..',
-        '.sensitive-data'
-    );
+    const sensitiveDataFile = pathJoin(__dirname, '..', '..', '.sensitivedata');
     const content = readFile(sensitiveDataFile).toString();
     const allPatterns = content
         .split(/\n|\r/)

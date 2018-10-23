@@ -31,7 +31,7 @@ describe('npm package analyzer', () => {
     after(() => console.log(`cwd is restored to: ${process.cwd()}`));
 
     /**
-     * this test is a guard against changes in the .sensitive-data file.
+     * this test is a guard against changes in the .sensitivedata file.
      * Any changes to this file will make this test failed
      */
     it('Should get default list of sensitiva data', () => {

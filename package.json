@@ -50,7 +50,7 @@
   "files": [
     "lib",
     "bin",
-    ".sensitive-data"
+    ".sensitivedata"
   ],
   "dependencies": {
     "chalk": "2.4.1",

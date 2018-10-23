@@ -4,4 +4,4 @@
 lib/**/*.spec.*
 !package.json
 !*.md
-!.sensitive-data
+!.sensitivedata
