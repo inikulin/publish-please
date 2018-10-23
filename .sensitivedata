@@ -4,6 +4,14 @@
 #   https://github.com/bahmutov/ban-sensitive-files
 
 #-----------------------
+# Benchmark Files
+#-----------------------
+benchmark/**
+**/benchmark/**
+benchmarks/**
+**/benchmarks/**
+
+#-----------------------
 # Configuration files
 #-----------------------
 # eslint

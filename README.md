@@ -132,6 +132,7 @@ sensitive data in your packages.
 
 Performed for the following items:
 
+ - Benchmark files
  - Configuration files
     - CI
     - eslint
