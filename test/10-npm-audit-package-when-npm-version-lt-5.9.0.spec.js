@@ -8,6 +8,7 @@ const del = require('del');
 const auditPackage = require('../lib/utils/npm-audit-package');
 const nodeInfos = require('../lib/utils/get-node-infos').getNodeInfosSync();
 const writeFile = require('fs').writeFileSync;
+const showValidationErrors = require('../lib/utils/show-validation-errors');
 const lineSeparator = '----------------------------------';
 
 if (!nodeInfos.npmPackHasJsonReporter) {
@@ -49,13 +50,13 @@ if (!nodeInfos.npmPackHasJsonReporter) {
                     .then(() => auditPackage(projectDir))
 
                     // Then
-                    .then((result) => {
-                        result.error.summary.should.containEql(
-                            'Unexpected token'
-                        );
-                        result.error.summary.should.containEql(
-                            'in JSON at position'
-                        );
+                    .then(() => {
+                        throw new Error('Promise rejection expected');
+                    })
+                    .catch((err) => {
+                        showValidationErrors(err);
+                        err.message.should.containEql('Unexpected token');
+                        err.message.should.containEql('in JSON at position');
                     })
             );
         });

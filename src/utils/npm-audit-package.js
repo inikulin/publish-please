@@ -12,37 +12,36 @@ const globMatching = require('micromatch');
  * @returns {Object} returns an object with sensitive/non-essential files found in the package that will be sent to the registry
  */
 module.exports = function auditPackage(projectDir) {
-    try {
-        const options = getDefaultOptionsFor(projectDir);
-        process.chdir(options.directoryToPackage);
-        const command = `npm pack --json > ${options.npmPackLogFilepath}`;
-        return exec(command)
-            .then(() =>
-                createResponseFromNpmPackLog(options.npmPackLogFilepath)
-            )
-            .then((response) => addSensitiveDataInfosIn(response))
-            .then((response) =>
-                updateSensitiveDataInfosOfIgnoredFilesIn(response, options)
-            );
-    } catch (error) {
-        return Promise.reject(error.message);
-    }
+    return (
+        Promise.resolve()
+            .then(() => getDefaultOptionsFor(projectDir))
+            // prettier-ignore
+            .then((options) => {
+                process.chdir(options.directoryToPackage);
+                const command = `npm pack --json > ${
+                    options.npmPackLogFilepath
+                }`;
+                return exec(command)
+                    .then(() =>
+                        createResponseFromNpmPackLog(options.npmPackLogFilepath)
+                    )
+                    .then((response) => addSensitiveDataInfosIn(response))
+                    .then((response) =>
+                        updateSensitiveDataInfosOfIgnoredFilesIn(
+                            response,
+                            options
+                        )
+                    );
+            })
+    );
 };
 
 function createResponseFromNpmPackLog(logFilePath) {
-    try {
-        const response = JSON.parse(readFile(logFilePath).toString());
-        // prettier-ignore
-        return Array.isArray(response)
-            ? response[0]
-            : response;
-    } catch (err) {
-        return {
-            error: {
-                summary: err.message,
-            },
-        };
-    }
+    const response = JSON.parse(readFile(logFilePath).toString());
+    // prettier-ignore
+    return Array.isArray(response)
+        ? response[0]
+        : response;
 }
 
 /**
@@ -52,29 +51,20 @@ function createResponseFromNpmPackLog(logFilePath) {
  *              with each file being tagged with a new boolean property 'isSensitiveData'.
  */
 function addSensitiveDataInfosIn(response) {
-    try {
-        const allSensitiveDataPatterns = getDefaultSensitiveData();
-        const augmentedResponse = JSON.parse(JSON.stringify(response, null, 2));
-        const files = augmentedResponse.files || [];
-        files.forEach((file) => {
-            if (file && isSensitiveData(file.path, allSensitiveDataPatterns)) {
-                file.isSensitiveData = true;
-                return;
-            }
-
-            if (file) {
-                file.isSensitiveData = false;
-            }
-        });
-        return augmentedResponse;
-    } catch (error) {
-        if (response) {
-            response.internalErrors = response.internalErrors || [];
-            response.internalErrors.push(error);
-            return response;
+    const allSensitiveDataPatterns = getDefaultSensitiveData();
+    const augmentedResponse = JSON.parse(JSON.stringify(response, null, 2));
+    const files = augmentedResponse.files || [];
+    files.forEach((file) => {
+        if (file && isSensitiveData(file.path, allSensitiveDataPatterns)) {
+            file.isSensitiveData = true;
+            return;
         }
-        return response;
-    }
+
+        if (file) {
+            file.isSensitiveData = false;
+        }
+    });
+    return augmentedResponse;
 }
 
 /**
@@ -121,29 +111,20 @@ function isSensitiveData(filepath, allSensitiveDataPatterns) {
  *              with each ignored file being tagged with 'isSensitiveData=false'.
  */
 function updateSensitiveDataInfosOfIgnoredFilesIn(response, options) {
-    try {
-        const ignoredData = getIgnoredSensitiveData(options);
-        const updatedResponse = JSON.parse(JSON.stringify(response, null, 2));
-        const files = updatedResponse.files || [];
-        files.forEach((file) => {
-            if (
-                file &&
-                file.isSensitiveData &&
-                isIgnoredData(file.path, ignoredData)
-            ) {
-                file.isSensitiveData = false;
-                return;
-            }
-        });
-        return updatedResponse;
-    } catch (error) {
-        if (response) {
-            response.internalErrors = response.internalErrors || [];
-            response.internalErrors.push(error);
-            return response;
+    const ignoredData = getIgnoredSensitiveData(options);
+    const updatedResponse = JSON.parse(JSON.stringify(response, null, 2));
+    const files = updatedResponse.files || [];
+    files.forEach((file) => {
+        if (
+            file &&
+            file.isSensitiveData &&
+            isIgnoredData(file.path, ignoredData)
+        ) {
+            file.isSensitiveData = false;
+            return;
         }
-        return response;
-    }
+    });
+    return updatedResponse;
 }
 
 function isIgnoredData(filepath, ignoredData) {
@@ -200,40 +181,33 @@ module.exports.getDefaultOptionsFor = getDefaultOptionsFor;
  * @returns {DefaultSensitiveData}
  */
 function getDefaultSensitiveData() {
-    try {
-        const sensitiveDataFile = pathJoin(
-            __dirname,
-            '..',
-            '..',
-            '.sensitive-data'
-        );
-        const content = readFile(sensitiveDataFile).toString();
-        const allPatterns = content
-            .split(/\n|\r/)
-            .map((line) => line.replace(/[\t]/g, ' '))
-            .map((line) => line.trim())
-            .filter((line) => line && line.length > 0)
-            .filter((line) => !line.startsWith('#'));
+    const sensitiveDataFile = pathJoin(
+        __dirname,
+        '..',
+        '..',
+        '.sensitive-data'
+    );
+    const content = readFile(sensitiveDataFile).toString();
+    const allPatterns = content
+        .split(/\n|\r/)
+        .map((line) => line.replace(/[\t]/g, ' '))
+        .map((line) => line.trim())
+        .filter((line) => line && line.length > 0)
+        .filter((line) => !line.startsWith('#'));
 
-        const sensitiveData = allPatterns.filter(
-            (pattern) => !pattern.startsWith('!')
-        );
+    const sensitiveData = allPatterns.filter(
+        (pattern) => !pattern.startsWith('!')
+    );
 
-        const ignoredData = allPatterns
-            .filter((pattern) => pattern.startsWith('!'))
-            .map((pattern) => pattern.replace('!', ''))
-            .map((pattern) => pattern.trim());
+    const ignoredData = allPatterns
+        .filter((pattern) => pattern.startsWith('!'))
+        .map((pattern) => pattern.replace('!', ''))
+        .map((pattern) => pattern.trim());
 
-        return {
-            sensitiveData,
-            ignoredData,
-        };
-    } catch (error) {
-        return {
-            sensitiveData: [],
-            ignoredData: [],
-        };
-    }
+    return {
+        sensitiveData,
+        ignoredData,
+    };
 }
 
 /**
