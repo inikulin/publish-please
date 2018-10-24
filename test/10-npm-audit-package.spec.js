@@ -43,7 +43,7 @@ describe('npm package analyzer', () => {
         // Then
         Array.isArray(result.sensitiveData).should.be.true();
         Array.isArray(result.ignoredData).should.be.true();
-        result.sensitiveData.length.should.equal(56);
+        result.sensitiveData.length.should.equal(57);
         result.ignoredData.length.should.equal(2);
     });
 
@@ -1821,170 +1821,235 @@ describe('npm package analyzer', () => {
         };
         result.should.containDeep(expected);
     });
-});
 
-it('Should add sensitiva data info on benchmark files (benchmark/)', () => {
-    // Given
-    const npmPackResponse = {
-        id: 'testing-repo@0.0.0',
-        name: 'testing-repo',
-        version: '0.0.0',
-        filename: 'testing-repo-0.0.0.tgz',
-        files: [
-            {
-                path: 'package.json',
-                size: 67,
-            },
-            {
-                path: 'benchmark/yo',
-                size: 123456,
-            },
-            {
-                path: 'benchmark/yo.123',
-                size: 123456,
-            },
-            {
-                path: 'benchmark/benchjs/yo.json',
-                size: 123456,
-            },
-            {
-                path: 'lib/benchmark/yo',
-                size: 123456,
-            },
-            {
-                path: 'lib/benchmark/yo.123',
-                size: 123456,
-            },
-        ],
-        entryCount: 6,
-        bundled: [],
-    };
-    // When
-    const result = audit.addSensitiveDataInfosIn(npmPackResponse);
+    it('Should add sensitiva data info on benchmark files (benchmark/)', () => {
+        // Given
+        const npmPackResponse = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                },
+                {
+                    path: 'benchmark/yo',
+                    size: 123456,
+                },
+                {
+                    path: 'benchmark/yo.123',
+                    size: 123456,
+                },
+                {
+                    path: 'benchmark/benchjs/yo.json',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/benchmark/yo',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/benchmark/yo.123',
+                    size: 123456,
+                },
+            ],
+            entryCount: 6,
+            bundled: [],
+        };
+        // When
+        const result = audit.addSensitiveDataInfosIn(npmPackResponse);
 
-    // Then
-    const expected = {
-        id: 'testing-repo@0.0.0',
-        name: 'testing-repo',
-        version: '0.0.0',
-        filename: 'testing-repo-0.0.0.tgz',
-        files: [
-            {
-                path: 'package.json',
-                size: 67,
-                isSensitiveData: false,
-            },
-            {
-                path: 'benchmark/yo',
-                size: 123456,
-                isSensitiveData: true,
-            },
-            {
-                path: 'benchmark/yo.123',
-                size: 123456,
-                isSensitiveData: true,
-            },
-            {
-                path: 'benchmark/benchjs/yo.json',
-                size: 123456,
-                isSensitiveData: true,
-            },
-            {
-                path: 'lib/benchmark/yo',
-                size: 123456,
-                isSensitiveData: true,
-            },
-            {
-                path: 'lib/benchmark/yo.123',
-                size: 123456,
-                isSensitiveData: true,
-            },
-        ],
-        entryCount: 6,
-        bundled: [],
-    };
-    result.should.containDeep(expected);
-});
+        // Then
+        const expected = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                    isSensitiveData: false,
+                },
+                {
+                    path: 'benchmark/yo',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'benchmark/yo.123',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'benchmark/benchjs/yo.json',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/benchmark/yo',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/benchmark/yo.123',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+            ],
+            entryCount: 6,
+            bundled: [],
+        };
+        result.should.containDeep(expected);
+    });
 
-it('Should add sensitiva data info on benchmark files (benchmarks/)', () => {
-    // Given
-    const npmPackResponse = {
-        id: 'testing-repo@0.0.0',
-        name: 'testing-repo',
-        version: '0.0.0',
-        filename: 'testing-repo-0.0.0.tgz',
-        files: [
-            {
-                path: 'package.json',
-                size: 67,
-            },
-            {
-                path: 'benchmarks/yo',
-                size: 123456,
-            },
-            {
-                path: 'benchmarks/yo.123',
-                size: 123456,
-            },
-            {
-                path: 'benchmarks/benchjs/yo.json',
-                size: 123456,
-            },
-            {
-                path: 'lib/benchmarks/yo',
-                size: 123456,
-            },
-            {
-                path: 'lib/benchmarks/yo.123',
-                size: 123456,
-            },
-        ],
-        entryCount: 6,
-        bundled: [],
-    };
-    // When
-    const result = audit.addSensitiveDataInfosIn(npmPackResponse);
+    it('Should add sensitiva data info on benchmark files (benchmarks/)', () => {
+        // Given
+        const npmPackResponse = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                },
+                {
+                    path: 'benchmarks/yo',
+                    size: 123456,
+                },
+                {
+                    path: 'benchmarks/yo.123',
+                    size: 123456,
+                },
+                {
+                    path: 'benchmarks/benchjs/yo.json',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/benchmarks/yo',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/benchmarks/yo.123',
+                    size: 123456,
+                },
+            ],
+            entryCount: 6,
+            bundled: [],
+        };
+        // When
+        const result = audit.addSensitiveDataInfosIn(npmPackResponse);
 
-    // Then
-    const expected = {
-        id: 'testing-repo@0.0.0',
-        name: 'testing-repo',
-        version: '0.0.0',
-        filename: 'testing-repo-0.0.0.tgz',
-        files: [
-            {
-                path: 'package.json',
-                size: 67,
-                isSensitiveData: false,
-            },
-            {
-                path: 'benchmarks/yo',
-                size: 123456,
-                isSensitiveData: true,
-            },
-            {
-                path: 'benchmarks/yo.123',
-                size: 123456,
-                isSensitiveData: true,
-            },
-            {
-                path: 'benchmarks/benchjs/yo.json',
-                size: 123456,
-                isSensitiveData: true,
-            },
-            {
-                path: 'lib/benchmarks/yo',
-                size: 123456,
-                isSensitiveData: true,
-            },
-            {
-                path: 'lib/benchmarks/yo.123',
-                size: 123456,
-                isSensitiveData: true,
-            },
-        ],
-        entryCount: 6,
-        bundled: [],
-    };
-    result.should.containDeep(expected);
+        // Then
+        const expected = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                    isSensitiveData: false,
+                },
+                {
+                    path: 'benchmarks/yo',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'benchmarks/yo.123',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'benchmarks/benchjs/yo.json',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/benchmarks/yo',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/benchmarks/yo.123',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+            ],
+            entryCount: 6,
+            bundled: [],
+        };
+        result.should.containDeep(expected);
+    });
+
+    it('Should add sensitiva data info on secret files (*.key)', () => {
+        // Given
+        const npmPackResponse = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                },
+                {
+                    path: 'master.key',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/master.key',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/yo/master.key',
+                    size: 123456,
+                },
+            ],
+            entryCount: 4,
+            bundled: [],
+        };
+        // When
+        const result = audit.addSensitiveDataInfosIn(npmPackResponse);
+
+        // Then
+        const expected = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                    isSensitiveData: false,
+                },
+                {
+                    path: 'master.key',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/master.key',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/yo/master.key',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+            ],
+            entryCount: 4,
+            bundled: [],
+        };
+        result.should.containDeep(expected);
+    });
 });
