@@ -76,6 +76,7 @@ module.exports.addSensitiveDataInfosIn = addSensitiveDataInfosIn;
  * Check if file in filepath is sensitive data
  * @param {string} filepath
  * @param {DefaultSensitiveData} allSensitiveDataPatterns
+ * @returns {boolean}
  */
 function isSensitiveData(filepath, allSensitiveDataPatterns) {
     if (
@@ -108,7 +109,7 @@ function isSensitiveData(filepath, allSensitiveDataPatterns) {
  * Update sensitive data infos for each ignored file included in the package
  * @param {Object} response - result of the npm pack command (eventually modified by previous middlewares execution)
  * @returns {Object} returns a new response object that is a deep copy of input response
- *              with each ignored file being tagged with 'isSensitiveData=false'.
+ * with each ignored file being tagged with 'isSensitiveData=false'.
  */
 function updateSensitiveDataInfosOfIgnoredFilesIn(response, options) {
     const ignoredData = getIgnoredSensitiveData(options);
@@ -128,16 +129,13 @@ function updateSensitiveDataInfosOfIgnoredFilesIn(response, options) {
 }
 
 function isIgnoredData(filepath, ignoredData) {
-    if (
+    return (
         filepath &&
         globMatching.any(filepath, ignoredData, {
             matchBase: true,
             nocase: true,
         })
-    ) {
-        return true;
-    }
-    return false;
+    );
 }
 
 /**
@@ -211,7 +209,7 @@ function getDefaultSensitiveData() {
 module.exports.getDefaultSensitiveData = getDefaultSensitiveData;
 
 /**
- * Get files that should be ignored within the npm package
+ * Get files, in .publishrc configuration file, that should be ignored within the npm package
  * @param {DefaultOptions} options
  * @returns {[string]} returns the list of files that should be ignored
  */

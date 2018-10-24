@@ -44,10 +44,7 @@ module.exports = {
         ).then((yes) => (yes ? configureIgnores() : false));
     },
     canRun() {
-        // prettier-ignore
-        return nodeInfos && nodeInfos.npmPackHasJsonReporter
-            ? true
-            : false;
+        return nodeInfos && nodeInfos.npmPackHasJsonReporter;
     },
     whyCannotRun() {
         return `Cannot check sensitive and non-essential data because npm version is ${
@@ -60,13 +57,11 @@ module.exports = {
             .then((projectDir) => auditPackage(projectDir))
             .then((result) => {
                 if (sensitivaDataFoundIn(result)) {
-                    const errs = [];
-                    result.files
+                    const errs = result.files
                         .filter((file) => file && file.isSensitiveData)
-                        .forEach((file) => {
-                            errs.push(summaryOf(file.path));
-                        });
-                    throw errs.sort();
+                        .map((file) => summaryOf(file.path))
+                        .sort();
+                    throw errs;
                 }
             });
     },
@@ -79,6 +74,5 @@ function sensitivaDataFoundIn(result) {
 }
 
 function summaryOf(sensitiveData) {
-    const summary = `Sensitive or non essential data found in npm package: ${sensitiveData}`;
-    return summary;
+    return `Sensitive or non essential data found in npm package: ${sensitiveData}`;
 }
