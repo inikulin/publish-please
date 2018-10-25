@@ -136,8 +136,9 @@ Performed for the following items (see [.sensitivedata file](.sensitivedata) for
  - Configuration files
     - CI
     - eslint
-    - Visual Studio Code
     - GitHub
+    - JetBrains
+    - Visual Studio Code
  - Coverage files
  - Demo files
  - Dependency directories

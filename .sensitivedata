@@ -14,23 +14,27 @@ benchmarks/**
 #-----------------------
 # Configuration files
 #-----------------------
+# CI
+.travis.yml
+appveyor.yml
+**/appveyor.yml
+
 # eslint
 .eslintrc
 .eslintrc.json
 .eslintrc.yaml
 .eslintrc.yml
 
-# CI
-.travis.yml
-appveyor.yml
-**/appveyor.yml
+# GitHub
+.github/**
+
+# JetBrains
+.idea/**/*
+**/.idea/**/*
 
 # Visual Studio Code
 .vscode/**
 **/.vscode/**
-
-# GitHub
-.github/**
 
 #-----------------------
 # Coverage Files
@@ -90,7 +94,6 @@ UpgradeLog*.htm
 
 # MSBuild Binary and Structured Log
 *.binlog
-
 
 #-----------------------
 # Private SSH keys
