@@ -43,7 +43,7 @@ describe('npm package analyzer', () => {
         // Then
         Array.isArray(result.sensitiveData).should.be.true();
         Array.isArray(result.ignoredData).should.be.true();
-        result.sensitiveData.length.should.equal(57);
+        result.sensitiveData.length.should.equal(59);
         result.ignoredData.length.should.equal(2);
     });
 
@@ -2048,6 +2048,89 @@ describe('npm package analyzer', () => {
                 },
             ],
             entryCount: 4,
+            bundled: [],
+        };
+        result.should.containDeep(expected);
+    });
+
+    it('Should add sensitiva data info on script files (scripts/)', () => {
+        // Given
+        const npmPackResponse = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                },
+                {
+                    path: 'scripts/yo',
+                    size: 123456,
+                },
+                {
+                    path: 'scripts/yo.123',
+                    size: 123456,
+                },
+                {
+                    path: 'scripts/windows/yo.json',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/scripts/yo',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/scripts/yo.123',
+                    size: 123456,
+                },
+            ],
+            entryCount: 6,
+            bundled: [],
+        };
+        // When
+        const result = audit.addSensitiveDataInfosIn(npmPackResponse);
+
+        // Then
+        const expected = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                    isSensitiveData: false,
+                },
+                {
+                    path: 'scripts/yo',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'scripts/yo.123',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'scripts/windows/yo.json',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/scripts/yo',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/scripts/yo.123',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+            ],
+            entryCount: 6,
             bundled: [],
         };
         result.should.containDeep(expected);

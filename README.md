@@ -144,6 +144,7 @@ Performed for the following items (see [.sensitivedata file](.sensitivedata) for
  - Example files
  - Log files
  - Private SSH key
+ - Script files
  - Secret files
  - Source files
  - Temp files
