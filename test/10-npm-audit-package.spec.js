@@ -43,7 +43,7 @@ describe('npm package analyzer', () => {
         // Then
         Array.isArray(result.sensitiveData).should.be.true();
         Array.isArray(result.ignoredData).should.be.true();
-        result.sensitiveData.length.should.equal(59);
+        result.sensitiveData.length.should.equal(63);
         result.ignoredData.length.should.equal(2);
     });
 
@@ -2131,6 +2131,190 @@ describe('npm package analyzer', () => {
                 },
             ],
             entryCount: 6,
+            bundled: [],
+        };
+        result.should.containDeep(expected);
+    });
+
+    it('Should add sensitiva data info on files in node_modules', () => {
+        // Given
+        const npmPackResponse = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                },
+                {
+                    path: 'node_modules/yo',
+                    size: 123456,
+                },
+                {
+                    path: 'node_modules/yo.123',
+                    size: 123456,
+                },
+                {
+                    path: 'node_modules/my-app/index.js',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/node_modules/yo',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/node_modules/yo.123',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/node_modules/my-app/index.js',
+                    size: 123456,
+                },
+            ],
+            entryCount: 7,
+            bundled: [],
+        };
+        // When
+        const result = audit.addSensitiveDataInfosIn(npmPackResponse);
+
+        // Then
+        const expected = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                    isSensitiveData: false,
+                },
+                {
+                    path: 'node_modules/yo',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'node_modules/yo.123',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'node_modules/my-app/index.js',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/node_modules/yo',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/node_modules/yo.123',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/node_modules/my-app/index.js',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+            ],
+            entryCount: 7,
+            bundled: [],
+        };
+        result.should.containDeep(expected);
+    });
+
+    it('Should add sensitiva data info on files in jspm_packages', () => {
+        // Given
+        const npmPackResponse = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                },
+                {
+                    path: 'jspm_packages/yo',
+                    size: 123456,
+                },
+                {
+                    path: 'jspm_packages/yo.123',
+                    size: 123456,
+                },
+                {
+                    path: 'jspm_packages/my-app/index.js',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/jspm_packages/yo',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/jspm_packages/yo.123',
+                    size: 123456,
+                },
+                {
+                    path: 'lib/jspm_packages/my-app/index.js',
+                    size: 123456,
+                },
+            ],
+            entryCount: 7,
+            bundled: [],
+        };
+        // When
+        const result = audit.addSensitiveDataInfosIn(npmPackResponse);
+
+        // Then
+        const expected = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                    isSensitiveData: false,
+                },
+                {
+                    path: 'jspm_packages/yo',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'jspm_packages/yo.123',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'jspm_packages/my-app/index.js',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/jspm_packages/yo',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/jspm_packages/yo.123',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+                {
+                    path: 'lib/jspm_packages/my-app/index.js',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+            ],
+            entryCount: 7,
             bundled: [],
         };
         result.should.containDeep(expected);

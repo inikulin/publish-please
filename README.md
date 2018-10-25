@@ -140,6 +140,7 @@ Performed for the following items (see [.sensitivedata file](.sensitivedata) for
     - GitHub
  - Coverage files
  - Demo files
+ - Dependency directories
  - Doc files
  - Example files
  - Log files
