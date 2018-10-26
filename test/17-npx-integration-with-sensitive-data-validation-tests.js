@@ -169,6 +169,101 @@ describe('npx integration tests with sensitive-data validation', () => {
                 });
         });
 
+        it('Should detect and ignore sensitive-data when sensitive-data check is enabled in .publishrc config file and package.json has a prepublish script', () => {
+            return Promise.resolve()
+                .then(() => {
+                    writeFile(
+                        '.publishrc',
+                        JSON.stringify(
+                            {
+                                confirm: false,
+                                validations: {
+                                    vulnerableDependencies: false,
+                                    sensitiveData: {
+                                        ignore: ['lib/**/*.tgz'],
+                                    },
+                                    uncommittedChanges: false,
+                                    untrackedFiles: false,
+                                    branch: 'master',
+                                    gitTag: false,
+                                },
+                                publishTag: 'latest',
+                                prePublishScript:
+                                    'echo "running script defined in .publishrc ..."',
+                                postPublishScript: false,
+                            },
+                            null,
+                            2
+                        )
+                    );
+                })
+                .then(() => {
+                    const pkg = JSON.parse(readFile('package.json').toString());
+                    // prettier-ignore
+                    pkg.dependencies = {
+                        'publish-please': '5.0.0',
+                    };
+                    pkg.scripts = {
+                        test: 'gulp travis',
+                        'publish-please': 'publish-please',
+                        prepublish: 'publish-please guard',
+                    };
+                    writeFile('package.json', JSON.stringify(pkg, null, 2));
+                })
+                .then(() => {
+                    touch(pathJoin(process.cwd(), 'lib', 'yo234.tgz'));
+                    mkdirp.sync(pathJoin(process.cwd(), 'lib', 'test'));
+                    touch(
+                        pathJoin(process.cwd(), 'lib', 'test', 'yo234.spec.js')
+                    );
+                    mkdirp.sync(pathJoin(process.cwd(), 'lib', 'node_modules'));
+                    mkdirp.sync(
+                        pathJoin(process.cwd(), 'lib', 'node_modules', 'my-app')
+                    );
+                    touch(
+                        pathJoin(
+                            process.cwd(),
+                            'lib',
+                            'node_modules',
+                            'my-app',
+                            'index.js'
+                        )
+                    );
+                })
+                .then(() => console.log(`> npx ${packageName}`))
+                .then(() =>
+                    exec(
+                        /* prettier-ignore */
+                        `npx ../${packageName.replace('@','-')}.tgz > ./publish09.log`
+                    )
+                )
+                .then(() => {
+                    const publishLog = readFile('./publish09.log').toString();
+                    console.log(publishLog);
+                    return publishLog;
+                })
+                .then((publishLog) => {
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running pre-publish script'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('running script defined in .publishrc ...'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running validations'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Checking for the sensitive and non-essential data in the npm package'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Validating branch'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('ERRORS'));
+                    /* prettier-ignore */
+                    assert(!publishLog.includes('Sensitive or non essential data found in npm package: lib/yo234.tgz'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Sensitive or non essential data found in npm package: lib/node_modules/my-app/index.js'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Sensitive or non essential data found in npm package: lib/test/yo234.spec.js'));
+                });
+        });
+
         it('Should ignore sensitive-data when sensitive-data check is disabled in .publishrc config file', () => {
             return Promise.resolve()
                 .then(() => {

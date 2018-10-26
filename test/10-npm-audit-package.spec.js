@@ -213,6 +213,171 @@ describe('npm package analyzer', () => {
         (result.files === undefined).should.be.true();
     });
 
+    it('Should extract the json part (an array) of the npm pack command when there is a prepublish script', () => {
+        // Given
+        const npmPackCommandResult = `
+            > testing-repo@1.3.77 prepublish /Users/HDO/VSCodeProjects/pr/publish-please/pr-sensitive-files/testing-repo
+            > publish-please guard
+
+            [
+              {
+                "id": "testing-repo@1.3.77",
+                "name": "testing-repo",
+                "version": "1.3.77",
+                "size": 455,
+                "unpackedSize": 343,
+                "shasum": "9a4137788a4c6f617ffa85c9cd38c2083139d85a",
+                "integrity": "sha512-HV/ZhvA+LSy8hHl6nBJyS6ZEUE9rHuPo+mL4Rf1jeFbCMAD6BRbKDrD0qC0jwTB3bld51aqNN8KaMuNPPnK91Q==",
+                "filename": "testing-repo-1.3.77.tgz",
+                "files": [
+                  {
+                    "path": "package.json",
+                    "size": 262,
+                    "mode": 420
+                  }
+                ],
+                "entryCount": 8,
+                "bundled": []
+              }
+            ]`;
+
+        // When
+        const result = audit.extractJsonDataFrom(npmPackCommandResult);
+
+        // Then
+        const jsonResult = JSON.parse(result);
+        const expected = [
+            {
+                id: 'testing-repo@1.3.77',
+                name: 'testing-repo',
+                version: '1.3.77',
+                size: 455,
+                unpackedSize: 343,
+                shasum: '9a4137788a4c6f617ffa85c9cd38c2083139d85a',
+                integrity:
+                    'sha512-HV/ZhvA+LSy8hHl6nBJyS6ZEUE9rHuPo+mL4Rf1jeFbCMAD6BRbKDrD0qC0jwTB3bld51aqNN8KaMuNPPnK91Q==',
+                filename: 'testing-repo-1.3.77.tgz',
+                files: [
+                    {
+                        path: 'package.json',
+                        size: 262,
+                        mode: 420,
+                    },
+                ],
+                entryCount: 8,
+                bundled: [],
+            },
+        ];
+        jsonResult.should.containDeep(expected);
+    });
+
+    it('Should extract the json part (an object) of the npm pack command when there is a prepublish script', () => {
+        // Given
+        const npmPackCommandResult = `
+            > testing-repo@1.3.77 prepublish /Users/HDO/VSCodeProjects/pr/publish-please/pr-sensitive-files/testing-repo
+            > publish-please guard
+              {
+                "id": "testing-repo@1.3.77",
+                "name": "testing-repo",
+                "version": "1.3.77",
+                "size": 455,
+                "unpackedSize": 343,
+                "shasum": "9a4137788a4c6f617ffa85c9cd38c2083139d85a",
+                "integrity": "sha512-HV/ZhvA+LSy8hHl6nBJyS6ZEUE9rHuPo+mL4Rf1jeFbCMAD6BRbKDrD0qC0jwTB3bld51aqNN8KaMuNPPnK91Q==",
+                "filename": "testing-repo-1.3.77.tgz",
+                "files": [
+                  {
+                    "path": "package.json",
+                    "size": 262,
+                    "mode": 420
+                  }
+                ],
+                "entryCount": 1,
+                "bundled": []
+              }`;
+
+        // When
+        const result = audit.extractJsonDataFrom(npmPackCommandResult);
+
+        // Then
+        const jsonResult = JSON.parse(result);
+        const expected = {
+            id: 'testing-repo@1.3.77',
+            name: 'testing-repo',
+            version: '1.3.77',
+            size: 455,
+            unpackedSize: 343,
+            shasum: '9a4137788a4c6f617ffa85c9cd38c2083139d85a',
+            integrity:
+                'sha512-HV/ZhvA+LSy8hHl6nBJyS6ZEUE9rHuPo+mL4Rf1jeFbCMAD6BRbKDrD0qC0jwTB3bld51aqNN8KaMuNPPnK91Q==',
+            filename: 'testing-repo-1.3.77.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 262,
+                    mode: 420,
+                },
+            ],
+            entryCount: 1,
+            bundled: [],
+        };
+        jsonResult.should.containDeep(expected);
+    });
+
+    it('Should extract the json part of the npm pack command when there is no prepublish script', () => {
+        // Given
+        const npmPackCommandResult = `[
+              {
+                "id": "testing-repo@1.3.77",
+                "name": "testing-repo",
+                "version": "1.3.77",
+                "size": 455,
+                "unpackedSize": 343,
+                "shasum": "9a4137788a4c6f617ffa85c9cd38c2083139d85a",
+                "integrity": "sha512-HV/ZhvA+LSy8hHl6nBJyS6ZEUE9rHuPo+mL4Rf1jeFbCMAD6BRbKDrD0qC0jwTB3bld51aqNN8KaMuNPPnK91Q==",
+                "filename": "testing-repo-1.3.77.tgz",
+                "files": [
+                  {
+                    "path": "package.json",
+                    "size": 262,
+                    "mode": 420
+                  }
+                ],
+                "entryCount": 8,
+                "bundled": []
+              }
+            ]`;
+
+        // When
+        const result = audit.extractJsonDataFrom(npmPackCommandResult);
+
+        // Then
+        const jsonResult = JSON.parse(result);
+        const expected = [
+            {
+                id: 'testing-repo@1.3.77',
+                name: 'testing-repo',
+                version: '1.3.77',
+                size: 455,
+                unpackedSize: 343,
+                shasum: '9a4137788a4c6f617ffa85c9cd38c2083139d85a',
+                integrity:
+                    'sha512-HV/ZhvA+LSy8hHl6nBJyS6ZEUE9rHuPo+mL4Rf1jeFbCMAD6BRbKDrD0qC0jwTB3bld51aqNN8KaMuNPPnK91Q==',
+                filename: 'testing-repo-1.3.77.tgz',
+                files: [
+                    {
+                        path: 'package.json',
+                        size: 262,
+                        mode: 420,
+                    },
+                ],
+                entryCount: 8,
+                bundled: [],
+            },
+        ];
+        jsonResult.should.containDeep(expected);
+    });
+
     it('Should add sensitiva data info on package.json file', () => {
         // Given
         const npmPackResponse = {

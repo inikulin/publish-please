@@ -37,12 +37,46 @@ module.exports = function auditPackage(projectDir) {
 };
 
 function createResponseFromNpmPackLog(logFilePath) {
-    const response = JSON.parse(readFile(logFilePath).toString());
+    const content = readFile(logFilePath).toString();
+    const extractedJson = extractJsonDataFrom(content);
+    const response = JSON.parse(extractedJson);
     // prettier-ignore
     return Array.isArray(response)
         ? response[0]
         : response;
 }
+
+/**
+ * Extract the Json data from input content.
+ * The problem: the 'npm pack --json > output.txt' command will run any 'prepublish' script
+ * defined in the package.json file before executing the npm pack command itself.
+ * In the context of publish-please, any already-installed publish-please package
+ * has already a prepublish script:  "prepublish": "publish-please guard"
+ * this will give the following output:
+ *          > testing-repo@1.3.77 prepublish ...
+ *          > publish-please guard
+ *          [{real ouput of npm pack}]
+ *
+ * So the input content may be either a valid json file
+ * or valid json data prefixed by the result of the prepublish script execution
+ * @param {string} content
+ */
+function extractJsonDataFrom(content) {
+    let firstValidIndex = 0;
+    for (let index = 0; index <= content.length - 1; index++) {
+        const char = content.charAt(index);
+        if (char === '[' || char === '{') {
+            firstValidIndex = index;
+            break;
+        }
+    }
+    return content.substr(firstValidIndex);
+}
+
+/**
+ * exported for testing purposes
+ */
+module.exports.extractJsonDataFrom = extractJsonDataFrom;
 
 /**
  * Add sensitive data infos for each file included in the package
