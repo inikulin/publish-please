@@ -51,7 +51,7 @@
     "cp-sugar": "^1.0.0",
     "elegant-status": "1.1.0",
     "inquirer": "6.2.0",
-    "lodash": "4.17.10",
+    "lodash": "4.17.11",
     "micromatch": "3.1.10",
     "node-emoji": "1.8.1",
     "osenv": "0.1.5",
