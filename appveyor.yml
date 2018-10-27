@@ -6,7 +6,13 @@ environment:
     - nodejs_version: '8'
     - nodejs_version: '6'
 install:
-  - ps: Install-Product node $env:nodejs_version
+  - ps: >-
+      if ($env:nodejs_version -eq "11") {
+        Install-Product node $env:nodejs_version x64
+      } else {
+        Install-Product node $env:nodejs_version
+      }
+  ps: 
   - set PATH=%APPDATA%\npm;%PATH%
   - ps: >-
       if ($env:nodejs_version -eq "6") {
