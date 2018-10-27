@@ -15,7 +15,7 @@ There are numerous ways to "shoot yourself in the foot" using `npm publish`. The
 `npm publish` for your packages with safe and more functional alternative, which will allow you to:
 
  - Run tests or build steps before publishing (because `prepublish` is [broken](https://medium.com/greenkeeper-blog/what-is-npm-s-prepublish-and-why-is-it-so-confusing-a948373e6be1#.a40w9sdy6)).
- - Perform check for the [sensitive data](#sensitive-information-audit) in your package to be sure that you didn't leak it by accident (Further reading: [Do not underestimate credentials leaks](https://github.com/ChALkeR/notes/blob/master/Do-not-underestimate-credentials-leaks.md)).
+ - Perform check for the [sensitive and non-essential data](#sensitive-information-audit) in your package to be sure that you didn't leak it by accident (Further reading: [Do not underestimate credentials leaks](https://github.com/ChALkeR/notes/blob/master/Do-not-underestimate-credentials-leaks.md)).
  - Perform check for vulnerable dependencies using `npm audit` data.
  - Check that you are in the correct git branch.
  - Check that git tag matches version specified in the `package.json`.
@@ -68,11 +68,11 @@ npm run publish-please
  - **untrackedFiles** - Check that there are no untracked files in the working tree. Default: `true`.
  - **gitTag** - Check that git tag matches version specified in the `package.json`. Default: `true`.
  - **branch** - Check that current branch matches the specified branch. Default: `master`.
-    - You may also set the branch as a regular expression to be able to use pubish-please in a multiple branches scenario like `master` and `release`:
+    - You may also set the branch as a regular expression to be able to use publish-please in a multiple branches scenario like `master` and `release`:
         ```js
         /(master|release)/
         ``` 
- - **sensitiveData** - Perform [audit for the sensitive data](#sensitive-information-audit). Default: `true`.
+ - **sensitive and non essential Data** - Perform [audit for the sensitive data](#sensitive-and-non-essential-data-audit). Default: `true` if npm version is 5.9.0 or above, `false` otherwise.
  - **vulnerableDependencies** - Perform vulnerable dependencies check using `npm audit`. Default: `true` if npm version is 6.1.0 or above, `false` otherwise.
     - you may prevent specific vulnerabilities to be reported by publish-please by creating a `.auditignore` file in the root of your project with content like the following:
 
@@ -126,62 +126,33 @@ npx publish-please
 npx publish-please config
 ```
 
-## Sensitive information audit
+## Sensitive and non-essential data audit
 **Important note:** tool provides some very basic sensitive data check. Do not rely on it fully. Always perform manual checks for the
 sensitive data in your packages.
 
-Performed for the following items:
+Performed for the following items (see [.sensitivedata file](.sensitivedata) for more details):
 
+ - Benchmark files
+ - Configuration files
+    - CI
+    - eslint
+    - GitHub
+    - JetBrains
+    - Visual Studio Code
+ - Coverage files
+ - Demo files
+ - Dependency directories
+ - Doc files
+ - Example files
+ - Log files
  - Private SSH key
- - Potential cryptographic private key
- - Potential cryptographic key bundle
- - Pidgin OTR private key
- - Shell command history file
- - MySQL client command history file
- - PostgreSQL client command history file
- - Ruby IRB console history file
- - Pidgin chat client account configuration file
- - Hexchat/XChat IRC client server list configuration file
- - Irssi IRC client configuration file
- - Recon-ng web reconnaissance framework API key database
- - DBeaver SQL database manager configuration file
- - Mutt e-mail client configuration file
- - S3cmd configuration file
- - T command-line Twitter client configuration file
- - OpenVPN client configuration file
- - Well, this is awkward... Gitrob configuration file
- - Shell configuration file
- - Shell profile configuration file
- - Shell command alias configuration file
- - Ruby On Rails secret token configuration file
- - OmniAuth configuration file
- - Carrierwave configuration file
- - Ruby On Rails database schema file
- - Potential Ruby On Rails database configuration file
- - Django configuration file
- - PHP configuration file
- - KeePass password manager database file
- - 1Password password manager database file
- - Apple Keychain database file
- - GNOME Keyring database file
- - Log file
- - Network traffic capture file
- - SQL dump file
- - GnuCash database file
- - Contains word: backup
- - Contains word: dump
- - Contains word: password
- - Contains words: private, key
- - Jenkins publish over SSH plugin file
- - Potential Jenkins credentials file
- - Apache htpasswd file
- - Configuration file for auto-login process
- - KDE Wallet Manager database file
- - Potential MediaWiki configuration file
- - Tunnelblick VPN configuration file
- - Rubygems credentials file
- - Potential MSBuild publish profile
- - PHP dotenv
+ - Script files
+ - Secret files
+ - Source files
+ - Temp files
+ - Test files
+ - Zip files
+    - Output of 'npm pack'
 
 ## Upgrading to latest publish-please version
 

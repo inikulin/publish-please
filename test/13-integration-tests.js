@@ -551,9 +551,9 @@ describe('Integration tests', () => {
             exec('git checkout master')
                 .then(() => mkdir('test'))
                 .then(() => {
-                    writeFile('lib/schema.rb', 'test');
-                    writeFile('lib/database.yml', 'test');
-                    writeFile('test/database.yml', 'test');
+                    writeFile('lib/pack1.tgz', 'test');
+                    writeFile('lib/pack2.tgz', 'test');
+                    writeFile('test/pack3.tgz', 'test');
                 })
                 .then(() =>
                     publish(
@@ -569,45 +569,47 @@ describe('Integration tests', () => {
                 .then(() => {
                     throw new Error('Promise rejection expected');
                 })
-                .catch((err) =>
-                    assert.strictEqual(
-                        err.message,
-                        '  * Sensitive data found in the working tree:\n' +
-                            '    invalid filename lib/database.yml\n' +
-                            '     - Potential Ruby On Rails database configuration file\n' +
-                            '     - Might contain database credentials.\n' +
-                            '    invalid filename lib/schema.rb\n' +
-                            '     - Ruby On Rails database schema file\n' +
-                            '     - Contains information on the database schema of a Ruby On Rails application.'
-                    )
-                ));
+                .catch(
+                    (err) =>
+                        // prettier-ignore
+                        nodeInfos.npmPackHasJsonReporter
+                            ? err.message.should.containEql('Sensitive or non essential data found in npm package: lib/pack1.tgz')
+                            && err.message.should.containEql('Sensitive or non essential data found in npm package: lib/pack2.tgz')
+                            && err.message.should.not.containEql('Sensitive or non essential data found in npm package: test/pack3.tgz')
 
-        it('Should not perform check for files specified in opts.ignore', () =>
-            exec('git checkout master')
-                .then(() => mkdir('test'))
-                .then(() => {
-                    writeFile('lib/schema.rb', 'test');
-                    writeFile('lib/1.keychain', 'test');
-                    writeFile('lib/2.keychain', 'test');
-                })
-                .then(() =>
-                    publish(
-                        getTestOptions({
-                            set: {
-                                publishCommand: echoPublishCommand,
-                                validations: {
-                                    sensitiveData: {
-                                        ignore: [
-                                            'lib/schema.rb',
-                                            'lib/*.keychain',
-                                        ],
+                            : assert(
+                                err.message.indexOf(
+                                    'Cannot check sensitive and non-essential data because npm version is'
+                                ) > -1
+                            )
+                ));
+        if (nodeInfos.npmPackHasJsonReporter) {
+            it('Should not perform check for files specified in opts.ignore', () =>
+                exec('git checkout master')
+                    .then(() => mkdir('test'))
+                    .then(() => {
+                        writeFile('lib/schema.rb', 'test');
+                        writeFile('lib/1.keychain', 'test');
+                        writeFile('lib/2.keychain', 'test');
+                    })
+                    .then(() =>
+                        publish(
+                            getTestOptions({
+                                set: {
+                                    publishCommand: echoPublishCommand,
+                                    validations: {
+                                        sensitiveData: {
+                                            ignore: [
+                                                'lib/schema.rb',
+                                                'lib/*.keychain',
+                                            ],
+                                        },
                                     },
                                 },
-                            },
-                        })
-                    )
-                ));
-
+                            })
+                        )
+                    ));
+        }
         it('Should not perform check if sensitiveData-validation is disabled', () =>
             exec('git checkout master')
                 .then(() => mkdir('test'))

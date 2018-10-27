@@ -2,7 +2,8 @@
 const exec = require('cp-sugar').exec;
 const execSync = require('./exec-sync');
 const semver = require('semver');
-const npmVersionWithAuditJsonReporter = '6.1.0';
+const NPM_VERSION_WITH_AUDIT_JSON_REPORTER = '6.1.0';
+const NPM_VERSION_WITH_PACK_JSON_REPORTER = '5.9.0';
 
 module.exports = {
     getNodeInfos,
@@ -16,17 +17,19 @@ function getNodeInfosSync() {
     const isAtLeastNpm6 = isAtLeastVersion6(npmVersion);
     const isSafeNpm = isSafeNpmVersion(npmVersion);
     const npmAuditHasJsonReporter = npmAuditCanReportInJson(npmVersion);
+    const npmPackHasJsonReporter = npmPackCanReportInJson(npmVersion);
     const shouldUsePrePublishOnlyScript = shouldUsePrePublishOnlyScriptInThis(
         npmVersion
     );
     return {
         nodeVersion,
         npmVersion,
-        npmVersionWithAuditJsonReporter,
+        npmVersionWithAuditJsonReporter: NPM_VERSION_WITH_AUDIT_JSON_REPORTER,
         isAtLeastNode6,
         isAtLeastNpm6,
         isSafeNpm,
         npmAuditHasJsonReporter,
+        npmPackHasJsonReporter,
         shouldUsePrePublishOnlyScript,
     };
 }
@@ -40,6 +43,7 @@ function getNodeInfos() {
             const isAtLeastNpm6 = isAtLeastVersion6(npmVersion);
             const isSafeNpm = isSafeNpmVersion(npmVersion);
             const npmAuditHasJsonReporter = npmAuditCanReportInJson(npmVersion);
+            const npmPackHasJsonReporter = npmPackCanReportInJson(npmVersion);
             const shouldUsePrePublishOnlyScript = shouldUsePrePublishOnlyScriptInThis(
                 npmVersion
             );
@@ -47,11 +51,12 @@ function getNodeInfos() {
             return Promise.resolve({
                 nodeVersion,
                 npmVersion,
-                npmVersionWithAuditJsonReporter,
+                npmVersionWithAuditJsonReporter: NPM_VERSION_WITH_AUDIT_JSON_REPORTER,
                 isAtLeastNode6,
                 isAtLeastNpm6,
                 isSafeNpm,
                 npmAuditHasJsonReporter,
+                npmPackHasJsonReporter,
                 shouldUsePrePublishOnlyScript,
             });
         }
@@ -88,5 +93,9 @@ function shouldUsePrePublishOnlyScriptInThis(version) {
 }
 
 function npmAuditCanReportInJson(version) {
-    return semver.gte(version, npmVersionWithAuditJsonReporter);
+    return semver.gte(version, NPM_VERSION_WITH_AUDIT_JSON_REPORTER);
+}
+
+function npmPackCanReportInJson(version) {
+    return semver.gte(version, NPM_VERSION_WITH_PACK_JSON_REPORTER);
 }

@@ -1,14 +1,15 @@
 'use strict';
 
-const isSensitiveData = require('ban-sensitive-files');
-const globby = require('globby');
 const confirm = require('../utils/inquires').confirm;
 const inputList = require('../utils/inquires').inputList;
 const Promise = require('pinkie-promise');
+const nodeInfos = require('../utils/get-node-infos').getNodeInfosSync();
+const auditPackage = require('../utils/npm-audit-package');
 
 module.exports = {
     option: 'sensitiveData',
-    statusText: 'Checking for the sensitive data in the working tree',
+    statusText:
+        'Checking for the sensitive and non-essential data in the npm package',
     defaultParam: true,
     /* eslint-disable indent */
     configurator(currentVal) {
@@ -38,39 +39,40 @@ module.exports = {
         /* eslint-enable indent */
 
         return confirm(
-            'Would you like to verify that there is no sensitive data in your working tree?',
+            'Would you like to verify that there is no sensitive and non-essential data in the npm package?',
             !!currentVal
         ).then((yes) => (yes ? configureIgnores() : false));
     },
-    canRun: () => true,
-    run(opts, pkgInfo) {
+    canRun() {
+        return nodeInfos && nodeInfos.npmPackHasJsonReporter;
+    },
+    whyCannotRun() {
+        return `Cannot check sensitive and non-essential data because npm version is ${
+            nodeInfos.npmVersion
+        }. Either upgrade npm to version 5.9.0 or above, or disable this validation in the configuration file`;
+    },
+    run() {
         return Promise.resolve()
-            .then(() => {
-                if (opts && Array.isArray(opts.ignore))
-                    return globby(opts.ignore);
-
-                return [];
-            })
-            .then((ignore) => {
-                const errs = [];
-                const addErr = errs.push.bind(errs);
-
-                pkgInfo.files
-                    .filter((path) => ignore.indexOf(path) < 0)
-                    .forEach((path) => isSensitiveData(path, addErr));
-
-                if (errs.length) {
-                    const msg = errs
-                        .map((err) =>
-                            err
-                                .split(/\n/)
-                                .map((line) => '    ' + line)
-                                .join('\n')
-                        )
-                        .join('\n');
-
-                    throw 'Sensitive data found in the working tree:\n' + msg;
+            .then(() => process.cwd())
+            .then((projectDir) => auditPackage(projectDir))
+            .then((result) => {
+                if (sensitivaDataFoundIn(result)) {
+                    const errs = result.files
+                        .filter((file) => file && file.isSensitiveData)
+                        .map((file) => summaryOf(file.path))
+                        .sort();
+                    throw errs;
                 }
             });
     },
 };
+
+function sensitivaDataFoundIn(result) {
+    return result && Array.isArray(result.files)
+        ? result.files.filter((file) => file && file.isSensitiveData).length > 0
+        : false;
+}
+
+function summaryOf(sensitiveData) {
+    return `Sensitive or non essential data found in npm package: ${sensitiveData}`;
+}

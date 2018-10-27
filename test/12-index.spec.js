@@ -7,6 +7,8 @@ const should = require('should');
 const cli = require('../lib');
 const pathJoin = require('path').join;
 const packageName = require('./utils/publish-please-version-under-test');
+const nodeInfos = require('../lib/utils/get-node-infos').getNodeInfosSync();
+const lineSeparator = '----------------------------------';
 
 /** !!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  * These tests runs publish-please code on publish-please repo itself
@@ -15,6 +17,7 @@ const packageName = require('./utils/publish-please-version-under-test');
  * The publishing tests MUST always fail to ensure there will never be a real publish to npm during a test run
  */
 describe('Publish-please CLI Options', () => {
+    let originalWorkingDirectory;
     let nativeExit;
     let nativeConsoleLog;
     let exitCode;
@@ -23,12 +26,15 @@ describe('Publish-please CLI Options', () => {
     let originalArgv;
 
     before(() => {
+        originalWorkingDirectory = process.cwd();
         originalConfiguration = JSON.parse(readFile('.publishrc').toString());
     });
     after(() => {
         writeFile('.publishrc', JSON.stringify(originalConfiguration, null, 2));
+        console.log(`cwd is restored to: ${process.cwd()}`);
     });
     beforeEach(() => {
+        console.log(`${lineSeparator} begin test ${lineSeparator}`);
         process.env.PUBLISH_PLEASE_TEST_MODE = true;
         exitCode = undefined;
         output = '';
@@ -58,6 +64,8 @@ describe('Publish-please CLI Options', () => {
         process.argv = originalArgv;
 
         writeFile('.publishrc', JSON.stringify(originalConfiguration, null, 2));
+        process.chdir(originalWorkingDirectory);
+        console.log(`${lineSeparator} end test ${lineSeparator}\n`);
     });
 
     it('Should execute dry-run workflow on `npm run publish-please --dry-run`', () => {
@@ -82,6 +90,10 @@ describe('Publish-please CLI Options', () => {
         const publishrc = JSON.parse(readFile('.publishrc').toString());
         publishrc.confirm = false;
         publishrc.validations.vulnerableDependencies = false;
+        // prettier-ignore
+        nodeInfos.npmPackHasJsonReporter
+            ? publishrc.validations.sensitiveData = true
+            : publishrc.validations.sensitiveData = false;
         publishrc.validations.uncommittedChanges = false;
         publishrc.validations.untrackedFiles = false;
         publishrc.validations.gitTag = false;
@@ -96,7 +108,9 @@ describe('Publish-please CLI Options', () => {
                     output.should.not.containEql('ERRORS');
                     output.should.containEql('dry mode activated');
                     output.should.containEql('Running pre-publish script');
-                    output.should.containEql('Running validations');
+                    nodeInfos.npmPackHasJsonReporter
+                        ? output.should.containEql('Running validations')
+                        : output.should.not.containEql('Running validations');
                     output.should.containEql('Release info');
                     output.should.containEql(
                         "run 'npm pack' to have more details on the package"
@@ -161,6 +175,10 @@ describe('Publish-please CLI Options', () => {
         const publishrc = JSON.parse(readFile('.publishrc').toString());
         publishrc.confirm = false;
         publishrc.validations.vulnerableDependencies = false;
+        // prettier-ignore
+        nodeInfos.npmPackHasJsonReporter
+            ? publishrc.validations.sensitiveData = true
+            : publishrc.validations.sensitiveData = false;
         publishrc.validations.uncommittedChanges = false;
         publishrc.validations.untrackedFiles = false;
         publishrc.validations.gitTag = false;
@@ -174,7 +192,9 @@ describe('Publish-please CLI Options', () => {
                     output.should.not.containEql('ERRORS');
                     output.should.containEql('dry mode activated');
                     output.should.containEql('Running pre-publish script');
-                    output.should.containEql('Running validations');
+                    nodeInfos.npmPackHasJsonReporter
+                        ? output.should.containEql('Running validations')
+                        : output.should.not.containEql('Running validations');
                     output.should.containEql('Release info');
                     output.should.containEql(
                         "run 'npm pack' to have more details on the package"
@@ -276,6 +296,12 @@ describe('Publish-please CLI Options', () => {
         output.should.containEql("'npm publish' is forbidden for this package");
     });
 
+    /**
+     * This test executes against the .publishrc file in publish-please root project
+     * It verifies that when you run the configuration wizard and choose all default values
+     * you got the same exact configuration.
+     * So be aware that changing any values in the .publishrc file will make this test fails
+     */
     it('Should execute configuration wizard on `npm run publish-please config`', () => {
         // Given
         process.env['npm_config_argv'] =
