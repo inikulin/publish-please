@@ -7,7 +7,6 @@
     "publish-please": "./bin/publish-please.js"
   },
   "scripts": {
-    "precommit": "lint-staged",
     "prettier-format": "prettier --write \"{bin,src,test}/**/*.js\"",
     "prettier-check": "prettier --list-different \"{bin,src,test}/**/*.js\"",
     "eslint-check-config": "eslint --print-config .eslintrc.json | eslint-config-prettier-check",
@@ -24,11 +23,6 @@
     "postinstall": "node lib/post-install.js",
     "package": "rimraf package && rimraf publish-please*.tgz && npm pack",
     "publish-please": "node ./bin/publish-please.js"
-  },
-  "lint-staged": {
-    "*.js": [
-      "prettier --write"
-    ]
   },
   "repository": {
     "type": "git",
@@ -74,10 +68,8 @@
     "del": "3.0.0",
     "eslint": "4.19.1",
     "eslint-config-prettier": "2.9.0",
-    "husky": "0.14.3",
     "import-fresh": "2.0.0",
     "istanbul": "0.4.5",
-    "lint-staged": "7.1.0",
     "mkdirp": "0.5.1",
     "mocha": "5.1.1",
     "mock-stdin": "0.3.1",
