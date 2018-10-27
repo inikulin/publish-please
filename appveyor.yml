@@ -6,7 +6,7 @@ environment:
     - nodejs_version: '8'
     - nodejs_version: '6'
 install:
-  - ps: >-
+  - ps: >
       if ($env:nodejs_version -eq "11") {
         Install-Product node $env:nodejs_version x64
       } else {
