@@ -12,7 +12,6 @@ install:
       } else {
         Install-Product node $env:nodejs_version
       }
-  ps: 
   - set PATH=%APPDATA%\npm;%PATH%
   - ps: >-
       if ($env:nodejs_version -eq "6") {
