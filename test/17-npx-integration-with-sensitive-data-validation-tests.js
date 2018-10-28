@@ -8,7 +8,6 @@ const mkdirp = require('mkdirp');
 const writeFile = require('fs').writeFileSync;
 const readFile = require('fs').readFileSync;
 const exec = require('cp-sugar').exec;
-const Promise = require('pinkie-promise');
 const packageName = require('./utils/publish-please-version-under-test');
 const nodeInfos = require('../lib/utils/get-node-infos').getNodeInfosSync();
 const EOL = require('os').EOL;

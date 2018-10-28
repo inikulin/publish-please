@@ -14,7 +14,6 @@ const unset = require('lodash/unset');
 const exec = require('cp-sugar').exec;
 const pkgd = require('pkgd');
 const mkdirp = require('mkdirp');
-const Promise = require('pinkie-promise');
 const chalk = require('chalk');
 const requireUncached = require('import-fresh');
 const packageName = require('./utils/publish-please-version-under-test');
