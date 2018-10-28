@@ -1,6 +1,6 @@
 'use strict';
 
-const pkgd = require('pkgd');
+const readPkg = require('../utils/read-package-json').readPkgSync;
 const chalk = require('chalk');
 const validate = require('../validations').validate;
 const confirm = require('../utils/inquires').confirm;
@@ -25,7 +25,7 @@ function reportAdvisory() {
 }
 
 module.exports = function(opts, projectDir) {
-    let pkgInfo = null;
+    let pkg = null;
 
     opts = getOptions(opts, projectDir);
 
@@ -37,10 +37,10 @@ module.exports = function(opts, projectDir) {
                 opts.prePublishScript &&
                 runScript(opts.prePublishScript, SCRIPT_TYPE.prePublish)
         )
-        .then(() => pkgd())
-        .then((info) => (pkgInfo = info))
-        .then(() => validate(opts.validations, pkgInfo))
-        .then(() => printReleaseInfo(pkgInfo.cfg.version, opts.publishTag))
+        .then(() => readPkg(projectDir))
+        .then((pkgContent) => (pkg = pkgContent))
+        .then(() => validate(opts.validations, pkg))
+        .then(() => printReleaseInfo(pkg.version, opts.publishTag))
         .then(
             () =>
                 /* eslint-disable indent */

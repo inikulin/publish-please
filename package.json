@@ -55,9 +55,7 @@
     "micromatch": "3.1.10",
     "node-emoji": "1.8.1",
     "osenv": "0.1.5",
-    "pkgd": "^1.1.2",
     "promisify-event": "^1.0.0",
-    "read-pkg": "3.0.0",
     "semver": "5.5.0"
   },
   "devDependencies": {
