@@ -72,7 +72,7 @@
     "mock-stdin": "0.3.1",
     "prettier": "1.14.3",
     "rimraf": "2.6.2",
-    "should": "13.2.1"
+    "should": "13.2.3"
   },
   "engines": {
     "node": ">=6.0.0"
