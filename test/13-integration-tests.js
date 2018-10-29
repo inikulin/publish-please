@@ -12,9 +12,8 @@ const sep = require('path').sep;
 const defaults = require('lodash/defaultsDeep');
 const unset = require('lodash/unset');
 const exec = require('cp-sugar').exec;
-const pkgd = require('pkgd');
+const readPkg = require('../lib/utils/read-package-json').readPkgSync;
 const mkdirp = require('mkdirp');
-const Promise = require('pinkie-promise');
 const chalk = require('chalk');
 const requireUncached = require('import-fresh');
 const packageName = require('./utils/publish-please-version-under-test');
@@ -634,12 +633,12 @@ describe('Integration tests', () => {
     describe('Node security project audit', () => {
         it('Should fail if there are vulnerable dependencies', () =>
             exec('git checkout master')
-                .then(() => pkgd())
-                .then((pkgInfo) => {
-                    pkgInfo.cfg.dependencies = {
+                .then(() => readPkg())
+                .then((pkg) => {
+                    pkg.dependencies = {
                         ms: '0.7.0',
                     };
-                    writeFile('package.json', JSON.stringify(pkgInfo.cfg));
+                    writeFile('package.json', JSON.stringify(pkg));
                 })
                 .then(() =>
                     publish(
@@ -669,11 +668,11 @@ describe('Integration tests', () => {
             const version = dependency.split('@')[1];
             it(`Should fail on transitive dependency inside ${dependency}`, () =>
                 exec('git checkout master')
-                    .then(() => pkgd())
-                    .then((pkgInfo) => {
-                        pkgInfo.cfg.dependencies = {};
-                        pkgInfo.cfg.dependencies[`${name}`] = `${version}`;
-                        writeFile('package.json', JSON.stringify(pkgInfo.cfg));
+                    .then(() => readPkg())
+                    .then((pkg) => {
+                        pkg.dependencies = {};
+                        pkg.dependencies[`${name}`] = `${version}`;
+                        writeFile('package.json', JSON.stringify(pkg));
                     })
                     .then(() =>
                         publish(
@@ -703,11 +702,11 @@ describe('Integration tests', () => {
             const version = dependency.split('@')[1];
             it(`Should fail on ${dependency} as a direct dependency`, () =>
                 exec('git checkout master')
-                    .then(() => pkgd())
-                    .then((pkgInfo) => {
-                        pkgInfo.cfg.dependencies = {};
-                        pkgInfo.cfg.dependencies[`${name}`] = `${version}`;
-                        writeFile('package.json', JSON.stringify(pkgInfo.cfg));
+                    .then(() => readPkg())
+                    .then((pkg) => {
+                        pkg.dependencies = {};
+                        pkg.dependencies[`${name}`] = `${version}`;
+                        writeFile('package.json', JSON.stringify(pkg));
                     })
                     .then(() =>
                         publish(
@@ -734,11 +733,11 @@ describe('Integration tests', () => {
 
         it('Should ignore vulnerabilities configured in .auditignore file when this file has a bad format', () =>
             exec('git checkout master')
-                .then(() => pkgd())
-                .then((pkgInfo) => {
-                    pkgInfo.cfg.dependencies = {};
-                    pkgInfo.cfg.dependencies['lodash'] = '4.16.4';
-                    writeFile('package.json', JSON.stringify(pkgInfo.cfg));
+                .then(() => readPkg())
+                .then((pkg) => {
+                    pkg.dependencies = {};
+                    pkg.dependencies['lodash'] = '4.16.4';
+                    writeFile('package.json', JSON.stringify(pkg));
                     writeFile(
                         '.auditignore',
                         JSON.stringify({
@@ -770,13 +769,13 @@ describe('Integration tests', () => {
 
         it('Should not perform check if vulnerableDependencies-validation is disabled', () =>
             exec('git checkout master')
-                .then(() => pkgd())
-                .then((pkgInfo) => {
-                    pkgInfo.cfg.dependencies = {
+                .then(() => readPkg())
+                .then((pkg) => {
+                    pkg.dependencies = {
                         ms: '0.7.0',
                     };
 
-                    writeFile('package.json', JSON.stringify(pkgInfo.cfg));
+                    writeFile('package.json', JSON.stringify(pkg));
                 })
                 .then(() =>
                     publish(
@@ -796,11 +795,11 @@ describe('Integration tests', () => {
         describe('Node security project audit when npm version is >= 6.1.0', () => {
             it('Should ignore vulnerabilities configured in .auditignorefile', () =>
                 exec('git checkout master')
-                    .then(() => pkgd())
-                    .then((pkgInfo) => {
-                        pkgInfo.cfg.dependencies = {};
-                        pkgInfo.cfg.dependencies['lodash'] = '4.16.4';
-                        writeFile('package.json', JSON.stringify(pkgInfo.cfg));
+                    .then(() => readPkg())
+                    .then((pkg) => {
+                        pkg.dependencies = {};
+                        pkg.dependencies['lodash'] = '4.16.4';
+                        writeFile('package.json', JSON.stringify(pkg));
                         writeFile(
                             '.auditignore',
                             ['https://npmjs.com/advisories/577'].join(EOL)
@@ -824,14 +823,11 @@ describe('Integration tests', () => {
                 const version = dependency.split('@')[1];
                 it(`Should not fail on ${dependency} as a direct dependency`, () =>
                     exec('git checkout master')
-                        .then(() => pkgd())
-                        .then((pkgInfo) => {
-                            pkgInfo.cfg.dependencies = {};
-                            pkgInfo.cfg.dependencies[`${name}`] = `${version}`;
-                            writeFile(
-                                'package.json',
-                                JSON.stringify(pkgInfo.cfg)
-                            );
+                        .then(() => readPkg())
+                        .then((pkg) => {
+                            pkg.dependencies = {};
+                            pkg.dependencies[`${name}`] = `${version}`;
+                            writeFile('package.json', JSON.stringify(pkg));
                         })
                         .then(() =>
                             publish(
@@ -849,12 +845,12 @@ describe('Integration tests', () => {
 
             it('Should not fail if there is no vulnerable dependency', () =>
                 exec('git checkout master')
-                    .then(() => pkgd())
-                    .then((pkgInfo) => {
-                        pkgInfo.cfg.dependencies = {
+                    .then(() => readPkg())
+                    .then((pkg) => {
+                        pkg.dependencies = {
                             ms: '0.7.1',
                         };
-                        writeFile('package.json', JSON.stringify(pkgInfo.cfg));
+                        writeFile('package.json', JSON.stringify(pkg));
                     })
                     .then(() =>
                         publish(
@@ -871,13 +867,13 @@ describe('Integration tests', () => {
 
             it('Should fail with two errors on lodash@4.16.4 and ms@0.7.0', () =>
                 exec('git checkout master')
-                    .then(() => pkgd())
-                    .then((pkgInfo) => {
-                        pkgInfo.cfg.dependencies = {
+                    .then(() => readPkg())
+                    .then((pkg) => {
+                        pkg.dependencies = {
                             ms: '0.7.0',
                             lodash: '4.16.4',
                         };
-                        writeFile('package.json', JSON.stringify(pkgInfo.cfg));
+                        writeFile('package.json', JSON.stringify(pkg));
                     })
                     .then(() =>
                         publish(

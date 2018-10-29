@@ -3,7 +3,6 @@
 const pathJoin = require('path').join;
 const audit = require('../utils/npm-audit');
 const confirm = require('../utils/inquires').confirm;
-const Promise = require('pinkie-promise');
 const chalk = require('chalk');
 const nodeInfos = require('../utils/get-node-infos').getNodeInfosSync();
 

@@ -2,7 +2,6 @@
 
 const confirm = require('../utils/inquires').confirm;
 const inputList = require('../utils/inquires').inputList;
-const Promise = require('pinkie-promise');
 const nodeInfos = require('../utils/get-node-infos').getNodeInfosSync();
 const auditPackage = require('../utils/npm-audit-package');
 

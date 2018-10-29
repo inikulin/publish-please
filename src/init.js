@@ -1,7 +1,7 @@
 'use strict';
 const pathJoin = require('path').join;
 const writeFile = require('fs').writeFileSync;
-const readPkg = require('read-pkg');
+const readPkg = require('./utils/read-package-json').readPkgSync;
 const chalk = require('chalk');
 const getProjectDir = require('./utils/get-project-dir');
 const nodeInfos = require('./utils/get-node-infos').getNodeInfosSync();
@@ -45,14 +45,6 @@ const DEPRECATION_NOTE_ON_PREPUBLISH = `
 `;
 
 function onInstall(projectDir) {
-    function readCfg() {
-        try {
-            return readPkg.sync(projectDir, { normalize: false });
-        } catch (err) {
-            return null;
-        }
-    }
-
     function reportNoConfig() {
         console.log(chalk.bgRed(NO_CONFIG_MESSAGE));
     }
@@ -86,41 +78,42 @@ function onInstall(projectDir) {
         return 'prepublish';
     }
 
-    function addConfigHooks(cfg) {
-        if (!cfg.scripts) cfg.scripts = {};
+    function addConfigHooks(pkg) {
+        pkg.scripts = pkg.scripts || {};
+        if (pkg.scripts['publish-please']) return false;
 
-        if (cfg.scripts['publish-please']) return false;
+        pkg.scripts['publish-please'] = 'publish-please';
 
-        cfg.scripts['publish-please'] = 'publish-please';
-
-        const prepublishKey = getPrePublishKey(cfg.scripts);
-        const existingPrepublishScript = cfg.scripts[prepublishKey];
-        cfg.scripts[prepublishKey] = existingPrepublishScript
+        const prepublishKey = getPrePublishKey(pkg.scripts);
+        const existingPrepublishScript = pkg.scripts[prepublishKey];
+        pkg.scripts[prepublishKey] = existingPrepublishScript
             ? `publish-please guard && ${existingPrepublishScript}`
             : 'publish-please guard';
 
         writeFile(
             pathJoin(projectDir, 'package.json'),
-            JSON.stringify(cfg, null, 2)
+            JSON.stringify(pkg, null, 2)
         );
 
         return true;
     }
 
     return (function runInstallationSteps() {
-        const cfg = readCfg();
-
-        if (!cfg) {
+        let pkg;
+        try {
+            pkg = readPkg(projectDir);
+        } catch (error) {
             reportNoConfig();
             process.exit(1);
             return;
         }
-        if (cfg && cfg.name === 'publish-please') {
+
+        if (pkg && pkg.name === 'publish-please') {
             reportNoHooksOnItself();
             process.exit(0);
             return;
         }
-        if (addConfigHooks(cfg)) {
+        if (addConfigHooks(pkg)) {
             reportHooksAdded();
             const config = require('./config');
             const opts = config.getCurrentOpts(projectDir);
@@ -133,6 +126,6 @@ function onInstall(projectDir) {
 }
 
 module.exports = function init(projectDir) {
-    projectDir = projectDir ? projectDir : getProjectDir();
+    projectDir = projectDir || getProjectDir();
     return onInstall(projectDir);
 };

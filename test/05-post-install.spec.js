@@ -9,7 +9,7 @@ const init = require('../lib/init');
 const pathJoin = require('path').join;
 const writeFile = require('fs').writeFileSync;
 const del = require('del');
-const readPkg = require('read-pkg');
+const readPkg = require('../lib//utils/read-package-json').readPkgSync;
 const nodeInfos = require('../lib/utils/get-node-infos').getNodeInfosSync();
 const shouldUsePrePublishOnlyScript = nodeInfos.shouldUsePrePublishOnlyScript;
 const lineSeparator = '----------------------------------';
@@ -107,9 +107,9 @@ describe('Post-Install Execution', () => {
                             prepublish: 'publish-please guard',
                         };
 
-                    readPkg
-                        .sync(projectDir)
-                        .scripts.should.containEql(expectedHooks);
+                    readPkg(projectDir).scripts.should.containEql(
+                        expectedHooks
+                    );
                 })
         );
     });
@@ -149,9 +149,9 @@ describe('Post-Install Execution', () => {
                             prepublish: 'publish-please guard',
                         };
 
-                    readPkg
-                        .sync(projectDir)
-                        .scripts.should.containEql(expectedHooks);
+                    readPkg(projectDir).scripts.should.containEql(
+                        expectedHooks
+                    );
                 })
         );
     });
@@ -186,7 +186,7 @@ describe('Post-Install Execution', () => {
         output.should.not.containEql(
             'publish-please hooks were successfully setup for the project'
         );
-        readPkg.sync(projectDir).scripts.should.containEql({
+        readPkg(projectDir).scripts.should.containEql({
             'publish-please': 'publish-please',
             prepublish: existingPrePublishScript,
             prepublishOnly: existingPrePublishOnlyScript,
@@ -219,7 +219,7 @@ describe('Post-Install Execution', () => {
             output.should.containEql(
                 'publish-please hooks were successfully setup for the project'
             );
-            readPkg.sync(projectDir).scripts.should.containEql({
+            readPkg(projectDir).scripts.should.containEql({
                 'publish-please': 'publish-please',
                 prepublish: `publish-please guard && ${existingPrePublishScript}`,
             });

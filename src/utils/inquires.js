@@ -1,5 +1,4 @@
 const inquirer = require('inquirer');
-const Promise = require('pinkie-promise');
 const executionContext = require('./execution-context');
 
 function ask(type, question, defaultAnswer) {

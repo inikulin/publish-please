@@ -1,7 +1,6 @@
 const chalk = require('chalk');
 const elegantStatus = require('elegant-status');
 const emoji = require('node-emoji').emoji;
-const Promise = require('pinkie-promise');
 
 const validations = [
     require('./vulnerable-dependencies'),
@@ -12,12 +11,12 @@ const validations = [
     require('./git-tag'),
 ];
 
-function runValidation(validation, param, pkgInfo, errs) {
+function runValidation(validation, param, pkg, errs) {
     const done = elegantStatus(validation.statusText);
 
     // prettier-ignore
     return validation
-        .run(param, pkgInfo)
+        .run(param, pkg)
         .then(() => done(true))
         .catch((err) => {
             Array.isArray(err)
@@ -48,7 +47,7 @@ module.exports = {
         return opts;
     }, {}),
 
-    validate: function(opts, pkgInfo) {
+    validate: function(opts, pkg) {
         const errs = [];
         const validationsToRun = validations.filter(
             (validation) => !!opts[validation.option]
@@ -69,7 +68,7 @@ module.exports = {
                             ? runValidation(
                                 validation,
                                 opts[validation.option],
-                                pkgInfo,
+                                pkg,
                                 errs
                             )
                             : skipValidation(validation, errs)
