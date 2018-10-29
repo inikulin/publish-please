@@ -8,6 +8,8 @@ const del = require('del');
 const writeFile = require('fs').writeFileSync;
 const EOL = require('os').EOL;
 const audit = require('../lib/utils/npm-audit-package');
+const touch = require('./utils/touch-file-sync');
+const fileExists = require('fs').existsSync;
 const lineSeparator = '----------------------------------';
 
 describe('npm package analyzer', () => {
@@ -23,6 +25,7 @@ describe('npm package analyzer', () => {
         del.sync(pathJoin(projectDir, 'package.json'));
         del.sync(pathJoin(projectDir, 'package-lock.json'));
         del.sync(pathJoin(projectDir, '.publishrc'));
+        del.sync(pathJoin(projectDir, 'testing-repo@0.0.0.tgz'));
     });
     afterEach(() => {
         process.chdir(originalWorkingDirectory);
@@ -376,6 +379,179 @@ describe('npm package analyzer', () => {
             },
         ];
         jsonResult.should.containDeep(expected);
+    });
+
+    it('Should do nothing when deleting the generated package but the file is not found', () => {
+        // Given
+        const npmPackResponse = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                    isSensitiveData: false,
+                },
+                {
+                    path: 'publish-please.tgz',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+            ],
+            entryCount: 2,
+            bundled: [],
+        };
+        // When
+        const result = audit.removePackageTarFileFrom(
+            projectDir,
+            npmPackResponse
+        );
+
+        // Then
+        const expected = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                    isSensitiveData: false,
+                },
+                {
+                    path: 'publish-please.tgz',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+            ],
+            entryCount: 2,
+            bundled: [],
+        };
+        result.should.containDeep(expected);
+        Array.isArray(result.internalErrors).should.be.false();
+    });
+
+    it('Should do nothing when input response is undefined', () => {
+        // Given
+        const npmPackResponse = undefined;
+        // When
+        const result = audit.removePackageTarFileFrom(
+            projectDir,
+            npmPackResponse
+        );
+
+        // Then
+        (result === undefined).should.be.true();
+    });
+
+    it('Should add internal errors on input response when the generated package cannot be deleted', () => {
+        // Given
+        const npmPackResponse = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                    isSensitiveData: false,
+                },
+                {
+                    path: 'publish-please.tgz',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+            ],
+            entryCount: 2,
+            bundled: [],
+        };
+        // When
+        const result = audit.removePackageTarFileFrom(null, npmPackResponse);
+
+        // Then
+        const expected = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                    isSensitiveData: false,
+                },
+                {
+                    path: 'publish-please.tgz',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+            ],
+            entryCount: 2,
+            bundled: [],
+            internalErrors: [
+                { message: 'The "path" argument must be of type string' },
+            ],
+        };
+        result.should.containDeep(expected);
+    });
+
+    it('Should remove the generated package', () => {
+        // Given
+        const npmPackResponse = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                    isSensitiveData: false,
+                },
+                {
+                    path: 'publish-please.tgz',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+            ],
+            entryCount: 2,
+            bundled: [],
+        };
+        touch(pathJoin(projectDir, npmPackResponse.filename));
+        // When
+        const result = audit.removePackageTarFileFrom(
+            projectDir,
+            npmPackResponse
+        );
+
+        // Then
+        const expected = {
+            id: 'testing-repo@0.0.0',
+            name: 'testing-repo',
+            version: '0.0.0',
+            filename: 'testing-repo-0.0.0.tgz',
+            files: [
+                {
+                    path: 'package.json',
+                    size: 67,
+                    isSensitiveData: false,
+                },
+                {
+                    path: 'publish-please.tgz',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
+            ],
+            entryCount: 2,
+            bundled: [],
+        };
+        result.should.containDeep(expected);
+        Array.isArray(result.internalErrors).should.be.false();
+        fileExists(expected.filename).should.be.false();
     });
 
     it('Should add sensitiva data info on package.json file', () => {
