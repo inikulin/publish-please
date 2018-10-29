@@ -492,11 +492,17 @@ describe('npm package analyzer', () => {
             ],
             entryCount: 2,
             bundled: [],
-            internalErrors: [
-                { message: 'The "path" argument must be of type string' },
-            ],
         };
         result.should.containDeep(expected);
+        Array.isArray(result.internalErrors).should.be.true();
+        (
+            result.internalErrors[0].message.includes(
+                'The "path" argument must be of type string'
+            ) ||
+            result.internalErrors[0].message.includes(
+                'Path must be a string. Received null'
+            )
+        ).should.be.true();
     });
 
     it('Should remove the generated package', () => {
