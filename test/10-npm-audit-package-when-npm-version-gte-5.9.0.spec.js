@@ -9,6 +9,7 @@ const del = require('del');
 const auditPackage = require('../lib/utils/npm-audit-package');
 const writeFile = require('fs').writeFileSync;
 const touch = require('./utils/touch-file-sync');
+const fileExists = require('fs').existsSync;
 
 const lineSeparator = '----------------------------------';
 
@@ -70,6 +71,47 @@ if (nodeInfos.npmPackHasJsonReporter) {
                             bundled: [],
                         };
                         result.should.containDeep(expected);
+                    })
+            );
+        });
+
+        it('Should remove the generated package tar file', () => {
+            // Given
+            const pkg = {
+                name: 'testing-repo',
+                version: '0.0.0',
+                scripts: {},
+            };
+            writeFile(
+                pathJoin(projectDir, 'package.json'),
+                JSON.stringify(pkg, null, 2)
+            );
+
+            // When
+            return (
+                Promise.resolve()
+                    .then(() => auditPackage(projectDir))
+
+                    // Then
+                    .then((result) => {
+                        const expected = {
+                            id: 'testing-repo@0.0.0',
+                            name: 'testing-repo',
+                            version: '0.0.0',
+                            filename: 'testing-repo-0.0.0.tgz',
+                            files: [
+                                {
+                                    path: 'package.json',
+                                    size: 67,
+                                    isSensitiveData: false,
+                                },
+                            ],
+                            entryCount: 1,
+                            bundled: [],
+                        };
+                        result.should.containDeep(expected);
+                        Array.isArray(result.internalErrors).should.be.false();
+                        fileExists(expected.filename).should.be.false();
                     })
             );
         });

@@ -5,6 +5,7 @@ const sep = require('path').sep;
 const tempFolder = require('osenv').tmpdir();
 const path = require('path');
 const globMatching = require('micromatch');
+const unlink = require('fs').unlinkSync;
 
 /**
  * Audit the package that will be sent to the registry
@@ -31,6 +32,12 @@ module.exports = function auditPackage(projectDir) {
                             response,
                             options
                         )
+                    )
+                    .then((response) =>
+                        removePackageTarFileFrom(
+                            options.directoryToPackage,
+                            response
+                        )
                     );
             })
     );
@@ -48,7 +55,7 @@ function createResponseFromNpmPackLog(logFilePath) {
 
 /**
  * Extract the Json data from input content.
- * The problem: the 'npm pack --json > output.txt' command will run any 'prepublish' script
+ * The problem: the 'npm pack --json > output.log' command will run any 'prepublish' script
  * defined in the package.json file before executing the npm pack command itself.
  * In the context of publish-please, any already-installed publish-please package
  * has already a prepublish script:  "prepublish": "publish-please guard"
@@ -275,3 +282,33 @@ function getIgnoredSensitiveData(options) {
  * exported for testing purposes
  */
 module.exports.getIgnoredSensitiveData = getIgnoredSensitiveData;
+
+/**
+ * Middleware that removes the auto-generated package tar file
+ * @param {string} projectDir - folder where the tar file has been generated
+ * @param {*} response - result of the npm pack command (eventually modified by previous middlewares execution)
+ * @returns input response if file removal is ok
+ * In case of error it adds or updates into the input response object the property 'internalErrors'
+ */
+function removePackageTarFileFrom(projectDir, response) {
+    try {
+        const file = pathJoin(projectDir, response.filename);
+        unlink(file);
+        return response;
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            return response;
+        }
+        if (response) {
+            response.internalErrors = response.internalErrors || [];
+            response.internalErrors.push(error);
+            return response;
+        }
+        return response;
+    }
+}
+
+/**
+ * exported for testing purposes
+ */
+module.exports.removePackageTarFileFrom = removePackageTarFileFrom;
