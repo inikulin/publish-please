@@ -217,8 +217,8 @@ module.exports.getDefaultOptionsFor = getDefaultOptionsFor;
 
 /**
  * get all sensitive data from the '.sensitivedata' file
- * If a sensitive data is found in input projectDir this one is taken
- * otherwise the default publish-please .sensitivedata file is taken
+ * If a .sensitivedata file is found in input projectDir, this one is taken
+ * otherwise the default publish-please .sensitivedata file is taken.
  * @param {string} projectDir - project directory to be analyzed by npm-pack command
  * @returns {DefaultSensitiveData}
  */
