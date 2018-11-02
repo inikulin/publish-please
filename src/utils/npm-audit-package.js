@@ -92,7 +92,7 @@ module.exports.extractJsonDataFrom = extractJsonDataFrom;
  *              with each file being tagged with a new boolean property 'isSensitiveData'.
  */
 function addSensitiveDataInfosIn(response) {
-    const allSensitiveDataPatterns = getDefaultSensitiveData();
+    const allSensitiveDataPatterns = getSensitiveData(process.cwd());
     const augmentedResponse = JSON.parse(JSON.stringify(response, null, 2));
     const files = augmentedResponse.files || [];
     files.forEach((file) => {
@@ -217,31 +217,38 @@ module.exports.getDefaultOptionsFor = getDefaultOptionsFor;
 
 /**
  * get all sensitive data from the '.sensitivedata' file
+ * If a sensitive data is found in input projectDir this one is taken
+ * otherwise the default publish-please .sensitivedata file is taken
+ * @param {string} projectDir - project directory to be analyzed by npm-pack command
+ * @returns {DefaultSensitiveData}
+ */
+function getSensitiveData(projectDir) {
+    try {
+        return getCustomSensitiveData(projectDir);
+    } catch (error) {
+        return getDefaultSensitiveData();
+    }
+}
+
+/**
+ * exported for testing purposes
+ */
+module.exports.getSensitiveData = getSensitiveData;
+
+/**
+ * @typedef DefaultSensitiveData
+ * @type {Object}
+ * @property {[string]} sensitiveData - all patterns that defines sensitive data
+ * @property {[string]} ignoredData - all patterns that defines data that is not sensitive
+ */
+
+/**
+ * get all sensitive data from the '.sensitivedata' file
  * @returns {DefaultSensitiveData}
  */
 function getDefaultSensitiveData() {
-    const sensitiveDataFile = pathJoin(__dirname, '..', '..', '.sensitivedata');
-    const content = readFile(sensitiveDataFile).toString();
-    const allPatterns = content
-        .split(/\n|\r/)
-        .map((line) => line.replace(/[\t]/g, ' '))
-        .map((line) => line.trim())
-        .filter((line) => line && line.length > 0)
-        .filter((line) => !line.startsWith('#'));
-
-    const sensitiveData = allPatterns.filter(
-        (pattern) => !pattern.startsWith('!')
-    );
-
-    const ignoredData = allPatterns
-        .filter((pattern) => pattern.startsWith('!'))
-        .map((pattern) => pattern.replace('!', ''))
-        .map((pattern) => pattern.trim());
-
-    return {
-        sensitiveData,
-        ignoredData,
-    };
+    const sensitiveDataDirectory = pathJoin(__dirname, '..', '..');
+    return getCustomSensitiveData(sensitiveDataDirectory);
 }
 
 /**
@@ -312,3 +319,38 @@ function removePackageTarFileFrom(projectDir, response) {
  * exported for testing purposes
  */
 module.exports.removePackageTarFileFrom = removePackageTarFileFrom;
+
+/**
+ * get all sensitive data from the '.sensitivedata' file
+ * @param {string} projectDir - directory that contains a .sensitivedata file
+ * @returns {DefaultSensitiveData}
+ */
+function getCustomSensitiveData(projectDir) {
+    const sensitiveDataFile = pathJoin(projectDir, '.sensitivedata');
+    const content = readFile(sensitiveDataFile).toString();
+    const allPatterns = content
+        .split(/\n|\r/)
+        .map((line) => line.replace(/[\t]/g, ' '))
+        .map((line) => line.trim())
+        .filter((line) => line && line.length > 0)
+        .filter((line) => !line.startsWith('#'));
+
+    const sensitiveData = allPatterns.filter(
+        (pattern) => !pattern.startsWith('!')
+    );
+
+    const ignoredData = allPatterns
+        .filter((pattern) => pattern.startsWith('!'))
+        .map((pattern) => pattern.replace('!', ''))
+        .map((pattern) => pattern.trim());
+
+    return {
+        sensitiveData,
+        ignoredData,
+    };
+}
+
+/**
+ * exported for testing purposes
+ */
+module.exports.getCustomSensitiveData = getCustomSensitiveData;

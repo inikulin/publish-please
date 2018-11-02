@@ -22,10 +22,12 @@ describe('npm package analyzer', () => {
     });
     beforeEach(() => {
         console.log(`${lineSeparator} begin test ${lineSeparator}`);
+        process.chdir(projectDir);
         del.sync(pathJoin(projectDir, 'package.json'));
         del.sync(pathJoin(projectDir, 'package-lock.json'));
         del.sync(pathJoin(projectDir, '.publishrc'));
         del.sync(pathJoin(projectDir, 'testing-repo@0.0.0.tgz'));
+        del.sync(pathJoin(projectDir, '.sensitivedata'));
     });
     afterEach(() => {
         process.chdir(originalWorkingDirectory);
@@ -48,6 +50,49 @@ describe('npm package analyzer', () => {
         Array.isArray(result.ignoredData).should.be.true();
         result.sensitiveData.length.should.equal(65);
         result.ignoredData.length.should.equal(2);
+    });
+
+    /**
+     * this test is a guard against changes in the .sensitivedata file.
+     * Any changes to this file will make this test failed
+     */
+    it('Should get default list of sensitiva data when custom .sensitivadata is missing', () => {
+        // Given
+
+        // When
+        const result = audit.getSensitiveData(projectDir);
+
+        // Then
+        Array.isArray(result.sensitiveData).should.be.true();
+        Array.isArray(result.ignoredData).should.be.true();
+        result.sensitiveData.length.should.equal(65);
+        result.ignoredData.length.should.equal(2);
+    });
+
+    /**
+     * this test is a guard against changes in the .sensitivedata file.
+     * Any changes to this file will make this test failed
+     */
+    it('Should get custom list of sensitiva data when custom .sensitivadata is defined', () => {
+        // Given
+        const customSensitiveData = `
+        #-----------------------
+        # yo Files
+        #-----------------------
+        yo/**
+        **/yo/**
+        !yo/keepit.js
+        `;
+        writeFile(pathJoin(projectDir, '.sensitivedata'), customSensitiveData);
+
+        // When
+        const result = audit.getSensitiveData(projectDir);
+
+        // Then
+        Array.isArray(result.sensitiveData).should.be.true();
+        Array.isArray(result.ignoredData).should.be.true();
+        result.sensitiveData.length.should.equal(2);
+        result.ignoredData.length.should.equal(1);
     });
 
     it('Should get no ignored files when publish-please has no configuration file', () => {
