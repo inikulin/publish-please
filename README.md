@@ -7,6 +7,11 @@
 <p align="center">
 <i>Safe and highly functional replacement for `npm publish`.</i>
 </p>
+
+<p align="center">
+<i>You could also use publish-please only as an ultimate check before publishing: `npx publish-please --dry-run`</i>
+</p>
+
 <p align="center">
     <img src="https://raw.githubusercontent.com/inikulin/publish-please/master/media/demo.gif" alt="demo" />
 </p>
@@ -75,6 +80,7 @@ npm run publish-please
  - **sensitive and non essential Data** - Perform [audit for the sensitive data](#sensitive-and-non-essential-data-audit). Default: `true` if npm version is 5.9.0 or above, `false` otherwise.
     - sensitive and non-essential data are by default defined inside this [.sensitivedata](.sensitivedata) file.
     - you may completely override this file by creating a `.sensitivedata` file in the root of your project so that this validation fits your needs.
+        - if you create your own `.sensitivedata` file, and the `package.json` file has no `files` section, consider adding `.sensitivedata` to the `.npmignore` file.
     
  - **vulnerableDependencies** - Perform vulnerable dependencies check using `npm audit`. Default: `true` if npm version is 6.1.0 or above, `false` otherwise.
     - you may prevent specific vulnerabilities to be reported by publish-please by creating a `.auditignore` file in the root of your project with content like the following:
