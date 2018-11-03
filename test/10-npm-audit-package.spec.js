@@ -718,8 +718,12 @@ describe('npm package analyzer', () => {
                     path: 'keys/foo_rsa.pub',
                     size: 123456,
                 },
+                {
+                    path: 'lib/keys/foo_rsa',
+                    size: 123456,
+                },
             ],
-            entryCount: 5,
+            entryCount: 6,
             bundled: [],
         };
         // When
@@ -757,8 +761,13 @@ describe('npm package analyzer', () => {
                     size: 123456,
                     isSensitiveData: false,
                 },
+                {
+                    path: 'lib/keys/foo_rsa',
+                    size: 123456,
+                    isSensitiveData: true,
+                },
             ],
-            entryCount: 5,
+            entryCount: 6,
             bundled: [],
         };
         result.should.containDeep(expected);
