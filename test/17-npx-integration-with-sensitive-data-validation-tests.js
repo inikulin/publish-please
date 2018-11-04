@@ -138,11 +138,11 @@ describe('npx integration tests with sensitive-data validation', () => {
                 .then(() =>
                     exec(
                         /* prettier-ignore */
-                        `npx ../${packageName.replace('@','-')}.tgz > ./publish09.log`
+                        `npx ../${packageName.replace('@','-')}.tgz > ./publish11.log`
                     )
                 )
                 .then(() => {
-                    const publishLog = readFile('./publish09.log').toString();
+                    const publishLog = readFile('./publish11.log').toString();
                     console.log(publishLog);
                     return publishLog;
                 })
@@ -233,11 +233,11 @@ describe('npx integration tests with sensitive-data validation', () => {
                 .then(() =>
                     exec(
                         /* prettier-ignore */
-                        `npx ../${packageName.replace('@','-')}.tgz > ./publish09.log`
+                        `npx ../${packageName.replace('@','-')}.tgz > ./publish12.log`
                     )
                 )
                 .then(() => {
-                    const publishLog = readFile('./publish09.log').toString();
+                    const publishLog = readFile('./publish12.log').toString();
                     console.log(publishLog);
                     return publishLog;
                 })
@@ -313,11 +313,11 @@ describe('npx integration tests with sensitive-data validation', () => {
                 .then(() =>
                     exec(
                         /* prettier-ignore */
-                        `npx ../${packageName.replace('@','-')}.tgz > ./publish10.log`
+                        `npx ../${packageName.replace('@','-')}.tgz > ./publish13.log`
                     )
                 )
                 .then(() => {
-                    const publishLog = readFile('./publish10.log').toString();
+                    const publishLog = readFile('./publish13.log').toString();
                     console.log(publishLog);
                     return publishLog;
                 })
@@ -342,6 +342,88 @@ describe('npx integration tests with sensitive-data validation', () => {
                     assert(!publishLog.includes('Sensitive or non essential data found in npm package: lib/node_modules/my-app/index.js'));
                     /* prettier-ignore */
                     assert(!publishLog.includes('Sensitive or non essential data found in npm package: lib/test/yo234.spec.js'));
+                });
+        });
+
+        it('Should detect custom .sensitivedata and ignore sensitive-data when sensitive-data check is enabled in .publishrc config file', () => {
+            return Promise.resolve()
+                .then(() => {
+                    writeFile(
+                        '.publishrc',
+                        JSON.stringify(
+                            {
+                                confirm: false,
+                                validations: {
+                                    vulnerableDependencies: false,
+                                    sensitiveData: {
+                                        ignore: ['**/yo456.tgz'],
+                                    },
+                                    uncommittedChanges: false,
+                                    untrackedFiles: false,
+                                    branch: 'master',
+                                    gitTag: false,
+                                },
+                                publishTag: 'latest',
+                                prePublishScript:
+                                    'echo "running script defined in .publishrc ..."',
+                                postPublishScript: false,
+                            },
+                            null,
+                            2
+                        )
+                    );
+                })
+                .then(() => {
+                    const customSensitiveData = `
+                    #-----------------------
+                    # yo Files
+                    #-----------------------
+                    yo/**
+                    **/yo/**
+                    !**/yo/keepit.js
+                    `;
+                    writeFile('.sensitivedata', customSensitiveData);
+                })
+                .then(() => {
+                    touch(pathJoin(process.cwd(), 'lib', 'yo234.tgz'));
+                    mkdirp.sync(pathJoin(process.cwd(), 'lib', 'yo'));
+                    touch(pathJoin(process.cwd(), 'lib', 'yo', 'yo234.tgz'));
+                    touch(pathJoin(process.cwd(), 'lib', 'yo', 'yo456.tgz'));
+                    touch(pathJoin(process.cwd(), 'lib', 'yo', 'keepit.js'));
+                })
+                .then(() => console.log(`> npx ${packageName}`))
+                .then(() =>
+                    exec(
+                        /* prettier-ignore */
+                        `npx ../${packageName.replace('@','-')}.tgz > ./publish14.log`
+                    )
+                )
+                .then(() => {
+                    const publishLog = readFile('./publish14.log').toString();
+                    console.log(publishLog);
+                    return publishLog;
+                })
+                .then((publishLog) => {
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running pre-publish script'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('running script defined in .publishrc ...'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running validations'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Checking for the sensitive and non-essential data in the npm package'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Validating branch'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('ERRORS'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Sensitive or non essential data found in npm package: lib/yo/yo234.tgz'));
+                    /* prettier-ignore */
+                    assert(!publishLog.includes('Sensitive or non essential data found in npm package: lib/yo234.tgz'));
+                    /* prettier-ignore */
+                    assert(!publishLog.includes('Sensitive or non essential data found in npm package: lib/yo/yo456.tgz'));
+                    /* prettier-ignore */
+                    assert(!publishLog.includes('Sensitive or non essential data found in npm package: lib/yo/keepit.js'));
                 });
         });
     }
@@ -399,11 +481,11 @@ describe('npx integration tests with sensitive-data validation', () => {
                 .then(() =>
                     exec(
                         /* prettier-ignore */
-                        `npx ../${packageName.replace('@','-')}.tgz > ./publish11.log`
+                        `npx ../${packageName.replace('@','-')}.tgz > ./publish15.log`
                     )
                 )
                 .then(() => {
-                    const publishLog = readFile('./publish11.log').toString();
+                    const publishLog = readFile('./publish15.log').toString();
                     console.log(publishLog);
                     return publishLog;
                 })
