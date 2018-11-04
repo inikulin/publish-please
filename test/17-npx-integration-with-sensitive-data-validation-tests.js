@@ -138,11 +138,11 @@ describe('npx integration tests with sensitive-data validation', () => {
                 .then(() =>
                     exec(
                         /* prettier-ignore */
-                        `npx ../${packageName.replace('@','-')}.tgz > ./publish09.log`
+                        `npx ../${packageName.replace('@','-')}.tgz > ./publish11.log`
                     )
                 )
                 .then(() => {
-                    const publishLog = readFile('./publish09.log').toString();
+                    const publishLog = readFile('./publish11.log').toString();
                     console.log(publishLog);
                     return publishLog;
                 })
@@ -233,11 +233,11 @@ describe('npx integration tests with sensitive-data validation', () => {
                 .then(() =>
                     exec(
                         /* prettier-ignore */
-                        `npx ../${packageName.replace('@','-')}.tgz > ./publish09.log`
+                        `npx ../${packageName.replace('@','-')}.tgz > ./publish12.log`
                     )
                 )
                 .then(() => {
-                    const publishLog = readFile('./publish09.log').toString();
+                    const publishLog = readFile('./publish12.log').toString();
                     console.log(publishLog);
                     return publishLog;
                 })
@@ -313,11 +313,11 @@ describe('npx integration tests with sensitive-data validation', () => {
                 .then(() =>
                     exec(
                         /* prettier-ignore */
-                        `npx ../${packageName.replace('@','-')}.tgz > ./publish10.log`
+                        `npx ../${packageName.replace('@','-')}.tgz > ./publish13.log`
                     )
                 )
                 .then(() => {
-                    const publishLog = readFile('./publish10.log').toString();
+                    const publishLog = readFile('./publish13.log').toString();
                     console.log(publishLog);
                     return publishLog;
                 })
@@ -395,11 +395,11 @@ describe('npx integration tests with sensitive-data validation', () => {
                 .then(() =>
                     exec(
                         /* prettier-ignore */
-                        `npx ../${packageName.replace('@','-')}.tgz > ./publish11.log`
+                        `npx ../${packageName.replace('@','-')}.tgz > ./publish14.log`
                     )
                 )
                 .then(() => {
-                    const publishLog = readFile('./publish11.log').toString();
+                    const publishLog = readFile('./publish14.log').toString();
                     console.log(publishLog);
                     return publishLog;
                 })
@@ -481,11 +481,11 @@ describe('npx integration tests with sensitive-data validation', () => {
                 .then(() =>
                     exec(
                         /* prettier-ignore */
-                        `npx ../${packageName.replace('@','-')}.tgz > ./publish12.log`
+                        `npx ../${packageName.replace('@','-')}.tgz > ./publish15.log`
                     )
                 )
                 .then(() => {
-                    const publishLog = readFile('./publish12.log').toString();
+                    const publishLog = readFile('./publish15.log').toString();
                     console.log(publishLog);
                     return publishLog;
                 })
