@@ -19,6 +19,7 @@ module.exports = function getNpmArgs(processEnv) {
         npmArgs['--save'] = npmCommand(args).hasArg('--save');
         npmArgs['--global'] = npmCommand(args).hasArg('--global');
         npmArgs['--dry-run'] = npmCommand(args).hasArg('--dry-run');
+        npmArgs['--ci'] = npmCommand(args).hasArg('--ci');
         npmArgs['config'] = npmCommand(args).hasArg('config');
         npmArgs.npx =
             npmCommand(args).hasArg('--prefix') &&

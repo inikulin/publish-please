@@ -28,6 +28,7 @@ describe('npx args parser util', () => {
         const args = npxArgs(process);
         // Then
         args['--dry-run'].should.be.false();
+        args['--ci'].should.be.false();
         args['config'].should.be.false();
     });
     it('Should parse even if process.argv does not exist', () => {
@@ -37,6 +38,7 @@ describe('npx args parser util', () => {
         const args = npxArgs(process);
         // Then
         args['--dry-run'].should.be.false();
+        args['--ci'].should.be.false();
         args['config'].should.be.false();
     });
     it('Should parse even if process.argv is not an array', () => {
@@ -47,6 +49,7 @@ describe('npx args parser util', () => {
         const args = npxArgs(process);
         // Then
         args['--dry-run'].should.be.false();
+        args['--ci'].should.be.false();
         args['config'].should.be.false();
     });
     it('Should parse even if process.argv is an empty array', () => {
@@ -57,6 +60,7 @@ describe('npx args parser util', () => {
         const args = npxArgs(process);
         // Then
         args['--dry-run'].should.be.false();
+        args['--ci'].should.be.false();
         args['config'].should.be.false();
     });
     it('Should parse even if the command is not an npx command', () => {
@@ -66,6 +70,7 @@ describe('npx args parser util', () => {
         const args = npxArgs(process);
         // Then
         args['--dry-run'].should.be.false();
+        args['--ci'].should.be.false();
         args['config'].should.be.false();
     });
     it('Should parse the command `npx publish-please --dry-run`', () => {
@@ -93,6 +98,67 @@ describe('npx args parser util', () => {
         const args = npxArgs(process);
         // Then
         args['--dry-run'].should.be.true();
+        args['--ci'].should.be.false();
+        args['config'].should.be.false();
+    });
+
+    it('Should parse the command `npx publish-please --ci`', () => {
+        // Given
+        // [ '/usr/local/bin/node',
+        //   '/Users/HDO/.npm/_npx/97852/bin/publish-please',
+        //   '--ci'
+        // ]
+
+        process.argv = [
+            pathJoin('usr', 'local', 'bin', 'node'),
+            pathJoin(
+                'Users',
+                'xxx',
+                '.npm',
+                '_npx',
+                '97852',
+                'bin',
+                'publish-please'
+            ),
+            '--ci',
+        ];
+
+        // When
+        const args = npxArgs(process);
+        // Then
+        args['--dry-run'].should.be.false();
+        args['--ci'].should.be.true();
+        args['config'].should.be.false();
+    });
+
+    it('Should parse the command `npx publish-please --ci --dry-run`', () => {
+        // Given
+        // [ '/usr/local/bin/node',
+        //   '/Users/HDO/.npm/_npx/97852/bin/publish-please',
+        //   '--ci'
+        //   '--dry-run'
+        // ]
+
+        process.argv = [
+            pathJoin('usr', 'local', 'bin', 'node'),
+            pathJoin(
+                'Users',
+                'xxx',
+                '.npm',
+                '_npx',
+                '97852',
+                'bin',
+                'publish-please'
+            ),
+            '--ci',
+            '--dry-run',
+        ];
+
+        // When
+        const args = npxArgs(process);
+        // Then
+        args['--dry-run'].should.be.true();
+        args['--ci'].should.be.true();
         args['config'].should.be.false();
     });
 
@@ -121,6 +187,7 @@ describe('npx args parser util', () => {
         const args = npxArgs(process);
         // Then
         args['--dry-run'].should.be.false();
+        args['--ci'].should.be.false();
         args['config'].should.be.true();
     });
 });
