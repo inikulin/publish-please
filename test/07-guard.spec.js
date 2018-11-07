@@ -11,6 +11,8 @@ describe('Guard Execution', () => {
     let output;
 
     beforeEach(() => {
+        delete process.env['npm_config_argv'];
+        process.argv = [];
         exitCode = undefined;
         output = '';
         nativeExit = process.exit;
@@ -29,7 +31,7 @@ describe('Guard Execution', () => {
         console.log = nativeConsoleLog;
     });
 
-    it('Should return an error message on `npm publish`', () => {
+    it('Should return an error message (elegant status reporter) on `npm publish`', () => {
         // Given
         process.env['npm_config_argv'] =
             '{"remain":[],"cooked":["publish"],"original":["publish"]}';
@@ -38,6 +40,21 @@ describe('Guard Execution', () => {
         // Then
         exitCode.should.be.equal(1);
         output.should.containEql("'npm publish' is forbidden for this package");
+        output.should.containEql('[41m[49m');
+    });
+
+    it('Should return an error message (CI reporter) on `npm publish --ci`', () => {
+        // Given
+        process.env['npm_config_argv'] =
+            '{"remain":[],"cooked":["publish", "--ci"],"original":["publish", "--ci"]}';
+        // When
+        guard(process.env);
+        // Then
+        exitCode.should.be.equal(1);
+        output.should.containEql("'npm publish' is forbidden for this package");
+        output.should.not.containEql('[41m[49m');
+        output.should.not.containEql('[41m');
+        output.should.not.containEql('[49m');
     });
 
     it('Should not return an error message on `npm publish --with-publish-please`', () => {

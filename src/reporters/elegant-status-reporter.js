@@ -6,7 +6,7 @@
 module.exports = {
     /**
      * name of the reporter. Must be unique among all reporters.
-    */
+     */
     name: 'elegant-status',
     /**
      * Check if this reporter can be used.
@@ -33,14 +33,14 @@ module.exports = {
     shouldRun() {
         return true;
     },
-    error,
+    reportError,
 };
 
 /**
  * report error message
  * @param {string} message - error message to be reported
  */
-function error(message) {
+function reportError(message) {
     const chalk = require('chalk');
     console.log(chalk.bgRed(message));
 }

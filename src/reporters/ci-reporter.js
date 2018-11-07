@@ -44,13 +44,13 @@ module.exports = {
         }
         return false;
     },
-    error,
+    reportError,
 };
 
 /**
  * report error message
  * @param {string} message - error message to be reported
  */
-function error(message) {
+function reportError(message) {
     console.log(message);
 }

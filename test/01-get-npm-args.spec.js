@@ -282,6 +282,7 @@ describe('npm args parser util', () => {
         args['--save-dev'].should.be.false();
         args['--save'].should.be.false();
         args['--dry-run'].should.be.false();
+        args['--ci'].should.be.false();
         args['config'].should.be.true();
     });
 
@@ -304,6 +305,7 @@ describe('npm args parser util', () => {
         args['--save-dev'].should.be.false();
         args['--save'].should.be.false();
         args['--dry-run'].should.be.false();
+        args['--ci'].should.be.false();
         args['config'].should.be.false();
     });
 });
