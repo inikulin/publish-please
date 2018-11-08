@@ -40,7 +40,9 @@ describe('Guard Execution', () => {
         // Then
         exitCode.should.be.equal(1);
         output.should.containEql("'npm publish' is forbidden for this package");
-        output.should.containEql('[41m[49m');
+        if (typeof process.env.APPVEYOR === 'undefined') {
+            output.should.containEql('[41m[49m');
+        }
     });
 
     it('Should return an error message (CI reporter) on `npm publish --ci`', () => {
