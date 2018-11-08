@@ -1,5 +1,5 @@
 const chalk = require('chalk');
-const elegantStatus = require('elegant-status');
+const reporter = require('../reporters/current');
 const emoji = require('node-emoji').emoji;
 
 const validations = [
@@ -12,7 +12,7 @@ const validations = [
 ];
 
 function runValidation(validation, param, pkg, errs) {
-    const done = elegantStatus(validation.statusText);
+    const done = reporter.current().reportRunningTask(validation.statusText);
 
     // prettier-ignore
     return validation
@@ -27,7 +27,7 @@ function runValidation(validation, param, pkg, errs) {
 }
 
 function skipValidation(validation, errs) {
-    const done = elegantStatus(validation.statusText);
+    const done = reporter.current().reportRunningTask(validation.statusText);
     return Promise.resolve()
         .then(() => errs.push(validation.whyCannotRun()))
         .then(() => done(false));

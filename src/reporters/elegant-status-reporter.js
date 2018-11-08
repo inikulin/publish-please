@@ -34,6 +34,7 @@ module.exports = {
         return true;
     },
     reportError,
+    reportRunningTask,
 };
 
 /**
@@ -43,4 +44,16 @@ module.exports = {
 function reportError(message) {
     const chalk = require('chalk');
     console.log(chalk.bgRed(message));
+}
+
+/**
+ * report a task that is executing and may take some time
+ * @param {string} taskname
+ * @returns {function(boolean): void} done - returns a function to be called when task has finished processing
+ * done(true) -> report success
+ * done(false) -> report failure
+ */
+function reportRunningTask(taskname) {
+    const elegantStatus = require('elegant-status');
+    return elegantStatus(taskname);
 }
