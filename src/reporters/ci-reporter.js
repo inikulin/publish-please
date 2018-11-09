@@ -1,4 +1,5 @@
 'use strict';
+const os = require('os');
 
 /**
  * CI reporter.
@@ -45,6 +46,7 @@ module.exports = {
         return false;
     },
     reportError,
+    reportRunningTask,
 };
 
 /**
@@ -53,4 +55,26 @@ module.exports = {
  */
 function reportError(message) {
     console.log(message);
+}
+
+/**
+ * report a task that is executing and may take some time
+ * @param {string} taskname
+ * @returns {function(boolean): void} done - returns a function to be called when task has finished processing
+ * done(true) -> report success
+ * done(false) -> report failure
+ */
+function reportRunningTask(taskname) {
+    const platform = os.platform();
+    function done(success) {
+        if (success) {
+            console.log(
+                `${platform.startsWith('win') ? '√' : '✓'} ${taskname}`
+            );
+            return;
+        }
+        console.log(`${platform.startsWith('win') ? '×' : '✖'} ${taskname}`);
+    }
+
+    return done;
 }
