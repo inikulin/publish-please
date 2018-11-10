@@ -16,16 +16,7 @@ module.exports = {
      * false otherwise
      */
     canRun() {
-        try {
-            const getNpmArgs = require('../utils/get-npm-args');
-            const getNpxArgs = require('../utils/get-npx-args');
-            return (
-                typeof getNpmArgs === 'function' &&
-                typeof getNpxArgs === 'function'
-            );
-        } catch (_error) {
-            return false;
-        }
+        return true;
     },
     /**
      * Check if this reporter should be used
