@@ -1,4 +1,11 @@
 'use strict';
+/**
+ * Why there is no import of third-party modules at the root of this file?
+ * Required modules may not be available at some point
+ * of the publish-please module lifecycle.
+ * Requiring those modules at first will break the publish-please execution
+ * because reporter's code will be the first to execute
+ */
 const os = require('os');
 
 /**

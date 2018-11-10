@@ -14,7 +14,7 @@
     "lint": "eslint bin src test",
     "clean": "rimraf lib",
     "compile": "babel src -d lib",
-    "build": "npm run clean && npm run compile && prettier --write \"lib/{pre,post}-install.js\" ",
+    "build": "npm run clean && npm run compile && prettier --write \"lib/{pre,post}-install.js\" && prettier --write \"lib/reporters/*.js\"",
     "mocha-with-coverage": "istanbul cover -x test node_modules/mocha/bin/_mocha test",
     "check-coverage": "istanbul check-coverage --statements 97 --lines 97 --branches 85 --functions 97",
     "test": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage && npm run check-coverage",
