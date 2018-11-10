@@ -1,5 +1,6 @@
 'use strict';
 
+const reporter = require('./reporters/current');
 const NO_GLOBAL_INSTALL_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !! Starting from v2.0.0 publish-please can't be installed globally.          !!
@@ -22,10 +23,5 @@ module.exports = function preventGlobalInstall() {
 };
 
 function reportNoGlobalInstall() {
-    try {
-        const chalk = require('chalk');
-        console.log(chalk.bgRed(NO_GLOBAL_INSTALL_MESSAGE));
-    } catch (error) {
-        console.log(NO_GLOBAL_INSTALL_MESSAGE);
-    }
+    reporter.current().reportError(NO_GLOBAL_INSTALL_MESSAGE);
 }
