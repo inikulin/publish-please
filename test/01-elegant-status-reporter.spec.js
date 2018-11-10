@@ -83,6 +83,44 @@ describe('Elegant status reporter', () => {
         // Then
         result.should.be.true();
     });
+    it('Should report success', () => {
+        // Given
+        const message = 'yo message';
+
+        // When
+        reporter.reportSuccess(message);
+        // Then
+        output.should.containEql(message);
+        if (typeof process.env.APPVEYOR === 'undefined') {
+            output.should.containEql('\u001b[42m');
+        }
+    });
+
+    it('Should report error', () => {
+        // Given
+        const message = 'yo error message';
+
+        // When
+        reporter.reportError(message);
+        // Then
+        output.should.containEql(message);
+        if (typeof process.env.APPVEYOR === 'undefined') {
+            output.should.containEql('\u001b[41m');
+        }
+    });
+
+    it('Should report information', () => {
+        // Given
+        const message = 'yo information message';
+
+        // When
+        reporter.reportInformation(message);
+        // Then
+        output.should.containEql(message);
+        if (typeof process.env.APPVEYOR === 'undefined') {
+            output.should.containEql('\u001b[7m');
+        }
+    });
 });
 
 describe('Elegant status reporter', () => {

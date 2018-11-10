@@ -2,10 +2,10 @@
 const pathJoin = require('path').join;
 const writeFile = require('fs').writeFileSync;
 const readPkg = require('./utils/read-package-json').readPkgSync;
-const chalk = require('chalk');
 const getProjectDir = require('./utils/get-project-dir');
 const nodeInfos = require('./utils/get-node-infos').getNodeInfosSync();
 const shouldUsePrePublishOnlyScript = nodeInfos.shouldUsePrePublishOnlyScript;
+const reporter = require('./reporters/current');
 
 const NO_CONFIG_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -46,23 +46,23 @@ const DEPRECATION_NOTE_ON_PREPUBLISH = `
 
 function onInstall(projectDir) {
     function reportNoConfig() {
-        console.log(chalk.bgRed(NO_CONFIG_MESSAGE));
+        reporter.current().reportError(NO_CONFIG_MESSAGE);
     }
 
     function reportNoHooksOnItself() {
-        console.log(chalk.inverse(POST_INSTALL_HOOKS_ARE_IGNORED));
+        reporter.current().reportInformation(POST_INSTALL_HOOKS_ARE_IGNORED);
     }
 
     function reportHooksAdded() {
-        console.log(chalk.bgGreen(HOOKS_ADDED_MESSAGE));
+        reporter.current().reportSuccess(HOOKS_ADDED_MESSAGE);
     }
 
     function reportCompletion() {
-        console.log(chalk.bgGreen(COMPLETION_MESSAGE));
+        reporter.current().reportSuccess(COMPLETION_MESSAGE);
     }
 
     function reportDeprecationNoteOnPrePublish() {
-        console.log(chalk.inverse(DEPRECATION_NOTE_ON_PREPUBLISH));
+        reporter.current().reportInformation(DEPRECATION_NOTE_ON_PREPUBLISH);
     }
 
     function getPrePublishKey(scripts) {

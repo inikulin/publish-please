@@ -19,7 +19,6 @@ module.exports = {
                 .pop();
             return selectedReporter || ciReporter;
         } catch (error) {
-            console.log(error);
             return ciReporter;
         }
     },
@@ -32,5 +31,7 @@ module.exports = {
  * @property {function(): boolean} canRun - Check if this reporter can be used.
  * @property {function(): boolean} shouldRun - Check if this reporter should be used
  * @property {function(string): void} reportError - report error message
+ * @property {function(string): void} reportInformation - report information message
  * @property {function(string): function(boolean):void} reportRunningTask - report a task that is executing and may take some time,
+ * @property {function(string): void} reportSuccess - report success message
  */

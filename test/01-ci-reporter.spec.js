@@ -37,6 +37,16 @@ describe('CI reporter', () => {
         console.log = nativeConsoleLog;
         console.log(`${lineSeparator} end test ${lineSeparator}\n`);
     });
+
+    it('Can run by default', () => {
+        // Given
+
+        // When
+        const result = reporter.canRun();
+        // Then
+        result.should.be.true();
+    });
+
     it('Should not run by default', () => {
         // Given
 
@@ -110,5 +120,35 @@ describe('CI reporter', () => {
             platform.startsWith('win') ? '×' : '✖'
         } ${taskname}`;
         output.should.containEql(expected);
+    });
+
+    it('Should report success', () => {
+        // Given
+        const message = 'yo message';
+
+        // When
+        reporter.reportSuccess(message);
+        // Then
+        output.should.containEql(message);
+    });
+
+    it('Should report error', () => {
+        // Given
+        const message = 'yo error message';
+
+        // When
+        reporter.reportError(message);
+        // Then
+        output.should.containEql(message);
+    });
+
+    it('Should report information', () => {
+        // Given
+        const message = 'yo information message';
+
+        // When
+        reporter.reportInformation(message);
+        // Then
+        output.should.containEql(message);
     });
 });

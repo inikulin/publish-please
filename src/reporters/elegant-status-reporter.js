@@ -42,7 +42,9 @@ module.exports = {
         return true;
     },
     reportError,
+    reportInformation,
     reportRunningTask,
+    reportSuccess,
 };
 
 /**
@@ -64,4 +66,22 @@ function reportError(message) {
 function reportRunningTask(taskname) {
     const elegantStatus = require('elegant-status');
     return elegantStatus(taskname);
+}
+
+/**
+ * report success message
+ * @param {string} message - success message to be reported
+ */
+function reportSuccess(message) {
+    const chalk = require('chalk');
+    console.log(chalk.bgGreen(message));
+}
+
+/**
+ * report information message
+ * @param {string} message - information message to be reported
+ */
+function reportInformation(message) {
+    const chalk = require('chalk');
+    console.log(chalk.inverse(message));
 }
