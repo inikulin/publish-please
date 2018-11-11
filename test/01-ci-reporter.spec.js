@@ -142,6 +142,26 @@ describe('CI reporter', () => {
         output.should.containEql(message);
     });
 
+    it('Should report step', () => {
+        // Given
+        const message = 'yo step message';
+
+        // When
+        reporter.reportStep(message);
+        // Then
+        output.should.containEql(message);
+    });
+
+    it('Should report as is', () => {
+        // Given
+        const message = 'yo line 1\nyo line 2\nyo line 3';
+
+        // When
+        reporter.reportAsIs(message);
+        // Then
+        output.should.containEql(message);
+    });
+
     it('Should report information', () => {
         // Given
         const message = 'yo information message';

@@ -43,9 +43,11 @@ module.exports = {
         }
         return false;
     },
+    reportAsIs,
     reportError,
     reportInformation,
     reportRunningTask,
+    reportStep,
     reportSuccess,
 };
 
@@ -92,5 +94,21 @@ function reportSuccess(message) {
  * @param {string} message - information message to be reported
  */
 function reportInformation(message) {
+    console.log(message);
+}
+
+/**
+ * report step message
+ * @param {string} message - step message to be reported
+ */
+function reportStep(message) {
+    console.log(message);
+}
+
+/**
+ * report message without doing any extra formatting
+ * @param {string} message - message to be reported
+ */
+function reportAsIs(message) {
     console.log(message);
 }

@@ -85,14 +85,14 @@ describe('Elegant status reporter', () => {
     });
     it('Should report success', () => {
         // Given
-        const message = 'yo message';
+        const message = 'yo success message';
 
         // When
         reporter.reportSuccess(message);
         // Then
         output.should.containEql(message);
         if (typeof process.env.APPVEYOR === 'undefined') {
-            output.should.containEql('\u001b[42m');
+            output.should.containEql('\u001b[32m');
         }
     });
 
@@ -105,7 +105,20 @@ describe('Elegant status reporter', () => {
         // Then
         output.should.containEql(message);
         if (typeof process.env.APPVEYOR === 'undefined') {
-            output.should.containEql('\u001b[41m');
+            output.should.containEql('\u001b[31m');
+        }
+    });
+
+    it('Should report step', () => {
+        // Given
+        const message = 'yo step message';
+
+        // When
+        reporter.reportStep(message);
+        // Then
+        output.should.containEql(message);
+        if (typeof process.env.APPVEYOR === 'undefined') {
+            output.should.containEql('\u001b[34m');
         }
     });
 
@@ -119,6 +132,20 @@ describe('Elegant status reporter', () => {
         output.should.containEql(message);
         if (typeof process.env.APPVEYOR === 'undefined') {
             output.should.containEql('\u001b[7m');
+        }
+    });
+
+    it('Should report as is', () => {
+        // Given
+        const message = 'yo line 1\nyo line 2\nyo line 3';
+
+        // When
+        reporter.reportAsIs(message);
+        // Then
+        output.should.containEql(message);
+        if (typeof process.env.APPVEYOR === 'undefined') {
+            output.should.not.containEql('\u001b');
+            output.should.not.containEql('[');
         }
     });
 });

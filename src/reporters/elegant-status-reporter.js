@@ -27,7 +27,8 @@ module.exports = {
             return (
                 typeof chalk === 'function' &&
                 typeof chalk.inverse === 'function' &&
-                typeof chalk.bgRed === 'function'
+                typeof chalk.red === 'function' &&
+                typeof chalk.green === 'function'
             );
         } catch (_error) {
             return false;
@@ -41,9 +42,11 @@ module.exports = {
     shouldRun() {
         return true;
     },
+    reportAsIs,
     reportError,
     reportInformation,
     reportRunningTask,
+    reportStep,
     reportSuccess,
 };
 
@@ -53,7 +56,7 @@ module.exports = {
  */
 function reportError(message) {
     const chalk = require('chalk');
-    console.log(chalk.bgRed(message));
+    console.log(chalk.red(message));
 }
 
 /**
@@ -74,7 +77,7 @@ function reportRunningTask(taskname) {
  */
 function reportSuccess(message) {
     const chalk = require('chalk');
-    console.log(chalk.bgGreen(message));
+    console.log(chalk.green(message));
 }
 
 /**
@@ -84,4 +87,21 @@ function reportSuccess(message) {
 function reportInformation(message) {
     const chalk = require('chalk');
     console.log(chalk.inverse(message));
+}
+
+/**
+ * report step message
+ * @param {string} message - step message to be reported
+ */
+function reportStep(message) {
+    const chalk = require('chalk');
+    console.log(chalk.blue(message));
+}
+
+/**
+ * report message without doing any extra formatting
+ * @param {string} message - message to be reported
+ */
+function reportAsIs(message) {
+    console.log(message);
 }

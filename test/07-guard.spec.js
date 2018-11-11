@@ -41,7 +41,7 @@ describe('Guard Execution', () => {
         exitCode.should.be.equal(1);
         output.should.containEql("'npm publish' is forbidden for this package");
         if (typeof process.env.APPVEYOR === 'undefined') {
-            output.should.containEql('[41m[49m');
+            output.should.containEql('\u001b[31m\u001b[39m');
         }
     });
 
@@ -54,7 +54,9 @@ describe('Guard Execution', () => {
         // Then
         exitCode.should.be.equal(1);
         output.should.containEql("'npm publish' is forbidden for this package");
-        output.should.not.containEql('[41m[49m');
+        output.should.not.containEql('\u001b');
+        output.should.not.containEql('[31m');
+        output.should.not.containEql('[39m');
         output.should.not.containEql('[41m');
         output.should.not.containEql('[49m');
     });
