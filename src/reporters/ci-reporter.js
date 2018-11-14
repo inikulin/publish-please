@@ -126,7 +126,6 @@ function reportAsIs(message) {
 function reportRunningSequence(message) {
     console.log(message);
     console.log('-------------------------');
-    console.log('');
 }
 
 /**

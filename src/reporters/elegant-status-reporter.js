@@ -122,7 +122,6 @@ function reportRunningSequence(message) {
     const chalk = require('chalk');
     console.log(chalk.yellow(message));
     console.log(chalk.yellow('-------------------------'));
-    console.log('');
 }
 
 /**
