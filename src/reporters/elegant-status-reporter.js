@@ -24,11 +24,13 @@ module.exports = {
     canRun() {
         try {
             const chalk = require('chalk');
+            const emoji = require('node-emoji').emoji;
             return (
                 typeof chalk === 'function' &&
                 typeof chalk.inverse === 'function' &&
                 typeof chalk.red === 'function' &&
-                typeof chalk.green === 'function'
+                typeof chalk.green === 'function' &&
+                emoji['+1'] !== undefined
             );
         } catch (_error) {
             return false;
@@ -48,6 +50,7 @@ module.exports = {
     reportRunningSequence,
     reportRunningTask,
     reportStep,
+    reportSucceededSequence,
     reportSuccess,
 };
 
@@ -119,5 +122,22 @@ function reportRunningSequence(message) {
     const chalk = require('chalk');
     console.log(chalk.yellow(message));
     console.log(chalk.yellow('-------------------------'));
+    console.log('');
+}
+
+/**
+ * report a successful execution of a sequence
+ * A running sequence is composed of one or more steps
+ * Each step in a sequence may be reported by:
+ *      reportStep if the step is synchronous
+ *      reportRunningTask if the step is asynchronous
+ * @param {string} message - name of the sequence to be reported
+ */
+// eslint-disable-next-line no-unused-vars
+function reportSucceededSequence(_message) {
+    const chalk = require('chalk');
+    const emoji = require('node-emoji').emoji;
+    console.log(chalk.yellow('-------------------'));
+    console.log(emoji['+1'], emoji['+1'], emoji['+1']);
     console.log('');
 }

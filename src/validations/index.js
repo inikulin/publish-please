@@ -1,6 +1,4 @@
-const chalk = require('chalk');
 const reporter = require('../reporters/current');
-const emoji = require('node-emoji').emoji;
 
 const validations = [
     require('./vulnerable-dependencies'),
@@ -76,9 +74,9 @@ module.exports = {
                     const msg = errs.map((err) => '  * ' + err).join('\n');
                     throw new Error(msg);
                 }
-                console.log(chalk.yellow('-------------------'));
-                console.log(emoji['+1'], emoji['+1'], emoji['+1']);
-                console.log('');
+                reporter
+                    .current()
+                    .reportSucceededSequence('Validations passed');
             });
     },
 };

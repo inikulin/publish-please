@@ -6,6 +6,7 @@ const packageName = require('./utils/publish-please-version-under-test');
 const reporter = require('../lib/reporters/elegant-status-reporter');
 const rename = require('fs').renameSync;
 const pathJoin = require('path').join;
+const emoji = require('node-emoji').emoji;
 const lineSeparator = '----------------------------------';
 
 describe('Elegant status reporter', () => {
@@ -159,6 +160,19 @@ describe('Elegant status reporter', () => {
         output.should.containEql(message);
         if (typeof process.env.APPVEYOR === 'undefined') {
             output.should.containEql('\u001b[33m');
+        }
+    });
+
+    it('Should report a succeeded sequence', () => {
+        // Given
+        const message = 'yo steps passed';
+
+        // When
+        reporter.reportSucceededSequence(message);
+        // Then
+        output.should.containEql('-------------------');
+        if (typeof process.env.APPVEYOR === 'undefined') {
+            output.should.containEql(emoji['+1']);
         }
     });
 });
