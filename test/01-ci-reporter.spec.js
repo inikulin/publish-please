@@ -171,4 +171,14 @@ describe('CI reporter', () => {
         // Then
         output.should.containEql(message);
     });
+
+    it('Should report a running sequence', () => {
+        // Given
+        const message = 'running yo steps';
+
+        // When
+        reporter.reportRunningSequence(message);
+        // Then
+        output.should.containEql(message);
+    });
 });

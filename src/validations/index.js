@@ -19,9 +19,9 @@ function runValidation(validation, param, pkg, errs) {
         .run(param, pkg)
         .then(() => done(true))
         .catch((err) => {
-            Array.isArray(err)
-                ? errs.push(...err)
-                : errs.push(err);
+            Array.isArray(err) ?
+                errs.push(...err) :
+                errs.push(err);
             done(false);
         });
 }
@@ -55,9 +55,7 @@ module.exports = {
 
         if (!validationsToRun.length) return Promise.resolve();
 
-        console.log(chalk.yellow('Running validations'));
-        console.log(chalk.yellow('-------------------'));
-        console.log('');
+        reporter.current().reportRunningSequence('Running validations');
 
         return validationsToRun
             .reduce((validationChain, validation) => {
@@ -69,8 +67,7 @@ module.exports = {
                                 validation,
                                 opts[validation.option],
                                 pkg,
-                                errs
-                            )
+                                errs)
                             : skipValidation(validation, errs)
                 );
             }, Promise.resolve())

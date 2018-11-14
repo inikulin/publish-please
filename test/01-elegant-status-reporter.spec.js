@@ -148,6 +148,19 @@ describe('Elegant status reporter', () => {
             output.should.not.containEql('[');
         }
     });
+
+    it('Should report a running sequence', () => {
+        // Given
+        const message = 'running yo steps';
+
+        // When
+        reporter.reportRunningSequence(message);
+        // Then
+        output.should.containEql(message);
+        if (typeof process.env.APPVEYOR === 'undefined') {
+            output.should.containEql('\u001b[33m');
+        }
+    });
 });
 
 describe('Elegant status reporter', () => {
