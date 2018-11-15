@@ -3,6 +3,7 @@
 /* eslint-disable no-unused-vars */
 const should = require('should');
 const guard = require('../lib/guard');
+const lineSeparator = '----------------------------------';
 
 describe('Guard Execution', () => {
     let nativeExit;
@@ -11,6 +12,7 @@ describe('Guard Execution', () => {
     let output;
 
     beforeEach(() => {
+        console.log(`${lineSeparator} begin test ${lineSeparator}`);
         delete process.env['npm_config_argv'];
         process.argv = [];
         exitCode = undefined;
@@ -29,6 +31,7 @@ describe('Guard Execution', () => {
     afterEach(() => {
         process.exit = nativeExit;
         console.log = nativeConsoleLog;
+        console.log(`${lineSeparator} end test ${lineSeparator}\n`);
     });
 
     it('Should return an error message (elegant status reporter) on `npm publish`', () => {

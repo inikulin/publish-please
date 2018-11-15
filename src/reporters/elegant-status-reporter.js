@@ -82,6 +82,7 @@ function reportRunningTask(taskname) {
 function reportSuccess(message) {
     const chalk = require('chalk');
     console.log(chalk.green(message));
+    console.log('');
 }
 
 /**

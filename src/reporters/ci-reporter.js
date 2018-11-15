@@ -89,6 +89,7 @@ function reportRunningTask(taskname) {
  */
 function reportSuccess(message) {
     console.log(message);
+    console.log('');
 }
 
 /**
