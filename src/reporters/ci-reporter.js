@@ -50,6 +50,7 @@ module.exports = {
     reportRunningTask,
     reportStep,
     reportSucceededSequence,
+    reportSucceededProcess,
     reportSuccess,
 };
 
@@ -141,4 +142,14 @@ function reportSucceededSequence(message) {
     console.log('-------------------');
     console.log(message);
     console.log('');
+}
+
+/**
+ * report a successful execution of a process
+ * @param {string} message
+ */
+// eslint-disable-next-line no-unused-vars
+function reportSucceededProcess(message) {
+    console.log('');
+    console.log(message);
 }

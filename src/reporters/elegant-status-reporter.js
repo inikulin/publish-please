@@ -51,6 +51,7 @@ module.exports = {
     reportRunningTask,
     reportStep,
     reportSucceededSequence,
+    reportSucceededProcess,
     reportSuccess,
 };
 
@@ -140,4 +141,15 @@ function reportSucceededSequence(_message) {
     console.log(chalk.yellow('-------------------'));
     console.log(emoji['+1'], emoji['+1'], emoji['+1']);
     console.log('');
+}
+
+/**
+ * report a successful execution of a process
+ * @param {string} message
+ */
+// eslint-disable-next-line no-unused-vars
+function reportSucceededProcess(_message) {
+    const emoji = require('node-emoji').emoji;
+    console.log('');
+    console.log(emoji.tada, emoji.tada, emoji.tada);
 }

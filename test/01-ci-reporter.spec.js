@@ -191,4 +191,14 @@ describe('CI reporter', () => {
         // Then
         output.should.containEql(message);
     });
+
+    it('Should report a succeeded process', () => {
+        // Given
+        const message = 'yo process passed';
+
+        // When
+        reporter.reportSucceededProcess(message);
+        // Then
+        output.should.containEql(message);
+    });
 });

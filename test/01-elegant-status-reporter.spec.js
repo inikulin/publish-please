@@ -65,9 +65,18 @@ describe('Elegant status reporter', () => {
             // nativeConsoleLog(val);
             if (exitCode === undefined) exitCode = val;
         };
-        console.log = (p1, p2) => {
-            p2 === undefined ? nativeConsoleLog(p1) : nativeConsoleLog(p1, p2);
-            output = output + p1;
+        console.log = (p1, p2, p3) => {
+            // prettier-ignore
+            // eslint-disable-next-line no-nested-ternary
+            p2 === undefined
+                ? nativeConsoleLog(p1)
+                : p3 === undefined
+                    ? nativeConsoleLog(p1, p2)
+                    : nativeConsoleLog(p1, p2, p3);
+
+            output = `${output}${p1 === undefined ? '' : p1}${
+                p2 === undefined ? '' : p2
+            }${p3 === undefined ? '' : p3}`;
         };
     });
     afterEach(() => {
@@ -173,6 +182,18 @@ describe('Elegant status reporter', () => {
         output.should.containEql('-------------------');
         if (typeof process.env.APPVEYOR === 'undefined') {
             output.should.containEql(emoji['+1']);
+        }
+    });
+
+    it('Should report a succeeded process', () => {
+        // Given
+        const message = 'yo process passed';
+
+        // When
+        reporter.reportSucceededProcess(message);
+        // Then
+        if (typeof process.env.APPVEYOR === 'undefined') {
+            output.should.containEql(emoji.tada);
         }
     });
 });
