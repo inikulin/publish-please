@@ -52,6 +52,7 @@ module.exports = {
     reportSucceededSequence,
     reportSucceededProcess,
     reportSuccess,
+    formatAsElegantPath,
 };
 
 /**
@@ -152,4 +153,20 @@ function reportSucceededSequence(message) {
 function reportSucceededProcess(message) {
     console.log('');
     console.log(message);
+}
+
+/**
+ * format input path
+ * @param {string} path
+ * @param {string} sep - path separator
+ * @returns {string} - returns input path as dir1 -> dir2 -> ... -> dirN -> file
+ */
+function formatAsElegantPath(path, sep) {
+    const packages = path.split(sep);
+
+    // prettier-ignore
+    const result = packages
+        .map((item) => item.trim())
+        .join(' -> ');
+    return result;
 }

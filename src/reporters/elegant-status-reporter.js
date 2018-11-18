@@ -53,6 +53,7 @@ module.exports = {
     reportSucceededSequence,
     reportSucceededProcess,
     reportSuccess,
+    formatAsElegantPath,
 };
 
 /**
@@ -152,4 +153,26 @@ function reportSucceededProcess(_message) {
     const emoji = require('node-emoji').emoji;
     console.log('');
     console.log(emoji.tada, emoji.tada, emoji.tada);
+}
+
+/**
+ * format input path
+ * @param {string} path
+ * @param {string} sep - path separator
+ */
+function formatAsElegantPath(path, sep) {
+    const chalk = require('chalk');
+    const packages = path.split(sep);
+    const lastIndex = packages.length - 1;
+
+    // prettier-ignore
+    const result = packages
+        .map((item) => item.trim())
+        .map((item, index) => {
+            return index === lastIndex
+                ? chalk.red.bold(item)
+                : item;
+        })
+        .join(' -> ');
+    return result;
 }

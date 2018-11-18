@@ -201,4 +201,16 @@ describe('CI reporter', () => {
         // Then
         output.should.containEql(message);
     });
+
+    it('Should format as elegant path', () => {
+        // Given
+        const path = 'publish-please>ban-sensitive-files > ggit> lodash';
+        const sep = '>';
+        // When
+        const result = reporter.formatAsElegantPath(path, sep);
+        // Then
+        result.should.containEql(
+            'publish-please -> ban-sensitive-files -> ggit -> lodash'
+        );
+    });
 });

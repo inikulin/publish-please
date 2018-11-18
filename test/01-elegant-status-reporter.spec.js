@@ -7,6 +7,7 @@ const reporter = require('../lib/reporters/elegant-status-reporter');
 const rename = require('fs').renameSync;
 const pathJoin = require('path').join;
 const emoji = require('node-emoji').emoji;
+const chalk = require('chalk');
 const lineSeparator = '----------------------------------';
 
 describe('Elegant status reporter', () => {
@@ -195,6 +196,20 @@ describe('Elegant status reporter', () => {
         if (typeof process.env.APPVEYOR === 'undefined') {
             output.should.containEql(emoji.tada);
         }
+    });
+
+    it('Should format as elegant path', () => {
+        // Given
+        const path = 'publish-please>ban-sensitive-files > ggit> lodash';
+        const sep = '>';
+        // When
+        const result = reporter.formatAsElegantPath(path, sep);
+        // Then
+        result.should.containEql(
+            `publish-please -> ban-sensitive-files -> ggit -> ${chalk.red.bold(
+                'lodash'
+            )}`
+        );
     });
 });
 

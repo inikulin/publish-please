@@ -3,8 +3,8 @@
 const pathJoin = require('path').join;
 const audit = require('../utils/npm-audit');
 const confirm = require('../utils/inquires').confirm;
-const chalk = require('chalk');
 const nodeInfos = require('../utils/get-node-infos').getNodeInfosSync();
+const reporter = require('../reporters/current');
 
 module.exports = {
     option: 'vulnerableDependencies',
@@ -69,31 +69,15 @@ function auditErrorFoundIn(result) {
 }
 
 function summaryOf(vulnerability) {
-    const summary = `Vulnerability found in ${elegantPath(
-        vulnerability.path,
-        '>'
-    )}`;
+    const summary = `Vulnerability found in ${reporter
+        .current()
+        .formatAsElegantPath(vulnerability.path, '>')}`;
     return summary;
 }
 
 function summaryErrorOf(error) {
     const summary = elegantSummary(error.summary);
     return summary;
-}
-
-function elegantPath(path, sep) {
-    const packages = path.split(sep);
-    const lastIndex = packages.length - 1;
-
-    // prettier-ignore
-    const result = packages
-        .map((item, index) => {
-            return index === lastIndex
-                ? chalk.red.bold(item)
-                : item;
-        })
-        .join(' -> ');
-    return result;
 }
 
 function elegantSummary(summary) {
