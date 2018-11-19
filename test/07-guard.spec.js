@@ -3,6 +3,7 @@
 /* eslint-disable no-unused-vars */
 const should = require('should');
 const guard = require('../lib/guard');
+const envType = require('../lib/reporters/env-type');
 const lineSeparator = '----------------------------------';
 
 describe('Guard Execution', () => {
@@ -43,7 +44,10 @@ describe('Guard Execution', () => {
         // Then
         exitCode.should.be.equal(1);
         output.should.containEql("'npm publish' is forbidden for this package");
-        if (typeof process.env.APPVEYOR === 'undefined') {
+        if (
+            typeof process.env.APPVEYOR === 'undefined' &&
+            envType.isCI() === false
+        ) {
             output.should.containEql('\u001b[31m\u001b[39m');
         }
     });
