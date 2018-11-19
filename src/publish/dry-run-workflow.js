@@ -1,7 +1,6 @@
 'use strict';
 
 const readPkg = require('../utils/read-package-json').readPkgSync;
-const chalk = require('chalk');
 const validate = require('../validations').validate;
 const confirm = require('../utils/inquires').confirm;
 const printReleaseInfo = require('./print-release-info');
@@ -13,6 +12,7 @@ const assertNode6PublishingPrerequisite = require('./publish-prerequisites')
     .assertNode6PublishingPrerequisite;
 const executionContext = require('../utils/execution-context');
 const showValidationErrors = require('../utils/show-validation-errors');
+const reporter = require('../reporters/current');
 
 const ADVISORY_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -21,7 +21,7 @@ const ADVISORY_MESSAGE = `
 `;
 
 function reportAdvisory() {
-    console.log(chalk.bgGreen(ADVISORY_MESSAGE));
+    reporter.current().reportAsIs(ADVISORY_MESSAGE);
 }
 
 module.exports = function(opts, projectDir) {
@@ -30,8 +30,10 @@ module.exports = function(opts, projectDir) {
     opts = getOptions(opts, projectDir);
 
     return assertNode6PublishingPrerequisite()
-        .then(() => console.log(chalk.green.bold('dry mode activated')))
-        .then(() => console.log(''))
+        .then(() =>
+            reporter.current().reportRunningSequence('dry mode activated')
+        )
+        .then(() => reporter.current().reportAsIs(''))
         .then(
             () =>
                 opts.prePublishScript &&
