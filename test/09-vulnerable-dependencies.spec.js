@@ -11,6 +11,7 @@ const requireUncached = require('import-fresh');
 const showValidationErrors = require('../lib/utils/show-validation-errors');
 const nodeInfos = require('../lib/utils/get-node-infos').getNodeInfosSync();
 const chalk = require('chalk');
+const envType = require('../lib/reporters/env-type');
 const lineSeparator = '----------------------------------';
 
 describe('Vulnerability validation when npm is < 6.1.0', () => {
@@ -199,19 +200,37 @@ describe('Vulnerability validation when npm is >= 6.1.0', () => {
                         err.message.should.containEql('Vulnerability found in');
                         err.message.should.containEql(`${packageName}`);
                         err.message.should.containEql(
-                            `-> ${chalk.red.bold('lodash')}`
+                            `-> ${
+                                envType.isCI()
+                                    ? 'lodash'
+                                    : chalk.red.bold('lodash')
+                            }`
                         );
                         err.message.should.containEql(
-                            `-> ${chalk.red.bold('https-proxy-agent')}`
+                            `-> ${
+                                envType.isCI()
+                                    ? 'https-proxy-agent'
+                                    : chalk.red.bold('https-proxy-agent')
+                            }`
                         );
                         err.message.should.containEql(
-                            `-> ${chalk.red.bold('hoek')}`
+                            `-> ${
+                                envType.isCI() ? 'hoek' : chalk.red.bold('hoek')
+                            }`
                         );
                         err.message.should.containEql(
-                            `-> ${chalk.red.bold('moment')}`
+                            `-> ${
+                                envType.isCI()
+                                    ? 'moment'
+                                    : chalk.red.bold('moment')
+                            }`
                         );
                         err.message.should.containEql(
-                            `-> ${chalk.red.bold('deep-extend')}`
+                            `-> ${
+                                envType.isCI()
+                                    ? 'deep-extend'
+                                    : chalk.red.bold('deep-extend')
+                            }`
                         );
                         return;
                     }
@@ -255,7 +274,7 @@ describe('Vulnerability validation when npm is >= 6.1.0', () => {
                         err.message.should.containEql('Vulnerability found in');
                         err.message.should.containEql(`${packageName}`);
                         err.message.should.containEql(
-                            `${chalk.red.bold('ms')}`
+                            `${envType.isCI() ? 'ms' : chalk.red.bold('ms')}`
                         );
                         err.message.should.not.containEql('->');
                         return;
@@ -299,10 +318,16 @@ describe('Vulnerability validation when npm is >= 6.1.0', () => {
                     if (nodeInfos.npmAuditHasJsonReporter) {
                         err.message.should.containEql('Vulnerability found in');
                         err.message.should.containEql(
-                            `-> ${chalk.red.bold('lodash')}`
+                            `-> ${
+                                envType.isCI()
+                                    ? 'lodash'
+                                    : chalk.red.bold('lodash')
+                            }`
                         );
                         err.message.should.containEql(
-                            `-> ${chalk.red.bold('atob')}`
+                            `-> ${
+                                envType.isCI() ? 'atob' : chalk.red.bold('atob')
+                            }`
                         );
                         err.message.should.containEql(`${packageName}`);
                         return;

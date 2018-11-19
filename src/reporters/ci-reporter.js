@@ -41,7 +41,9 @@ module.exports = {
         if (npxArgs && npxArgs['--ci']) {
             return true;
         }
-        return false;
+
+        const isCI = require('./env-type').isCI();
+        return isCI;
     },
     reportAsIs,
     reportError,

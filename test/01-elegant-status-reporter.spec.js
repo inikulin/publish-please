@@ -8,11 +8,13 @@ const rename = require('fs').renameSync;
 const pathJoin = require('path').join;
 const emoji = require('node-emoji').emoji;
 const chalk = require('chalk');
+const envType = require('../lib/reporters/env-type');
 const lineSeparator = '----------------------------------';
 
 describe('Elegant status reporter', () => {
     let nativeExit;
     let nativeConsoleLog;
+    let nativeIsCI;
     let exitCode;
     let output;
 
@@ -22,6 +24,7 @@ describe('Elegant status reporter', () => {
         output = '';
         nativeExit = process.exit;
         nativeConsoleLog = console.log;
+        nativeIsCI = envType.isCI;
         process.exit = (val) => {
             // nativeConsoleLog(val);
             if (exitCode === undefined) exitCode = val;
@@ -36,6 +39,7 @@ describe('Elegant status reporter', () => {
     afterEach(() => {
         process.exit = nativeExit;
         console.log = nativeConsoleLog;
+        envType.isCI = nativeIsCI;
         rename('./node_modules/chalk0', './node_modules/chalk');
         console.log(`${lineSeparator} end test ${lineSeparator}\n`);
     });
@@ -214,18 +218,30 @@ describe('Elegant status reporter', () => {
 });
 
 describe('Elegant status reporter', () => {
+    let nativeIsCI;
     beforeEach(() => {
         console.log(`${lineSeparator} begin test ${lineSeparator}`);
+        nativeIsCI = envType.isCI;
     });
     afterEach(() => {
+        envType.isCI = nativeIsCI;
         console.log(`${lineSeparator} end test ${lineSeparator}\n`);
     });
-    it('Should run by default', () => {
+    it('Should run by default non CI', () => {
         // Given
-
+        envType.isCI = () => false;
         // When
         const result = reporter.shouldRun();
         // Then
         result.should.be.true();
+    });
+
+    it('Should not run by default on CI', () => {
+        // Given
+        envType.isCI = () => true;
+        // When
+        const result = reporter.shouldRun();
+        // Then
+        result.should.be.false();
     });
 });

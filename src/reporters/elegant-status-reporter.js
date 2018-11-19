@@ -25,12 +25,14 @@ module.exports = {
         try {
             const chalk = require('chalk');
             const emoji = require('node-emoji').emoji;
+            const isCI = require('./env-type').isCI();
             return (
                 typeof chalk === 'function' &&
                 typeof chalk.inverse === 'function' &&
                 typeof chalk.red === 'function' &&
                 typeof chalk.green === 'function' &&
-                emoji['+1'] !== undefined
+                emoji['+1'] !== undefined &&
+                typeof isCI === 'boolean'
             );
         } catch (_error) {
             return false;
@@ -42,7 +44,8 @@ module.exports = {
      * To make this reporter the default one, this method must return true unconditionnaly
      */
     shouldRun() {
-        return true;
+        const isCI = require('./env-type').isCI();
+        return isCI === false;
     },
     reportAsIs,
     reportError,
