@@ -1,3 +1,5 @@
+'use strict';
+
 const exec = require('cp-sugar').exec;
 const pathJoin = require('path').join;
 const readFile = require('fs').readFileSync;
