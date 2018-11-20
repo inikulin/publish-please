@@ -5,6 +5,7 @@ coverage
 lib/**/*.js
 !lib/pre-install.js
 !lib/post-install.js
+!lib/reporters/**/*.js
 package
 *.tgz
 test/tmp

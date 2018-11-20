@@ -1,6 +1,6 @@
 {
   "name": "publish-please",
-  "version": "5.2.0",
+  "version": "5.3.0",
   "description": "Safe and highly functional replacement for `npm publish`.",
   "main": "./lib/index.js",
   "bin": {
@@ -14,7 +14,7 @@
     "lint": "eslint bin src test",
     "clean": "rimraf lib",
     "compile": "babel src -d lib",
-    "build": "npm run clean && npm run compile && prettier --write \"lib/{pre,post}-install.js\" ",
+    "build": "npm run clean && npm run compile && prettier --write \"lib/{pre,post}-install.js\" && prettier --write \"lib/reporters/*.js\"",
     "mocha-with-coverage": "istanbul cover -x test node_modules/mocha/bin/_mocha test",
     "check-coverage": "istanbul check-coverage --statements 97 --lines 97 --branches 85 --functions 97",
     "test": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage && npm run check-coverage",
@@ -51,6 +51,7 @@
     "cp-sugar": "1.0.0",
     "elegant-status": "1.1.0",
     "inquirer": "6.2.0",
+    "is-ci": "1.2.1",
     "lodash": "4.17.11",
     "micromatch": "3.1.10",
     "node-emoji": "1.8.1",

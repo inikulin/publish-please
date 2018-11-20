@@ -3,13 +3,13 @@
 const readFile = require('fs').readFileSync;
 const writeFile = require('fs').writeFileSync;
 const pathJoin = require('path').join;
-const chalk = require('chalk');
 const defaults = require('lodash/defaultsDeep');
 const DEFAULT_OPTIONS = require('./default-options');
 const inputWithConfirmation = require('./utils/inquires').inputWithConfirmation;
 const input = require('./utils/inquires').input;
 const confirm = require('./utils/inquires').confirm;
 const validationConfigurators = require('./validations').configurators;
+const reporter = require('./reporters/current');
 
 const optionsConfigurators = {
     prePublishScript: (currentVal) =>
@@ -48,18 +48,18 @@ function configureOptsObject(obj, configurators, optType) {
     return Object.keys(configurators).reduce((chain, prop) => {
         return chain
             .then(() => {
-                console.log(chalk.blue(`-- Configuring ${optType} "${prop}":`));
+                reporter
+                    .current()
+                    .reportStep(`-- Configuring ${optType} "${prop}":`);
                 return configurators[prop](obj[prop]);
             })
             .then((val) => {
-                console.log('');
                 obj[prop] = val;
             });
     }, Promise.resolve());
 }
 
 function configure(opts) {
-    console.log('');
     return configureOptsObject(opts, optionsConfigurators, 'option')
         .then(() =>
             configureOptsObject(
@@ -69,10 +69,10 @@ function configure(opts) {
             )
         )
         .then(() => {
-            console.log(chalk.green('-- Current configuration:'));
-            console.log('');
-            console.log(JSON.stringify(opts, null, 2));
-            console.log('');
+            reporter.current().reportInformation('-- Current configuration:');
+            reporter.current().reportAsIs(JSON.stringify(opts, null, 2));
+            reporter.current().reportAsIs('');
+            reporter.current().reportAsIs('');
             return confirm('Is this OK?', true);
         })
         .then((yes) => !yes && configure(opts));
@@ -81,8 +81,15 @@ function configure(opts) {
 function configureAndSave(opts, rcFile) {
     return configure(opts)
         .then(() => writeFile(rcFile, JSON.stringify(opts, null, 2)))
-        .then(() => console.log('Configuration has been successfully saved.'))
-        .catch((err) => console.log(chalk.red('ERROR: \n') + err.stack));
+        .then(() =>
+            reporter
+                .current()
+                .reportSuccess('Configuration has been successfully saved.')
+        )
+        .catch((err) => {
+            reporter.current().reportError('ERROR');
+            reporter.current().reportAsIs(err.stack);
+        });
 }
 
 function getCurrentOpts(projectDir) {

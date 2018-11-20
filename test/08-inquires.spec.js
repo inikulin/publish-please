@@ -5,6 +5,7 @@ const requires = require('../lib/utils/inquires');
 const should = require('should');
 const stdinMock = require('mock-stdin');
 const simulateUserInput = require('./utils/simulate-user-input');
+const lineSeparator = '----------------------------------';
 
 /* eslint-disable max-nested-callbacks */
 describe('Input with confirmation', () => {
@@ -13,7 +14,14 @@ describe('Input with confirmation', () => {
         return Promise.resolve().then(() => (stdin = stdinMock.stdin()));
     });
     beforeEach(() => {
-        return Promise.resolve().then(() => stdin.reset());
+        return Promise.resolve()
+            .then(() =>
+                console.log(`${lineSeparator} begin test ${lineSeparator}`)
+            )
+            .then(() => stdin.reset());
+    });
+    afterEach(() => {
+        console.log(`${lineSeparator} end test ${lineSeparator}\n`);
     });
     after(() => {
         return Promise.resolve().then(() => stdin.restore());

@@ -19,6 +19,7 @@ const requireUncached = require('import-fresh');
 const packageName = require('./utils/publish-please-version-under-test');
 const nodeInfos = require('../lib/utils/get-node-infos').getNodeInfosSync();
 const shouldUsePrePublishOnlyScript = nodeInfos.shouldUsePrePublishOnlyScript;
+const envType = require('../lib/reporters/env-type');
 const lineSeparator = '----------------------------------';
 
 /* eslint-disable max-nested-callbacks */
@@ -726,7 +727,7 @@ describe('Integration tests', () => {
                         (err) =>
                             /* prettier-ignore */
                             nodeInfos.npmAuditHasJsonReporter
-                                ? assert(err.message.indexOf(`Vulnerability found in ${chalk.red.bold(name)}`) > -1)
+                                ? assert(err.message.indexOf(`Vulnerability found in ${envType.isCI() ? name :chalk.red.bold(name)}`) > -1)
                                 : assert(err.message.indexOf('Cannot check vulnerable dependencies') > -1)
                     ));
         });
@@ -763,7 +764,7 @@ describe('Integration tests', () => {
                     (err) =>
                         /* prettier-ignore */
                         nodeInfos.npmAuditHasJsonReporter
-                            ? assert(err.message.indexOf(`Vulnerability found in ${chalk.red.bold('lodash')}`) > -1)
+                            ? assert(err.message.indexOf(`Vulnerability found in ${envType.isCI() ? 'lodash' : chalk.red.bold('lodash')}`) > -1)
                             : assert(err.message.indexOf('Cannot check vulnerable dependencies') > -1)
                 ));
 

@@ -1,9 +1,12 @@
 'use strict';
-
-const chalk = require('chalk');
-
+const reporter = require('../reporters/current');
+/**
+ * Show validation errors.
+ * @module utils/show-validation-errors
+ * @param {Error} err - Error object
+ */
 module.exports = function showValidationErrors(err) {
-    console.log(chalk.red.bold('ERRORS'));
-    console.log(err.message);
-    console.log('');
+    reporter.current().reportError('ERRORS');
+    reporter.current().reportAsIs(err.message);
+    reporter.current().reportAsIs('');
 };

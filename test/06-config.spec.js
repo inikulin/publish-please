@@ -7,6 +7,7 @@ const simulateUserInput = require('./utils/simulate-user-input');
 const pathJoin = require('path').join;
 const mkdirp = require('mkdirp');
 const config = require('../lib/config');
+const lineSeparator = '----------------------------------';
 
 /* eslint-disable max-nested-callbacks */
 describe('Config execution', () => {
@@ -15,7 +16,14 @@ describe('Config execution', () => {
         return Promise.resolve().then(() => (stdin = stdinMock.stdin()));
     });
     beforeEach(() => {
-        return Promise.resolve().then(() => stdin.reset());
+        return Promise.resolve()
+            .then(() =>
+                console.log(`${lineSeparator} begin test ${lineSeparator}`)
+            )
+            .then(() => stdin.reset());
+    });
+    afterEach(() => {
+        console.log(`${lineSeparator} end test ${lineSeparator}\n`);
     });
     after(() => {
         return Promise.resolve().then(() => stdin.restore());

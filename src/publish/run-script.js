@@ -1,20 +1,20 @@
 'use strict';
-const chalk = require('chalk');
 const spawn = require('cp-sugar').spawn;
-const emoji = require('node-emoji').emoji;
+const reporter = require('../reporters/current');
 
 module.exports = function runScript(command, scriptType) {
-    console.log(
-        chalk.yellow(
-            'Running ' + (scriptType ? scriptType + ' ' : '') + 'script'
-        )
-    );
-    console.log(chalk.yellow('-------------------------'));
+    reporter
+        .current()
+        .reportRunningSequence(
+            `Running ${scriptType ? scriptType : ''} script`
+        );
 
     return spawn(command).then(() => {
-        console.log(chalk.yellow('-------------------------'));
-        console.log(emoji['+1'], emoji['+1'], emoji['+1']);
-        console.log('');
+        reporter
+            .current()
+            .reportSucceededSequence(
+                `${scriptType ? scriptType : ''} script passed`
+            );
     });
 };
 

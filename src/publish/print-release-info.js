@@ -1,6 +1,6 @@
 'use strict';
 const exec = require('cp-sugar').exec;
-const chalk = require('chalk');
+const reporter = require('../reporters/current');
 
 module.exports = function printReleaseInfo(pkgVersion, publishTag) {
     let commitInfo = null;
@@ -11,14 +11,17 @@ module.exports = function printReleaseInfo(pkgVersion, publishTag) {
 
             return exec('npm whoami --silent');
         })
-        .catch(() => chalk.red('<not logged in>'))
+        .catch(() => reporter.current().reportError('<not logged in>'))
         .then((publisher) => {
-            console.log(chalk.yellow('Release info'));
-            console.log(chalk.yellow('------------'));
-            console.log('  ' + chalk.magenta('Version:       ') + pkgVersion);
-            console.log('  ' + chalk.magenta('Latest commit: ') + commitInfo);
-            console.log('  ' + chalk.magenta('Publish tag:   ') + publishTag);
-            console.log('  ' + chalk.magenta('Publisher:     ') + publisher);
-            console.log('');
+            // prettier-ignore
+            reporter.current().reportRunningSequence('Release info');
+            // prettier-ignore
+            reporter.current().reportAsIs(`  Version:       ${pkgVersion}`);
+            // prettier-ignore
+            reporter.current().reportAsIs(`  Latest commit: ${commitInfo}`);
+            // prettier-ignore
+            reporter.current().reportAsIs(`  Publish tag:   ${publishTag}`);
+            // prettier-ignore
+            reporter.current().reportAsIs(`  Publisher:     ${publisher}`);
         });
 };

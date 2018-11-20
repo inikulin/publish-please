@@ -19,6 +19,7 @@ module.exports = function getNpmArgs(processEnv) {
         npmArgs['--save'] = npmCommand(args).hasArg('--save');
         npmArgs['--global'] = npmCommand(args).hasArg('--global');
         npmArgs['--dry-run'] = npmCommand(args).hasArg('--dry-run');
+        npmArgs['--ci'] = npmCommand(args).hasArg('--ci');
         npmArgs['config'] = npmCommand(args).hasArg('config');
         npmArgs.npx =
             npmCommand(args).hasArg('--prefix') &&
@@ -27,16 +28,8 @@ module.exports = function getNpmArgs(processEnv) {
             );
         // prettier-ignore
         npmArgs['--with-publish-please'] = npmCommand(args).hasArg('--with-publish-please');
-    } catch (err) {
-        console.error(
-            "[Publish-please] Cannot parse property 'npm_config_argv' in process.env "
-        );
-        // prettier-ignore
-        console.error(
-            `[Publish-please] process.env['npm_config_argv']= '${processEnv['npm_config_argv']}'`
-        );
-        console.error(`[Publish-please] ${err.message}`);
-    }
+        // eslint-disable-next-line no-empty
+    } catch (err) {}
 
     return npmArgs;
 };

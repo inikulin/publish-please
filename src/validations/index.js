@@ -1,6 +1,4 @@
-const chalk = require('chalk');
-const elegantStatus = require('elegant-status');
-const emoji = require('node-emoji').emoji;
+const reporter = require('../reporters/current');
 
 const validations = [
     require('./vulnerable-dependencies'),
@@ -12,22 +10,22 @@ const validations = [
 ];
 
 function runValidation(validation, param, pkg, errs) {
-    const done = elegantStatus(validation.statusText);
+    const done = reporter.current().reportRunningTask(validation.statusText);
 
     // prettier-ignore
     return validation
         .run(param, pkg)
         .then(() => done(true))
         .catch((err) => {
-            Array.isArray(err)
-                ? errs.push(...err)
-                : errs.push(err);
+            Array.isArray(err) ?
+                errs.push(...err) :
+                errs.push(err);
             done(false);
         });
 }
 
 function skipValidation(validation, errs) {
-    const done = elegantStatus(validation.statusText);
+    const done = reporter.current().reportRunningTask(validation.statusText);
     return Promise.resolve()
         .then(() => errs.push(validation.whyCannotRun()))
         .then(() => done(false));
@@ -55,9 +53,7 @@ module.exports = {
 
         if (!validationsToRun.length) return Promise.resolve();
 
-        console.log(chalk.yellow('Running validations'));
-        console.log(chalk.yellow('-------------------'));
-        console.log('');
+        reporter.current().reportRunningSequence('Running validations');
 
         return validationsToRun
             .reduce((validationChain, validation) => {
@@ -69,8 +65,7 @@ module.exports = {
                                 validation,
                                 opts[validation.option],
                                 pkg,
-                                errs
-                            )
+                                errs)
                             : skipValidation(validation, errs)
                 );
             }, Promise.resolve())
@@ -79,9 +74,9 @@ module.exports = {
                     const msg = errs.map((err) => '  * ' + err).join('\n');
                     throw new Error(msg);
                 }
-                console.log(chalk.yellow('-------------------'));
-                console.log(emoji['+1'], emoji['+1'], emoji['+1']);
-                console.log('');
+                reporter
+                    .current()
+                    .reportSucceededSequence('Validations passed');
             });
     },
 };

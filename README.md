@@ -169,6 +169,24 @@ Performed for the following items (see [.sensitivedata file](.sensitivedata) for
 
 - Run `npm help scripts` to get more details.
 
+## Running in CI mode
+
+You can execute publish-please in CI mode by adding the `--ci` option:
+
+```shell
+npm run publish-please --ci
+```
+
+or 
+
+```shell
+npx publish-please --ci
+```
+
+This option will turn off the default elegant-status reporter in favor of the integrated CI reporter.
+Use this option to disable emoji and spinner usage.
+When publish-please executes in a CI (Teamcity, Travis, AppVeyor, ...), the CI reporter is automatically activated.
+
 ## Check out my other packages used by this tool
 - [cp-sugar](https://github.com/inikulin/cp-sugar) - Some sugar for child_process module.
 - [elegant-status](https://github.com/inikulin/elegant-status) - Create elegant task status for CLI.

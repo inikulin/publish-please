@@ -1,6 +1,6 @@
 'use strict';
 
-const chalk = require('chalk');
+const reporter = require('./reporters/current');
 const getNpmArgs = require('./utils/get-npm-args');
 const ERROR_MESSAGE = `
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -10,7 +10,7 @@ const ERROR_MESSAGE = `
 `;
 
 function reportError() {
-    console.log(chalk.bgRed(ERROR_MESSAGE));
+    reporter.current().reportError(ERROR_MESSAGE);
 }
 
 module.exports = function(processEnv) {

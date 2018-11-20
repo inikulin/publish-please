@@ -11,6 +11,11 @@ module.exports = function getNpxArgs(process) {
         npxCommand(args).hasArgThatContains(
             `${pathSeparator}_npx${pathSeparator}`
         );
+    npxArgs['--ci'] =
+        npxCommand(args).hasArg('--ci') &&
+        npxCommand(args).hasArgThatContains(
+            `${pathSeparator}_npx${pathSeparator}`
+        );
     npxArgs['config'] =
         npxCommand(args).hasArg('config') &&
         npxCommand(args).hasArgThatContains(
