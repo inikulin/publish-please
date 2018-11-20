@@ -28,16 +28,8 @@ module.exports = function getNpmArgs(processEnv) {
             );
         // prettier-ignore
         npmArgs['--with-publish-please'] = npmCommand(args).hasArg('--with-publish-please');
-    } catch (err) {
-        console.error(
-            "[Publish-please] Cannot parse property 'npm_config_argv' in process.env "
-        );
-        // prettier-ignore
-        console.error(
-            `[Publish-please] process.env['npm_config_argv']= '${processEnv['npm_config_argv']}'`
-        );
-        console.error(`[Publish-please] ${err.message}`);
-    }
+        // eslint-disable-next-line no-empty
+    } catch (err) {}
 
     return npmArgs;
 };
