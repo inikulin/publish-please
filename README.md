@@ -183,9 +183,9 @@ or
 npx publish-please --ci
 ```
 
-This option will turn off the default elegant-status reporter in favor of a CI reporter.
+This option will turn off the default elegant-status reporter in favor of the integrated CI reporter.
 Use this option to disable emoji and spinner usage.
-When publish-please executes in a CI (Teamcity, Travis, AppVeyor, ...), this CI reporter is automatically activated.
+When publish-please executes in a CI (Teamcity, Travis, AppVeyor, ...), the CI reporter is automatically activated.
 
 ## Check out my other packages used by this tool
 - [cp-sugar](https://github.com/inikulin/cp-sugar) - Some sugar for child_process module.

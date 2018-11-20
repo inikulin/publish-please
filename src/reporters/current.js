@@ -9,6 +9,16 @@ const reporters = [elegantStatusReporter, ciReporter];
 module.exports = {
     /**
      * get current reporter
+     * Why the reporter must be re-evaluated at each call?
+     * because publish-please module lifecycle is different when called by
+     *          `npm install` after a fresh git clone of the publish-please repo
+     *          `npm install` after an already installed clone of the publish-please repo
+     *          `npm install --save-dev publish-please` on your own repo
+     *          `npm install -g publish-please`
+     *          `npx publish-please` on your own repo
+     *          `npm run publish-please` on your own repo
+     * This lifecycle may prevent the 'elegant-status-reporter' to be available for a short period of time
+     * During this short period of time the 'elegant-status-reporter' will automatically fall back to the 'ci-reporter'
      * @returns {Reporter}
      */
     current() {
