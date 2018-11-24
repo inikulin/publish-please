@@ -252,8 +252,64 @@ describe('npm integration tests', () => {
                 assert(publishLog.includes('Release info'));
                 /* prettier-ignore */
                 assert(publishLog.includes('testing-repo-1.3.77.tgz'));
+            });
+    });
+
+    it('Should be able to run publish-please in dry mode after installing locally on CI', () => {
+        return Promise.resolve()
+            .then(() => {
+                console.log('> setting .auditignore with content:');
+                console.log(readFile('.auditignore').toString());
+                console.log('');
+            })
+            .then(() => console.log(`> npm install --save-dev ${packageName}`))
+            .then(() =>
+                exec(
+                    /* prettier-ignore */
+                    `npm install --save-dev ../${packageName.replace('@','-')}.tgz`
+                )
+            )
+            .then(() =>
+                console.log('> edit .publishrc to disable blocking validations')
+            )
+            .then(() => {
+                const publishrc = JSON.parse(readFile('.publishrc').toString());
+                publishrc.validations.uncommittedChanges = false;
+                publishrc.validations.untrackedFiles = false;
+                publishrc.validations.gitTag = false;
+                writeFile('.publishrc', JSON.stringify(publishrc));
+                return publishrc;
+            })
+            .then((publishrc) => {
+                console.log('');
+                console.log(publishrc);
+                console.log('');
+            })
+            .then(() => console.log('> npm run publish-please --dry-run --ci'))
+            .then(() =>
+                exec('npm run publish-please --dry-run --ci > ./publish02b.log')
+            )
+            .then(() => {
+                const publishLog = readFile('./publish02b.log').toString();
+                console.log(publishLog);
                 /* prettier-ignore */
-                assert(publishLog.includes("run 'npm pack' to have more details on the package"));
+                assert(publishLog.includes('dry mode activated'));
+                /* prettier-ignore */
+                assert(publishLog.includes('Running pre-publish script'));
+                /* prettier-ignore */
+                assert(publishLog.includes('Running validations'));
+
+                /* prettier-ignore */
+                nodeInfos.npmAuditHasJsonReporter
+                    ? assert(publishLog.includes('Checking for the vulnerable dependencies'))
+                    : assert(!publishLog.includes('Checking for the vulnerable dependencies'));
+
+                /* prettier-ignore */
+                assert(publishLog.includes('Release info'));
+                /* prettier-ignore */
+                assert(publishLog.includes('testing-repo-1.3.77.tgz'));
+                /* prettier-ignore */
+                assert(publishLog.includes('testing-repo is safe to be published'));
             });
     });
 

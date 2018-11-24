@@ -6,6 +6,7 @@ const writeFile = require('fs').writeFileSync;
 const should = require('should');
 const cli = require('../lib');
 const pathJoin = require('path').join;
+const pathSeparator = require('path').sep;
 const packageName = require('./utils/publish-please-version-under-test');
 const nodeInfos = require('../lib/utils/get-node-infos').getNodeInfosSync();
 const lineSeparator = '----------------------------------';
@@ -112,8 +113,44 @@ describe('Publish-please CLI Options', () => {
                         ? output.should.containEql('Running validations')
                         : output.should.not.containEql('Running validations');
                     output.should.containEql('Release info');
+                })
+        );
+    });
+
+    it('Should execute dry-run workflow with no errors on `npm run publish-please --dry-run --ci`', () => {
+        // Given
+        process.env['npm_config_argv'] =
+            '{"remain":[],"cooked":["run","publish-please","--dry-run", "--ci"],"original":["run","publish-please","--dry-run", "--ci"]}';
+        const publishrc = JSON.parse(readFile('.publishrc').toString());
+        publishrc.confirm = false;
+        publishrc.validations.vulnerableDependencies = false;
+        // prettier-ignore
+        nodeInfos.npmPackHasJsonReporter
+            ? publishrc.validations.sensitiveData = true
+            : publishrc.validations.sensitiveData = false;
+        publishrc.validations.uncommittedChanges = false;
+        publishrc.validations.untrackedFiles = false;
+        publishrc.validations.gitTag = false;
+        publishrc.validations.branch = false;
+        writeFile('.publishrc', JSON.stringify(publishrc, null, 2));
+        const projectName = process
+            .cwd()
+            .split(pathSeparator)
+            .pop();
+        // When
+        return (
+            cli()
+                // Then
+                .then(() => {
+                    output.should.not.containEql('ERRORS');
+                    output.should.containEql('dry mode activated');
+                    output.should.containEql('Running pre-publish script');
+                    nodeInfos.npmPackHasJsonReporter
+                        ? output.should.containEql('Running validations')
+                        : output.should.not.containEql('Running validations');
+                    output.should.containEql('Release info');
                     output.should.containEql(
-                        "run 'npm pack' to have more details on the package"
+                        `${projectName} is safe to be published`
                     );
                 })
         );
@@ -196,8 +233,65 @@ describe('Publish-please CLI Options', () => {
                         ? output.should.containEql('Running validations')
                         : output.should.not.containEql('Running validations');
                     output.should.containEql('Release info');
+                })
+        );
+    });
+
+    it('Should execute dry-run workflow with no errors on `npx publish-please --dry-run --ci`', () => {
+        // Given
+        process.env['npm_config_argv'] = undefined;
+
+        // [ '/usr/local/bin/node',
+        //   '/Users/HDO/.npm/_npx/97852/bin/publish-please',
+        //   '--dry-run'
+        //   '--ci'
+        // ]
+        process.argv = [
+            pathJoin('usr', 'local', 'bin', 'node'),
+            pathJoin(
+                'Users',
+                'xxx',
+                '.npm',
+                '_npx',
+                '97852',
+                'bin',
+                'publish-please'
+            ),
+            '--dry-run',
+            '--ci',
+        ];
+        const publishrc = JSON.parse(readFile('.publishrc').toString());
+        publishrc.confirm = false;
+        publishrc.validations.vulnerableDependencies = false;
+        // prettier-ignore
+        nodeInfos.npmPackHasJsonReporter
+            ? publishrc.validations.sensitiveData = true
+            : publishrc.validations.sensitiveData = false;
+        publishrc.validations.uncommittedChanges = false;
+        publishrc.validations.untrackedFiles = false;
+        publishrc.validations.gitTag = false;
+        publishrc.validations.branch = false;
+        writeFile('.publishrc', JSON.stringify(publishrc, null, 2));
+
+        const projectName = process
+            .cwd()
+            .split(pathSeparator)
+            .pop();
+
+        // When
+        return (
+            cli()
+                // Then
+                .then(() => {
+                    output.should.not.containEql('ERRORS');
+                    output.should.containEql('dry mode activated');
+                    output.should.containEql('Running pre-publish script');
+                    nodeInfos.npmPackHasJsonReporter
+                        ? output.should.containEql('Running validations')
+                        : output.should.not.containEql('Running validations');
+                    output.should.containEql('Release info');
                     output.should.containEql(
-                        "run 'npm pack' to have more details on the package"
+                        `${projectName} is safe to be published`
                     );
                 })
         );
