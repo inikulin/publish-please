@@ -13,7 +13,7 @@ module.exports = function publish(publishCommand, publishTag) {
         .pop();
     return spawn(command)
         .then((res) => {
-            publishCommand.includes(' npm publish')
+            publishCommand.includes('npm publish')
                 ? reporter
                       .current()
                       .reportSucceededProcess(
