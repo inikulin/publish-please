@@ -9,6 +9,7 @@ const pathJoin = require('path').join;
 const pathSeparator = require('path').sep;
 const packageName = require('./utils/publish-please-version-under-test');
 const nodeInfos = require('../lib/utils/get-node-infos').getNodeInfosSync();
+const fileExists = require('fs').existsSync;
 const lineSeparator = '----------------------------------';
 
 /** !!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -36,7 +37,7 @@ describe('Publish-please CLI Options', () => {
     });
     beforeEach(() => {
         console.log(`${lineSeparator} begin test ${lineSeparator}`);
-        process.env.PUBLISH_PLEASE_TEST_MODE = true;
+        process.env.PUBLISH_PLEASE_TEST_MODE = false;
         exitCode = undefined;
         output = '';
         nativeExit = process.exit;
@@ -45,9 +46,21 @@ describe('Publish-please CLI Options', () => {
             // nativeConsoleLog(val);
             if (exitCode === undefined) exitCode = val;
         };
-        console.log = (p1, p2) => {
-            p2 === undefined ? nativeConsoleLog(p1) : nativeConsoleLog(p1, p2);
-            output = output + p1;
+        console.log = (p1, p2, p3) => {
+            if (p1 === undefined) {
+                return;
+            }
+            // prettier-ignore
+            // eslint-disable-next-line no-nested-ternary
+            p2 === undefined
+                ? nativeConsoleLog(p1)
+                : p3 === undefined
+                    ? nativeConsoleLog(p1, p2)
+                    : nativeConsoleLog(p1, p2, p3);
+
+            output = `${output}${p1 === undefined ? '' : p1}${
+                p2 === undefined ? '' : p2
+            }${p3 === undefined ? '' : p3}`;
         };
 
         originalArgv = process.argv.map((arg) => arg);
@@ -80,6 +93,7 @@ describe('Publish-please CLI Options', () => {
                 .catch((err) => {
                     output.should.containEql('ERRORS');
                     output.should.containEql('dry mode activated');
+                    (exitCode || 0).should.be.equal(1);
                 })
         );
     });
@@ -99,6 +113,7 @@ describe('Publish-please CLI Options', () => {
         publishrc.validations.untrackedFiles = false;
         publishrc.validations.gitTag = false;
         publishrc.validations.branch = false;
+        publishrc.publishCommand = "echo 'npm publish'";
         writeFile('.publishrc', JSON.stringify(publishrc, null, 2));
 
         // When
@@ -113,6 +128,10 @@ describe('Publish-please CLI Options', () => {
                         ? output.should.containEql('Running validations')
                         : output.should.not.containEql('Running validations');
                     output.should.containEql('Release info');
+                    (exitCode || 0).should.be.equal(0);
+                    // prettier-ignore
+                    const packageFilename = `${packageName.replace('@','-')}.tgz`;
+                    fileExists(packageFilename).should.be.false();
                 })
         );
     });
@@ -132,6 +151,7 @@ describe('Publish-please CLI Options', () => {
         publishrc.validations.untrackedFiles = false;
         publishrc.validations.gitTag = false;
         publishrc.validations.branch = false;
+        publishrc.publishCommand = "echo 'npm publish'";
         writeFile('.publishrc', JSON.stringify(publishrc, null, 2));
         const projectName = process
             .cwd()
@@ -152,6 +172,10 @@ describe('Publish-please CLI Options', () => {
                     output.should.containEql(
                         `${projectName} is safe to be published`
                     );
+                    (exitCode || 0).should.be.equal(0);
+                    // prettier-ignore
+                    const packageFilename = `${packageName.replace('@','-')}.tgz`;
+                    fileExists(packageFilename).should.be.false();
                 })
         );
     });
@@ -194,6 +218,10 @@ describe('Publish-please CLI Options', () => {
                     output.should.containEql(
                         `${projectName} has been successfully published`
                     );
+                    (exitCode || 0).should.be.equal(0);
+                    // prettier-ignore
+                    const packageFilename = `${packageName.replace('@','-')}.tgz`;
+                    fileExists(packageFilename).should.be.false();
                 })
         );
     });
@@ -226,6 +254,7 @@ describe('Publish-please CLI Options', () => {
                 .catch((err) => {
                     output.should.containEql('dry mode activated');
                     output.should.containEql('ERRORS');
+                    (exitCode || 0).should.be.equal(1);
                 })
         );
     });
@@ -275,6 +304,10 @@ describe('Publish-please CLI Options', () => {
                         ? output.should.containEql('Running validations')
                         : output.should.not.containEql('Running validations');
                     output.should.containEql('Release info');
+                    (exitCode || 0).should.be.equal(0);
+                    // prettier-ignore
+                    const packageFilename = `${packageName.replace('@','-')}.tgz`;
+                    fileExists(packageFilename).should.be.false();
                 })
         );
     });
@@ -335,6 +368,10 @@ describe('Publish-please CLI Options', () => {
                     output.should.containEql(
                         `${projectName} is safe to be published`
                     );
+                    (exitCode || 0).should.be.equal(0);
+                    // prettier-ignore
+                    const packageFilename = `${packageName.replace('@','-')}.tgz`;
+                    fileExists(packageFilename).should.be.false();
                 })
         );
     });
@@ -369,6 +406,7 @@ describe('Publish-please CLI Options', () => {
                     output.should.containEql('Running pre-publish script');
                     output.should.containEql('Running validations');
                     output.should.containEql('ERRORS');
+                    (exitCode || 0).should.be.equal(1);
                 })
         );
     });
@@ -428,12 +466,17 @@ describe('Publish-please CLI Options', () => {
                     output.should.containEql(
                         `${projectName} has been successfully published`
                     );
+                    (exitCode || 0).should.be.equal(0);
+                    // prettier-ignore
+                    const packageFilename = `${packageName.replace('@','-')}.tgz`;
+                    fileExists(packageFilename).should.be.false();
                 })
         );
     });
 
     it('Should execute configuration workflow on `npx publish-please config`', () => {
         // Given
+        process.env.PUBLISH_PLEASE_TEST_MODE = true;
         process.env['npm_config_argv'] = undefined;
 
         // [ '/usr/local/bin/node',
@@ -499,6 +542,7 @@ describe('Publish-please CLI Options', () => {
      */
     it('Should execute configuration wizard on `npm run publish-please config`', () => {
         // Given
+        process.env.PUBLISH_PLEASE_TEST_MODE = true;
         process.env['npm_config_argv'] =
             '{"remain":["config"],"cooked":["run","publish-please","config"],"original":["run","publish-please","config"]}';
         // When
