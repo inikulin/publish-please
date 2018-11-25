@@ -459,7 +459,7 @@ describe('npx integration tests', () => {
                         `npx ../${packageName.replace('@','-')}.tgz --dry-run > ./publish07.log`
                     )
                 )
-                .then(() => {
+                .catch(() => {
                     const publishLog = readFile('./publish07.log').toString();
                     console.log(publishLog);
                     /* prettier-ignore */

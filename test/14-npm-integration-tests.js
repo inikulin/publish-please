@@ -403,10 +403,10 @@ describe('npm integration tests', () => {
                 })
                 .then(() => console.log('> npm run publish-please --dry-run'))
                 .then(() =>
-                    exec('npm run publish-please --dry-run > ./publish07.log')
+                    exec('npm run publish-please --dry-run > ./publish07a.log')
                 )
-                .then(() => {
-                    const publishLog = readFile('./publish07.log').toString();
+                .catch(() => {
+                    const publishLog = readFile('./publish07a.log').toString();
                     console.log(publishLog);
                     return publishLog;
                 })
