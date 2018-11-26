@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+## [5.4.0] - 2018-11-26
+### Changed
+- dry-run workflow should not prompt for user input
+### Fixed
+- tgz file is left in project directory after successfull dry-run 
+### Fixed
+- last message showned in publishing workflow is not correct 
+
 ## [5.3.0] - 2018-11-21
 ### Added
 - add a CI reporter and be able to automatically switch from elegant status reporter to CI reporter when running on CI 
