@@ -1,6 +1,6 @@
 {
   "name": "publish-please",
-  "version": "5.3.1",
+  "version": "5.4.3",
   "description": "Safe and highly functional replacement for `npm publish`.",
   "main": "./lib/index.js",
   "bin": {

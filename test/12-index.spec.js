@@ -6,8 +6,10 @@ const writeFile = require('fs').writeFileSync;
 const should = require('should');
 const cli = require('../lib');
 const pathJoin = require('path').join;
+const pathSeparator = require('path').sep;
 const packageName = require('./utils/publish-please-version-under-test');
 const nodeInfos = require('../lib/utils/get-node-infos').getNodeInfosSync();
+const fileExists = require('fs').existsSync;
 const lineSeparator = '----------------------------------';
 
 /** !!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -35,7 +37,7 @@ describe('Publish-please CLI Options', () => {
     });
     beforeEach(() => {
         console.log(`${lineSeparator} begin test ${lineSeparator}`);
-        process.env.PUBLISH_PLEASE_TEST_MODE = true;
+        process.env.PUBLISH_PLEASE_TEST_MODE = false;
         exitCode = undefined;
         output = '';
         nativeExit = process.exit;
@@ -44,9 +46,21 @@ describe('Publish-please CLI Options', () => {
             // nativeConsoleLog(val);
             if (exitCode === undefined) exitCode = val;
         };
-        console.log = (p1, p2) => {
-            p2 === undefined ? nativeConsoleLog(p1) : nativeConsoleLog(p1, p2);
-            output = output + p1;
+        console.log = (p1, p2, p3) => {
+            if (p1 === undefined) {
+                return;
+            }
+            // prettier-ignore
+            // eslint-disable-next-line no-nested-ternary
+            p2 === undefined
+                ? nativeConsoleLog(p1)
+                : p3 === undefined
+                    ? nativeConsoleLog(p1, p2)
+                    : nativeConsoleLog(p1, p2, p3);
+
+            output = `${output}${p1 === undefined ? '' : p1}${
+                p2 === undefined ? '' : p2
+            }${p3 === undefined ? '' : p3}`;
         };
 
         originalArgv = process.argv.map((arg) => arg);
@@ -79,6 +93,7 @@ describe('Publish-please CLI Options', () => {
                 .catch((err) => {
                     output.should.containEql('ERRORS');
                     output.should.containEql('dry mode activated');
+                    (exitCode || 0).should.be.equal(1);
                 })
         );
     });
@@ -98,6 +113,7 @@ describe('Publish-please CLI Options', () => {
         publishrc.validations.untrackedFiles = false;
         publishrc.validations.gitTag = false;
         publishrc.validations.branch = false;
+        publishrc.publishCommand = "echo 'npm publish'";
         writeFile('.publishrc', JSON.stringify(publishrc, null, 2));
 
         // When
@@ -112,9 +128,100 @@ describe('Publish-please CLI Options', () => {
                         ? output.should.containEql('Running validations')
                         : output.should.not.containEql('Running validations');
                     output.should.containEql('Release info');
+                    (exitCode || 0).should.be.equal(0);
+                    // prettier-ignore
+                    const packageFilename = `${packageName.replace('@','-')}.tgz`;
+                    fileExists(packageFilename).should.be.false();
+                })
+        );
+    });
+
+    it('Should execute dry-run workflow with no errors on `npm run publish-please --dry-run --ci`', () => {
+        // Given
+        process.env['npm_config_argv'] =
+            '{"remain":[],"cooked":["run","publish-please","--dry-run", "--ci"],"original":["run","publish-please","--dry-run", "--ci"]}';
+        const publishrc = JSON.parse(readFile('.publishrc').toString());
+        publishrc.confirm = false;
+        publishrc.validations.vulnerableDependencies = false;
+        // prettier-ignore
+        nodeInfos.npmPackHasJsonReporter
+            ? publishrc.validations.sensitiveData = true
+            : publishrc.validations.sensitiveData = false;
+        publishrc.validations.uncommittedChanges = false;
+        publishrc.validations.untrackedFiles = false;
+        publishrc.validations.gitTag = false;
+        publishrc.validations.branch = false;
+        publishrc.publishCommand = "echo 'npm publish'";
+        writeFile('.publishrc', JSON.stringify(publishrc, null, 2));
+        const projectName = process
+            .cwd()
+            .split(pathSeparator)
+            .pop();
+        // When
+        return (
+            cli()
+                // Then
+                .then(() => {
+                    output.should.not.containEql('ERRORS');
+                    output.should.containEql('dry mode activated');
+                    output.should.containEql('Running pre-publish script');
+                    nodeInfos.npmPackHasJsonReporter
+                        ? output.should.containEql('Running validations')
+                        : output.should.not.containEql('Running validations');
+                    output.should.containEql('Release info');
                     output.should.containEql(
-                        "run 'npm pack' to have more details on the package"
+                        `${projectName} is safe to be published`
                     );
+                    (exitCode || 0).should.be.equal(0);
+                    // prettier-ignore
+                    const packageFilename = `${packageName.replace('@','-')}.tgz`;
+                    fileExists(packageFilename).should.be.false();
+                })
+        );
+    });
+
+    it('Should execute publish workflow with no errors on `npm run publish-please --ci`', () => {
+        // Given
+        process.env['npm_config_argv'] =
+            '{"remain":[],"cooked":["run","publish-please", "--ci"],"original":["run","publish-please", "--ci"]}';
+        const publishrc = JSON.parse(readFile('.publishrc').toString());
+        publishrc.confirm = false;
+        publishrc.validations.vulnerableDependencies = false;
+        // prettier-ignore
+        nodeInfos.npmPackHasJsonReporter
+            ? publishrc.validations.sensitiveData = true
+            : publishrc.validations.sensitiveData = false;
+        publishrc.validations.uncommittedChanges = false;
+        publishrc.validations.untrackedFiles = false;
+        publishrc.validations.gitTag = false;
+        publishrc.validations.branch = false;
+        publishrc.publishCommand = "echo 'npm publish'";
+        writeFile('.publishrc', JSON.stringify(publishrc, null, 2));
+
+        const projectName = process
+            .cwd()
+            .split(pathSeparator)
+            .pop();
+
+        // When
+        return (
+            cli()
+                // Then
+                .then(() => {
+                    output.should.not.containEql('ERRORS');
+                    output.should.not.containEql('dry mode activated');
+                    output.should.containEql('Running pre-publish script');
+                    nodeInfos.npmPackHasJsonReporter
+                        ? output.should.containEql('Running validations')
+                        : output.should.not.containEql('Running validations');
+                    output.should.containEql('Release info');
+                    output.should.containEql(
+                        `${projectName} has been successfully published`
+                    );
+                    (exitCode || 0).should.be.equal(0);
+                    // prettier-ignore
+                    const packageFilename = `${packageName.replace('@','-')}.tgz`;
+                    fileExists(packageFilename).should.be.false();
                 })
         );
     });
@@ -147,6 +254,7 @@ describe('Publish-please CLI Options', () => {
                 .catch((err) => {
                     output.should.containEql('dry mode activated');
                     output.should.containEql('ERRORS');
+                    (exitCode || 0).should.be.equal(1);
                 })
         );
     });
@@ -196,9 +304,74 @@ describe('Publish-please CLI Options', () => {
                         ? output.should.containEql('Running validations')
                         : output.should.not.containEql('Running validations');
                     output.should.containEql('Release info');
+                    (exitCode || 0).should.be.equal(0);
+                    // prettier-ignore
+                    const packageFilename = `${packageName.replace('@','-')}.tgz`;
+                    fileExists(packageFilename).should.be.false();
+                })
+        );
+    });
+
+    it('Should execute dry-run workflow with no errors on `npx publish-please --dry-run --ci`', () => {
+        // Given
+        process.env['npm_config_argv'] = undefined;
+
+        // [ '/usr/local/bin/node',
+        //   '/Users/HDO/.npm/_npx/97852/bin/publish-please',
+        //   '--dry-run'
+        //   '--ci'
+        // ]
+        process.argv = [
+            pathJoin('usr', 'local', 'bin', 'node'),
+            pathJoin(
+                'Users',
+                'xxx',
+                '.npm',
+                '_npx',
+                '97852',
+                'bin',
+                'publish-please'
+            ),
+            '--dry-run',
+            '--ci',
+        ];
+        const publishrc = JSON.parse(readFile('.publishrc').toString());
+        publishrc.confirm = false;
+        publishrc.validations.vulnerableDependencies = false;
+        // prettier-ignore
+        nodeInfos.npmPackHasJsonReporter
+            ? publishrc.validations.sensitiveData = true
+            : publishrc.validations.sensitiveData = false;
+        publishrc.validations.uncommittedChanges = false;
+        publishrc.validations.untrackedFiles = false;
+        publishrc.validations.gitTag = false;
+        publishrc.validations.branch = false;
+        writeFile('.publishrc', JSON.stringify(publishrc, null, 2));
+
+        const projectName = process
+            .cwd()
+            .split(pathSeparator)
+            .pop();
+
+        // When
+        return (
+            cli()
+                // Then
+                .then(() => {
+                    output.should.not.containEql('ERRORS');
+                    output.should.containEql('dry mode activated');
+                    output.should.containEql('Running pre-publish script');
+                    nodeInfos.npmPackHasJsonReporter
+                        ? output.should.containEql('Running validations')
+                        : output.should.not.containEql('Running validations');
+                    output.should.containEql('Release info');
                     output.should.containEql(
-                        "run 'npm pack' to have more details on the package"
+                        `${projectName} is safe to be published`
                     );
+                    (exitCode || 0).should.be.equal(0);
+                    // prettier-ignore
+                    const packageFilename = `${packageName.replace('@','-')}.tgz`;
+                    fileExists(packageFilename).should.be.false();
                 })
         );
     });
@@ -233,12 +406,77 @@ describe('Publish-please CLI Options', () => {
                     output.should.containEql('Running pre-publish script');
                     output.should.containEql('Running validations');
                     output.should.containEql('ERRORS');
+                    (exitCode || 0).should.be.equal(1);
+                })
+        );
+    });
+
+    it('Should execute publish workflow with no errors on `npx publish-please --ci`', () => {
+        // Given
+        process.env['npm_config_argv'] = undefined;
+
+        // [ '/usr/local/bin/node',
+        //   '/Users/HDO/.npm/_npx/97852/bin/publish-please',
+        //   '--ci'
+        // ]
+        process.argv = [
+            pathJoin('usr', 'local', 'bin', 'node'),
+            pathJoin(
+                'Users',
+                'xxx',
+                '.npm',
+                '_npx',
+                '97852',
+                'bin',
+                'publish-please'
+            ),
+            '--ci',
+        ];
+        const publishrc = JSON.parse(readFile('.publishrc').toString());
+        publishrc.confirm = false;
+        publishrc.validations.vulnerableDependencies = false;
+        // prettier-ignore
+        nodeInfos.npmPackHasJsonReporter
+            ? publishrc.validations.sensitiveData = true
+            : publishrc.validations.sensitiveData = false;
+        publishrc.validations.uncommittedChanges = false;
+        publishrc.validations.untrackedFiles = false;
+        publishrc.validations.gitTag = false;
+        publishrc.validations.branch = false;
+        publishrc.publishCommand = "echo 'npm publish'";
+        writeFile('.publishrc', JSON.stringify(publishrc, null, 2));
+
+        const projectName = process
+            .cwd()
+            .split(pathSeparator)
+            .pop();
+
+        // When
+        return (
+            cli()
+                // Then
+                .then(() => {
+                    output.should.not.containEql('ERRORS');
+                    output.should.not.containEql('dry mode activated');
+                    output.should.containEql('Running pre-publish script');
+                    nodeInfos.npmPackHasJsonReporter
+                        ? output.should.containEql('Running validations')
+                        : output.should.not.containEql('Running validations');
+                    output.should.containEql('Release info');
+                    output.should.containEql(
+                        `${projectName} has been successfully published`
+                    );
+                    (exitCode || 0).should.be.equal(0);
+                    // prettier-ignore
+                    const packageFilename = `${packageName.replace('@','-')}.tgz`;
+                    fileExists(packageFilename).should.be.false();
                 })
         );
     });
 
     it('Should execute configuration workflow on `npx publish-please config`', () => {
         // Given
+        process.env.PUBLISH_PLEASE_TEST_MODE = true;
         process.env['npm_config_argv'] = undefined;
 
         // [ '/usr/local/bin/node',
@@ -304,6 +542,7 @@ describe('Publish-please CLI Options', () => {
      */
     it('Should execute configuration wizard on `npm run publish-please config`', () => {
         // Given
+        process.env.PUBLISH_PLEASE_TEST_MODE = true;
         process.env['npm_config_argv'] =
             '{"remain":["config"],"cooked":["run","publish-please","config"],"original":["run","publish-please","config"]}';
         // When

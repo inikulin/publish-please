@@ -97,7 +97,7 @@ describe('npx integration tests', () => {
                     `npx ../${packageName.replace('@','-')}.tgz --dry-run > ./publish01.log`
                 )
             )
-            .then(() => {
+            .catch(() => {
                 const publishLog = readFile('./publish01.log').toString();
                 console.log(publishLog);
                 /* prettier-ignore */
@@ -176,8 +176,66 @@ describe('npx integration tests', () => {
                 assert(publishLog.includes('Release info'));
                 /* prettier-ignore */
                 assert(publishLog.includes('testing-repo-1.3.77.tgz'));
+            });
+    });
+
+    it('Should be able to run publish-please in dry mode on CI (with existing .publishrc config file)', () => {
+        return Promise.resolve()
+            .then(() => {
+                const pkg = JSON.parse(readFile('package.json').toString());
+                const scripts = {};
+                scripts.test = 'echo "running tests ..."';
+                pkg.scripts = scripts;
+                writeFile('package.json', JSON.stringify(pkg, null, 2));
+            })
+            .then(() => {
+                writeFile(
+                    '.publishrc',
+                    JSON.stringify({
+                        confirm: true,
+                        validations: {
+                            vulnerableDependencies: false,
+                            sensitiveData: false,
+                            uncommittedChanges: false,
+                            untrackedFiles: false,
+                            branch: 'master',
+                            gitTag: false,
+                        },
+                        publishTag: 'latest',
+                        prePublishScript:
+                            'echo "running script defined in .publishrc ..."',
+                        postPublishScript: false,
+                    })
+                );
+            })
+            .then(() => console.log(`> npx ${packageName} --dry-run --ci`))
+            .then(() =>
+                exec(
+                    /* prettier-ignore */
+                    `npx ../${packageName.replace('@','-')}.tgz --dry-run --ci > ./publish02b.log`
+                )
+            )
+            .then(() => {
+                const publishLog = readFile('./publish02b.log').toString();
+                console.log(publishLog);
                 /* prettier-ignore */
-                assert(publishLog.includes("run 'npm pack' to have more details on the package"));
+                assert(publishLog.includes('dry mode activated'));
+                /* prettier-ignore */
+                assert(publishLog.includes('Running pre-publish script'));
+                /* prettier-ignore */
+                assert(publishLog.includes('running script defined in .publishrc ...'));
+                /* prettier-ignore */
+                assert(publishLog.includes('Running validations'));
+                /* prettier-ignore */
+                assert(publishLog.includes('Validating branch'));
+                /* prettier-ignore */
+                assert(!publishLog.includes('ERRORS'));
+                /* prettier-ignore */
+                assert(publishLog.includes('Release info'));
+                /* prettier-ignore */
+                assert(publishLog.includes('testing-repo-1.3.77.tgz'));
+                /* prettier-ignore */
+                assert(publishLog.includes('testing-repo is safe to be published'));
             });
     });
 
@@ -401,7 +459,7 @@ describe('npx integration tests', () => {
                         `npx ../${packageName.replace('@','-')}.tgz --dry-run > ./publish07.log`
                     )
                 )
-                .then(() => {
+                .catch(() => {
                     const publishLog = readFile('./publish07.log').toString();
                     console.log(publishLog);
                     /* prettier-ignore */
