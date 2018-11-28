@@ -4,22 +4,23 @@
 const should = require('should');
 const packageName = require('./utils/publish-please-version-under-test');
 const reporter = require('../lib/reporters/ci-reporter');
-const rename = require('fs').renameSync;
 const pathJoin = require('path').join;
-const platform = require('os').platform();
+const os = require('os');
 const envType = require('../lib/reporters/env-type');
+const icon = require('../lib/reporters/ci-icon');
 const lineSeparator = '----------------------------------';
 
 describe('CI reporter', () => {
     let nativeExit;
     let nativeConsoleLog;
     let nativeIsCI;
+    let nativePlatform;
     let exitCode;
     let output;
 
     beforeEach(() => {
         console.log(
-            `${lineSeparator} begin test - platform: ${platform} ${lineSeparator}`
+            `${lineSeparator} begin test - platform: ${os.platform()} ${lineSeparator}`
         );
         delete process.env.TEAMCITY_VERSION;
         exitCode = undefined;
@@ -27,6 +28,7 @@ describe('CI reporter', () => {
         nativeExit = process.exit;
         nativeConsoleLog = console.log;
         nativeIsCI = envType.isCI;
+        nativePlatform = os.platform;
         process.exit = (val) => {
             // nativeConsoleLog(val);
             if (exitCode === undefined) exitCode = val;
@@ -40,6 +42,7 @@ describe('CI reporter', () => {
         process.exit = nativeExit;
         console.log = nativeConsoleLog;
         envType.isCI = nativeIsCI;
+        os.platform = nativePlatform;
         console.log(`${lineSeparator} end test ${lineSeparator}\n`);
     });
 
@@ -88,6 +91,60 @@ describe('CI reporter', () => {
         result.should.be.false();
     });
 
+    it('Success icon on Teamcity should be [v]', () => {
+        // Given
+        process.env.TEAMCITY_VERSION = '1.0.0';
+        // When
+        const result = icon.success();
+        // Then
+        result.should.be.containEql('[v]');
+    });
+
+    it('Success icon on windows CI should be √', () => {
+        // Given
+        os.platform = () => 'windows';
+        // When
+        const result = icon.success();
+        // Then
+        result.should.be.containEql('√');
+    });
+
+    it('Success icon on linux CI should be ✓', () => {
+        // Given
+        os.platform = () => 'darwin';
+        // When
+        const result = icon.success();
+        // Then
+        result.should.be.containEql('✓');
+    });
+
+    it('Error icon on Teamcity CI should be [x]', () => {
+        // Given
+        process.env.TEAMCITY_VERSION = '1.0.0';
+        // When
+        const result = icon.error();
+        // Then
+        result.should.be.containEql('[x]');
+    });
+
+    it('Error icon on windows CI should be ×', () => {
+        // Given
+        os.platform = () => 'windows';
+        // When
+        const result = icon.error();
+        // Then
+        result.should.be.containEql('×');
+    });
+
+    it('Error icon on linux CI should be ✖', () => {
+        // Given
+        os.platform = () => 'darwin';
+        // When
+        const result = icon.error();
+        // Then
+        result.should.be.containEql('✖');
+    });
+
     it("Should run when publish-please is started with command 'npm run publish-please --ci'", () => {
         // Given
         process.env['npm_config_argv'] =
@@ -128,29 +185,57 @@ describe('CI reporter', () => {
 
     it('Should report running task with success', () => {
         // Given
-        const taskname = 'yo yask';
+        const taskname = 'yo task';
         const done = reporter.reportRunningTask(taskname);
 
         // When
         const result = done(true);
         // Then
         const expected = `${
-            platform.startsWith('win') ? '√' : '✓'
+            os.platform().startsWith('win') ? '√' : '✓'
         } ${taskname}`;
+        output.should.containEql(expected);
+    });
+
+    it.skip('Should report running task with success on Teamcity', () => {
+        // Given
+        os.platform = () => 'windows';
+        process.env.TEAMCITY_VERSION = '1.0.0';
+        const taskname = 'yo task';
+        const done = reporter.reportRunningTask(taskname);
+
+        // When
+        const result = done(true);
+        // Then
+        const expected = `[v] ${taskname}`;
         output.should.containEql(expected);
     });
 
     it('Should report running task with failure', () => {
         // Given
-        const taskname = 'yo yask';
+        const taskname = 'yo task';
         const done = reporter.reportRunningTask(taskname);
 
         // When
         const result = done(false);
         // Then
         const expected = `${
-            platform.startsWith('win') ? '×' : '✖'
+            os.platform().startsWith('win') ? '×' : '✖'
         } ${taskname}`;
+        output.should.containEql(expected);
+    });
+
+    it.skip('Should report running task with failure on Teamcity', () => {
+        // Given
+        os.platform = () => 'windows';
+        process.env.TEAMCITY_VERSION = '1.0.0';
+        const taskname = 'yo task';
+        const done = reporter.reportRunningTask(taskname);
+
+        // When
+        const result = done(false);
+        // Then
+        const expected = `[x] ${taskname}`;
         output.should.containEql(expected);
     });
 
