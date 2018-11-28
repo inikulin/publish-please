@@ -21,6 +21,7 @@ describe('CI reporter', () => {
         console.log(
             `${lineSeparator} begin test - platform: ${platform} ${lineSeparator}`
         );
+        delete process.env.TEAMCITY_VERSION;
         exitCode = undefined;
         output = '';
         nativeExit = process.exit;
@@ -67,6 +68,24 @@ describe('CI reporter', () => {
         const result = reporter.shouldRun();
         // Then
         result.should.be.true();
+    });
+
+    it('Should detect Teamcity', () => {
+        // Given
+        process.env.TEAMCITY_VERSION = '1.0.0';
+        // When
+        const result = envType.isTeamcity();
+        // Then
+        result.should.be.true();
+    });
+
+    it('Should detect non Teamcity', () => {
+        // Given
+        delete process.env.TEAMCITY_VERSION;
+        // When
+        const result = envType.isTeamcity();
+        // Then
+        result.should.be.false();
     });
 
     it("Should run when publish-please is started with command 'npm run publish-please --ci'", () => {
