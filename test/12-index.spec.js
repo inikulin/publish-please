@@ -38,6 +38,7 @@ describe('Publish-please CLI Options', () => {
     beforeEach(() => {
         console.log(`${lineSeparator} begin test ${lineSeparator}`);
         process.env.PUBLISH_PLEASE_TEST_MODE = false;
+        delete process.env.TEAMCITY_VERSION;
         exitCode = undefined;
         output = '';
         nativeExit = process.exit;
@@ -180,6 +181,56 @@ describe('Publish-please CLI Options', () => {
         );
     });
 
+    it('Should execute dry-run workflow with no errors on `npm run publish-please --dry-run --ci` (TeamCity env)', () => {
+        // Given
+        process.env.TEAMCITY_VERSION = '1.0.0';
+        process.env['npm_config_argv'] =
+            '{"remain":[],"cooked":["run","publish-please","--dry-run", "--ci"],"original":["run","publish-please","--dry-run", "--ci"]}';
+        const publishrc = JSON.parse(readFile('.publishrc').toString());
+        publishrc.confirm = false;
+        publishrc.validations.vulnerableDependencies = false;
+        // prettier-ignore
+        nodeInfos.npmPackHasJsonReporter
+            ? publishrc.validations.sensitiveData = true
+            : publishrc.validations.sensitiveData = false;
+        publishrc.validations.uncommittedChanges = false;
+        publishrc.validations.untrackedFiles = false;
+        publishrc.validations.gitTag = false;
+        publishrc.validations.branch = false;
+        publishrc.publishCommand = "echo 'npm publish'";
+        writeFile('.publishrc', JSON.stringify(publishrc, null, 2));
+        const projectName = process
+            .cwd()
+            .split(pathSeparator)
+            .pop();
+        // When
+        return (
+            cli()
+                // Then
+                .then(() => {
+                    output.should.not.containEql('ERRORS');
+                    output.should.containEql('dry mode activated');
+                    output.should.containEql('Running pre-publish script');
+                    nodeInfos.npmPackHasJsonReporter
+                        ? output.should.containEql('Running validations')
+                        : output.should.not.containEql('Running validations');
+                    if (nodeInfos.npmPackHasJsonReporter) {
+                        output.should.containEql(
+                            '[v] Checking for the sensitive and non-essential data in the npm package'
+                        );
+                    }
+                    output.should.containEql('Release info');
+                    output.should.containEql(
+                        `${projectName} is safe to be published`
+                    );
+                    (exitCode || 0).should.be.equal(0);
+                    // prettier-ignore
+                    const packageFilename = `${packageName.replace('@','-')}.tgz`;
+                    fileExists(packageFilename).should.be.false();
+                })
+        );
+    });
+
     it('Should execute publish workflow with no errors on `npm run publish-please --ci`', () => {
         // Given
         process.env['npm_config_argv'] =
@@ -254,6 +305,43 @@ describe('Publish-please CLI Options', () => {
                 .catch((err) => {
                     output.should.containEql('dry mode activated');
                     output.should.containEql('ERRORS');
+                    (exitCode || 0).should.be.equal(1);
+                })
+        );
+    });
+
+    it('Should execute dry-run workflow with errors on `npx publish-please --dry-run --ci` (TeamCity env)', () => {
+        // Given
+        process.env.TEAMCITY_VERSION = '1.0.0';
+        process.env['npm_config_argv'] = undefined;
+
+        // [ '/usr/local/bin/node',
+        //   '/Users/HDO/.npm/_npx/97852/bin/publish-please',
+        //   '--dry-run'
+        //   '--ci'
+        // ]
+        process.argv = [
+            pathJoin('usr', 'local', 'bin', 'node'),
+            pathJoin(
+                'Users',
+                'xxx',
+                '.npm',
+                '_npx',
+                '97852',
+                'bin',
+                'publish-please'
+            ),
+            '--dry-run',
+            '--ci',
+        ];
+        // When
+        return (
+            cli()
+                // Then
+                .catch((err) => {
+                    output.should.containEql('dry mode activated');
+                    output.should.containEql('ERRORS');
+                    output.should.containEql('[x] ');
                     (exitCode || 0).should.be.equal(1);
                 })
         );
