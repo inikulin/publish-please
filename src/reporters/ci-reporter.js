@@ -6,7 +6,6 @@
  * Requiring those modules at first will break the publish-please execution
  * because reporter's code will be the first to execute
  */
-const os = require('os');
 
 /**
  * CI reporter.
@@ -73,15 +72,11 @@ function reportError(message) {
  * done(false) -> report failure
  */
 function reportRunningTask(taskname) {
-    const platform = os.platform();
+    const icon = require('./ci-icon');
     function done(success) {
-        if (success) {
-            console.log(
-                `${platform.startsWith('win') ? '√' : '✓'} ${taskname}`
-            );
-            return;
-        }
-        console.log(`${platform.startsWith('win') ? '×' : '✖'} ${taskname}`);
+        success
+            ? console.log(`${icon.success()} ${taskname}`)
+            : console.log(`${icon.error()} ${taskname}`);
     }
 
     return done;

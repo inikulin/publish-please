@@ -197,7 +197,7 @@ describe('CI reporter', () => {
         output.should.containEql(expected);
     });
 
-    it.skip('Should report running task with success on Teamcity', () => {
+    it('Should report running task with success on Teamcity', () => {
         // Given
         os.platform = () => 'windows';
         process.env.TEAMCITY_VERSION = '1.0.0';
@@ -225,7 +225,7 @@ describe('CI reporter', () => {
         output.should.containEql(expected);
     });
 
-    it.skip('Should report running task with failure on Teamcity', () => {
+    it('Should report running task with failure on Teamcity', () => {
         // Given
         os.platform = () => 'windows';
         process.env.TEAMCITY_VERSION = '1.0.0';
