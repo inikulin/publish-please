@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Unreleased
 - align the README with all previous changes 
 
+## [5.4.2] - 2018-11-29
+### Fixed
+- fix CI reporter on TeamCity
+
 ## [5.4.1] - 2018-11-26
 ### Fixed
 - package 5.4.0 was published too early. Do not use it.
