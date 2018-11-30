@@ -22,4 +22,10 @@ This example shows up that you are about to push your test files to the registry
 
 ![dry-run-demo-with-errors](media/dry-run-with-errors.gif)
 
+when all validations pass, publish-please will show you the exact content of the package that will be sent to the registry, so you can check everything is included in the package:
+
+![dry-run-demo-success](media/dry-run-demo-success.gif)
+
+
+
 [to be continued]
