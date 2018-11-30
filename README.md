@@ -83,7 +83,43 @@ When all validations pass, publish-please will show you the exact content of the
         {
             "prePublishScript": false,
         }
+         ```
+
+
+- **Checking for the vulnerable dependencies**
+    - This validation check uses `npm audit` under the hood. This validation check performs only if npm version is 6.1.0 or above.
+
+    - you may prevent specific vulnerabilities to be reported by publish-please by creating a `.auditignore` file in the root of your project with content like the following:
+
+        ```yaml
+        https://npmjs.com/advisories/12
+        https://npmjs.com/advisories/577
         ```
+    - you may perform vulnerabilities check only for a specific vulnerability level: `critical`, `high`, `moderate` or `low`. 
+    To do this create an `audit.opts` file in the root of your project with content like the following:
+        ```sh
+        --audit-level=high
+        ```
+        The above example will enable to report only vulnerabilities of level `critical` and `high`
+
+    - if you want to disable this validation, run the command:
+
+        ```sh
+        npx publish-please config
+
+        Would you like to verify that your package doesn`t have vulnerable dependencies before publishing? No
+        ```
+
+        or directly edit the property `vulnerableDependencies` in the `.publishrc` file:
+
+        ```json
+        {
+            "validations": {
+                "vulnerableDependencies": false,
+            }
+        }
+         ```
+
 
 
 [to be continued]
