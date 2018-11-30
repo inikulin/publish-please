@@ -5,6 +5,14 @@ Safe and highly functional replacement for `npm publish`.
 [![npm version](https://img.shields.io/npm/v/publish-please.svg)](https://www.npmjs.com/package/publish-please)
 [![Dependency Status](https://david-dm.org/inikulin/publish-please.svg)](https://david-dm.org/inikulin/publish-please)
 
+Publish-please enables you to :
+- Validate your package before publishing to the registry
+- Publish to the registry on sucessfull validation
+- Run any script on successfull publishing
+
+Publish-please is versatile enough to be used only as a validation tool before publishing or as an all-in-one tool when you want to manually handle your releases.
+
+See how the [TestCafe](https://github.com/DevExpress/testcafe) team uses publish-please when [bumping to the next release](https://github.com/DevExpress/testcafe/commit/ab1f5ad430f307c224723a15c6425a41f25087df).
 
 ## Validate your package before publishing to the registry
 
