@@ -22,9 +22,31 @@ This example shows up that you are about to push your test files to the registry
 
 ![dry-run-demo-with-errors](media/dry-run-with-errors.gif)
 
-when all validations pass, publish-please will show you the exact content of the package that will be sent to the registry, so you can check everything is included in the package:
+When all validations pass, publish-please will show you the exact content of the package that will be sent to the registry, so you can check everything is included in the package:
 
 ![dry-run-demo-success](media/dry-run-demo-success.gif)
+
+### **The validation workflow performs by default the following actions:**
+- **npm test**
+    - Check that all tests pass
+
+- **Checking for the vulnerable dependencies**
+    - Perform vulnerable dependencies check using `npm audit`
+
+- **Checking for the uncommitted changes**
+    - Check that there are no uncommitted changes in the working tree
+
+- **Checking for the untracked files**
+    - Check that there are no untracked files in the working tree
+
+- **Checking for the sensitive and non-essential data in the npm package**
+    - Check that the npm package will not embed sensitive files or useless files (like test files)
+
+- **Validating branch** 
+    - Check that current branch is master
+    
+- **Validating git tag**
+    - Check that git tag matches version specified in the `package.json`
 
 
 
