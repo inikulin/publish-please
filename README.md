@@ -26,7 +26,7 @@ When all validations pass, publish-please will show you the exact content of the
 
 ![dry-run-demo-success](media/dry-run-demo-success.gif)
 
-### **The validation workflow performs by default the following actions:**
+### **The Validation Workflow performs by default the following actions:**
 - **npm test**
     - Check that all tests pass
 
@@ -44,10 +44,38 @@ When all validations pass, publish-please will show you the exact content of the
 
 - **Validating branch** 
     - Check that current branch is master
-    
+
 - **Validating git tag**
     - Check that git tag matches version specified in the `package.json`
 
+
+## Customize the Validation Workflow
+
+- **npm test**
+    - you can run any kind of command in place of the `npm test` command. 
+    For this you need a `.publishrc` configuration file at the root of your project. To create or modify the `.publishrc` file, run the command
+
+    ```sh
+    npx publish-please config
+
+    Do you want to run any scripts before publishing (e.g. build steps, tests)? Yes
+    Input pre-publish script: npm run my-own-script
+    ```
+
+    - if you want to disable this validation, run the command:
+
+        ```sh
+        npx publish-please config
+
+        Do you want to run any scripts before publishing (e.g.  build steps, tests)? No
+        ```
+        or directly edit the property `prePublishScript` in the `.publishrc` file:
+
+        ```json
+        {
+            "prePublishScript": false,
+        }
+        ```
 
 
 [to be continued]
