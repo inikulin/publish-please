@@ -35,6 +35,7 @@ When all validations pass, publish-please will show you the exact content of the
 ![dry-run-demo-success](media/dry-run-demo-success.gif)
 
 ### **The Validation Workflow performs by default the following actions:**
+
 - **npm test**
     - Check that all tests pass
 
@@ -188,7 +189,7 @@ When all validations pass, publish-please will show you the exact content of the
         - Zip files
            - Output of 'npm pack'
 
-    - sensitive and non-essential files are defined inside this [.sensitivedata](.sensitivedata) file.
+    - sensitive and non-essential files are defined inside this built-in [.sensitivedata](.sensitivedata) file.
 
     - you may completely override this file by creating a `.sensitivedata` file in the root of your project so that this validation fits your needs.
         - if you create your own `.sensitivedata` file, and the `package.json` file has no `files` section, consider adding `.sensitivedata` to the `.npmignore` file.
@@ -211,5 +212,43 @@ When all validations pass, publish-please will show you the exact content of the
         }
          ```
 
+- **Validating branch**
+    - This validation checks that current branch is `master`.
+    - You can set the branch as a regular expression to be able to use publish-please in a multiple branches scenario like `master` and `release`:
+
+        ```sh
+        npx publish-please config
+
+        Would you like to verify that you are publishing from the correct git branch? Yes
+        Which branch should it be? /(master|release)/
+        ```
+
+        or directly edit the property `branch` in the `.publishrc` file:
+
+        ```json
+        {
+            "validations": {
+                "branch": "/(master|release)/",
+            }
+        }
+         ```
+    
+    - if you want to disable this validation, run the command:
+
+        ```sh
+        npx publish-please config
+
+        Would you like to verify that you are publishing from the correct git branch? No
+        ```
+
+        or directly edit the property `branch` in the `.publishrc` file:
+
+        ```json
+        {
+            "validations": {
+                "branch": false,
+            }
+        }
+         ```
 
 [to be continued]
