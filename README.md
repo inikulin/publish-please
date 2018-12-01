@@ -120,6 +120,96 @@ When all validations pass, publish-please will show you the exact content of the
         }
          ```
 
+- **Checking for the uncommitted changes**
+    - This validation checks that there are no uncommitted changes in the working tree.
+    
+    - if you want to disable this validation, run the command:
+
+        ```sh
+        npx publish-please config
+
+        Would you like to verify that there are no uncommitted changes in your working tree before publishing? No
+        ```
+
+        or directly edit the property `uncommittedChanges` in the `.publishrc` file:
+
+        ```json
+        {
+            "validations": {
+                "uncommittedChanges": false,
+            }
+        }
+         ```
+
+- **Checking for the untracked files**
+    - This validation checks that there are no untracked files in the working tree.
+
+    - if you want to disable this validation, run the command:
+
+        ```sh
+        npx publish-please config
+
+        Would you like to verify that there are no files that are not tracked by git in your working tree before publishing? No
+        ```
+
+        or directly edit the property `untrackedFiles` in the `.publishrc` file:
+
+        ```json
+        {
+            "validations": {
+                "untrackedFiles": false,
+            }
+        }
+         ```
+
+- **Checking for the sensitive and non-essential data in the npm package**
+    - This validation checks there is no sensitive files and no useless files inside the to-be-published package. This validation check performs only if npm version is 5.9.0 or above.
+
+    - This validation is able to detect the following files:
+        - Benchmark files
+        - Configuration files
+           - CI
+           - eslint
+           - GitHub
+           - JetBrains
+           - Visual Studio Code
+        - Coverage files
+        - Demo files
+        - Dependency directories
+        - Doc files
+        - Example files
+        - Log files
+        - Private SSH key
+        - Script files
+        - Secret files
+        - Source files
+        - Temp files
+        - Test files
+        - Zip files
+           - Output of 'npm pack'
+
+    - sensitive and non-essential files are defined inside this [.sensitivedata](.sensitivedata) file.
+
+    - you may completely override this file by creating a `.sensitivedata` file in the root of your project so that this validation fits your needs.
+        - if you create your own `.sensitivedata` file, and the `package.json` file has no `files` section, consider adding `.sensitivedata` to the `.npmignore` file.
+
+    - if you want to disable this validation, run the command:
+
+        ```sh
+        npx publish-please config
+
+        Would you like to verify that there is no sensitive and non-essential data in the npm package? No
+        ```
+
+        or directly edit the property `sensitiveData` in the `.publishrc` file:
+
+        ```json
+        {
+            "validations": {
+                "sensitiveData": false,
+            }
+        }
+         ```
 
 
 [to be continued]
