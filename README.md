@@ -14,6 +14,13 @@ Publish-please is versatile enough to be used only as a validation tool before p
 
 See how the [TestCafe](https://github.com/DevExpress/testcafe) team uses publish-please when [bumping to the next release](https://github.com/DevExpress/testcafe/commit/ab1f5ad430f307c224723a15c6425a41f25087df).
 
+Other topics:
+- [Installing publish-please locally](#Installing-publish-please-locally)
+- [Upgrading to latest publish-please version](#Upgrading-to-latest-publish-please-version)
+- [Running in CI mode](#Running-in-CI-mode)
+- [Customize the Validation Workflow](#Customize-the-Validation-Workflow)
+- [Customize the Publishing Workflow](#Customize-the-Publishing-Workflow)
+
 -------------------------------------------------------------
 ## Validate your package before publishing to the registry
 
@@ -27,7 +34,7 @@ Before running `npm publish`,  run this command at the root of your project fold
 npx publish-please --dry-run
 ```
 
-This example shows up that you are about to push your test files to the registry:
+The following example shows that you are about to push your test files to the registry:
 
 ![dry-run-demo-with-errors](media/dry-run-with-errors.gif)
 
@@ -280,11 +287,6 @@ To publish on successfull validation, run the following command:
 ```sh
 npx publish-please
 ```
-you may also install publish-please as dev dependency in your project:
-
-```sh
-npm install --save-dev publish-please
-```
 
 ## Customize the Publishing Workflow
 
@@ -326,7 +328,7 @@ npm install --save-dev publish-please
         ```
 
     - run publish-please (publish-please will automatically add on the publish command the option `--tag alpha`):
-    
+
         ```sh
         npx publish-please
         ```
@@ -357,13 +359,13 @@ npm install --save-dev publish-please
         }
         ```
 
-
 -------------------------------------------------------------
 ## Run any script on successfull publishing
 
 - Publish-please enables you to run a command after successful publishing. Use it for release announcements, uploading binaries, etc.
 
 - to configure a post-publish script:
+
     ```sh
     npx publish-please config
 
@@ -376,6 +378,7 @@ npm install --save-dev publish-please
         "postPublishScript": "npm run my-post-publish-script"
     }
     ```
+
 - to disable a post-publish script:
     ```sh
     npx publish-please config
@@ -401,19 +404,38 @@ npm install --save-dev publish-please
 
 You can execute publish-please in CI mode by adding the `--ci` option:
 
-```shell
+```sh
 npm run publish-please --ci
 ```
 
 or 
 
-```shell
+```sh
 npx publish-please --ci
 ```
 
 This option will turn off the default elegant-status reporter in favor of the built-in CI reporter.
 Use this option to disable emoji and spinner usage.
 When publish-please executes in a CI (Teamcity, Travis, AppVeyor, ...), the CI reporter is automatically activated.
+
+-------------------------------------------------------------
+## Installing publish-please locally
+
+publish-please can be installed locally:
+
+```sh
+npm install --save-dev publish-please
+```
+
+Once installed, the configuration wizard will enable you to configure the validation and publishing workflow.
+
+**From now on you cannot use anymore the `npm publish` command in your project.**
+
+But don't worry it's done for the good reason to prevent you or your co-workers run unsafe publishing process. Use publish-please instead of `npm publish`:
+
+```sh
+npm run publish-please
+```
 
 -------------------------------------------------------------
 ## Check out my other packages used by this tool
