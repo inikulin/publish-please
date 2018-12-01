@@ -251,4 +251,24 @@ When all validations pass, publish-please will show you the exact content of the
         }
          ```
 
+- **Validating git tag**
+    - This validation checks that git tag matches version specified in the `package.json`.
+    - if you want to disable this validation, run the command:
+
+        ```sh
+        npx publish-please config
+
+        Would you like to verify that published commit has git tag that is equal to the version specified in package.json? No
+        ```
+
+        or directly edit the property `gitTag` in the `.publishrc` file:
+
+        ```json
+        {
+            "validations": {
+                "gitTag": false,
+            }
+        }
+         ```
+
 [to be continued]
