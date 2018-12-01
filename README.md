@@ -14,6 +14,7 @@ Publish-please is versatile enough to be used only as a validation tool before p
 
 See how the [TestCafe](https://github.com/DevExpress/testcafe) team uses publish-please when [bumping to the next release](https://github.com/DevExpress/testcafe/commit/ab1f5ad430f307c224723a15c6425a41f25087df).
 
+-------------------------------------------------------------
 ## Validate your package before publishing to the registry
 
 There are numerous ways to "shoot yourself in the foot" using `npm publish`. 
@@ -57,7 +58,7 @@ When all validations pass, publish-please will show you the exact content of the
 - **Validating git tag**
     - Check that git tag matches version specified in the `package.json`
 
-
+-------------------------------------------------------------
 ## Customize the Validation Workflow
 
 - **npm test**
@@ -270,5 +271,40 @@ When all validations pass, publish-please will show you the exact content of the
             }
         }
          ```
+
+-------------------------------------------------------------
+## Publish to the registry on sucessfull validation
+
+To publish on successfull validation, run the following command:
+
+```sh
+npx publish-please
+```
+you may also install publish-please as dev dependency in your project:
+
+```sh
+npm install --save-dev publish-please
+```
+
+## Customize the Publishing Workflow
+
+- **publish command**
+
+    You can customize the command used by publish-please to publish to the registry. By default this command is `npm publish`.
+    In some situation you may need to add specific options on the `npm publish` command, or you may have your own publish script.
+
+    ```sh
+    npx publish-please config
+    
+    Specify publishing command which will be used to publish your package: 
+    npm publish --userconfig ~/.npmrc-myuser-config 
+    ```
+    or directly edit the property `publishCommand` in the `.publishrc` file:
+    ```json
+    {
+        "publishCommand": "npm publish --userconfig ~/.npmrc-myuser-config"
+    }
+     ```
+
 
 [to be continued]
