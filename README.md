@@ -6,9 +6,9 @@ Safe and highly functional replacement for `npm publish`.
 [![Dependency Status](https://david-dm.org/inikulin/publish-please.svg)](https://david-dm.org/inikulin/publish-please)
 
 Publish-please enables you to :
-- Validate your package before publishing to the registry
-- Publish to the registry on sucessfull validation
-- Run any script on successfull publishing
+- [Validate your package before publishing to the registry](#Validate-your-package-before-publishing-to-the-registry)
+- [Publish to the registry on sucessfull validation](#Publish-to-the-registry-on-sucessfull-validation)
+- [Run any script on successfull publishing](#Run-any-script-on-successfull-publishing)
 
 Publish-please is versatile enough to be used only as a validation tool before publishing or as an all-in-one tool when you want to manually handle your releases.
 
@@ -291,11 +291,13 @@ npm install --save-dev publish-please
 - **publish command**
 
     You can customize the command used by publish-please to publish to the registry. By default this command is `npm publish`.
-    In some situation you may need to add specific options on the `npm publish` command, or you may have your own publish script.
+    In some situation you may need to add specific options on the `npm publish` command (the `--tag` option must not be set here because this option is managed by the **publish Tag** configuration (see below)). 
+    
+    You may also want to run your own publish script instead of the `npm publish`command.
 
     ```sh
     npx publish-please config
-    
+
     Specify publishing command which will be used to publish your package: 
     npm publish --userconfig ~/.npmrc-myuser-config 
     ```
@@ -306,5 +308,118 @@ npm install --save-dev publish-please
     }
      ```
 
+- **publish Tag**
 
-[to be continued]
+    You can set the tag with which the package will be published. See [npm publish docs](https://docs.npmjs.com/cli/publish) for more info.
+    By default publish please will run the `npm publish` command with the option `--tag latest`.
+
+    When you want to manually release an alpha version for version `x.y.z` on npm, you should take the following steps:
+    - in package.json: bump version to `x.y.z-alpha.1`, 
+    - commit and push;
+    - on github: tag this commit with `vx.y.z-alpha.1`
+    - in the `.publishrc` file edit the `publishTag` property:
+
+        ```json
+        {
+            "publishTag": "alpha"
+        }
+        ```
+
+    - run publish-please (publish-please will automatically add on the publish command the option `--tag alpha`):
+    
+        ```sh
+        npx publish-please
+        ```
+
+        or
+
+        ```sh
+        npm run publish-please
+        ```
+        if you have installed locally publish-please
+
+- **confirm** 
+
+    - by default a confirmation will be asked before publishing.
+    - if you want to disable this confirmation, run the command:
+
+        ```sh
+        npx publish-please config
+
+        Do you want manually confirm publishing? No
+        ```
+
+        or directly edit the property `confirm` in the `.publishrc` file:
+
+        ```json
+        {
+            "confirm": false
+        }
+        ```
+
+
+-------------------------------------------------------------
+## Run any script on successfull publishing
+
+- Publish-please enables you to run a command after successful publishing. Use it for release announcements, uploading binaries, etc.
+
+- to configure a post-publish script:
+    ```sh
+    npx publish-please config
+
+    Do you want to run any scripts after succesful publishing (e.g. releaseannouncements, binary uploading)? Yes
+    Input post-publish script : npm run my-post-publish-script
+    ```
+    or directly edit the property `postPublishScript` in the `.publishrc` file:
+    ```json
+    {
+        "postPublishScript": "npm run my-post-publish-script"
+    }
+    ```
+- to disable a post-publish script:
+    ```sh
+    npx publish-please config
+
+    Do you want to run any scripts after succesful publishing (e.g. releaseannouncements, binary uploading)? No
+    ```
+    or directly edit the property `postPublishScript` in the `.publishrc` file:
+    ```json
+    {
+        "postPublishScript": ""
+    }
+    ```
+
+-------------------------------------------------------------
+## Upgrading to latest publish-please version
+
+- If you are running node 8 or above, and if you have in the `package.json` file an already existing `prepublish` script, you should rename that script to `prepublishOnly` after you have upgraded publish-please. 
+
+- Run `npm help scripts` to get more details.
+
+-------------------------------------------------------------
+## Running in CI mode
+
+You can execute publish-please in CI mode by adding the `--ci` option:
+
+```shell
+npm run publish-please --ci
+```
+
+or 
+
+```shell
+npx publish-please --ci
+```
+
+This option will turn off the default elegant-status reporter in favor of the built-in CI reporter.
+Use this option to disable emoji and spinner usage.
+When publish-please executes in a CI (Teamcity, Travis, AppVeyor, ...), the CI reporter is automatically activated.
+
+-------------------------------------------------------------
+## Check out my other packages used by this tool
+- [cp-sugar](https://github.com/inikulin/cp-sugar) - Some sugar for child_process module.
+- [elegant-status](https://github.com/inikulin/elegant-status) - Create elegant task status for CLI.
+
+-------------------------------------------------------------
+## Author
+[Ivan Nikulin](https://github.com/inikulin) (ifaaan@gmail.com)
