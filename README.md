@@ -287,6 +287,7 @@ To publish on successfull validation, run the following command:
 ```sh
 npx publish-please
 ```
+![publish-demo-success](media/publish-demo-success.gif)
 
 ## Customize the Publishing Workflow
 
