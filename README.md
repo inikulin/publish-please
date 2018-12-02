@@ -1,88 +1,103 @@
 # Publish, please!
+Safe and highly functional replacement for `npm publish`.
 
 [![Build Status](https://travis-ci.org/inikulin/publish-please.svg?branch=master)](https://travis-ci.org/inikulin/publish-please)
 [![npm version](https://img.shields.io/npm/v/publish-please.svg)](https://www.npmjs.com/package/publish-please)
 [![Dependency Status](https://david-dm.org/inikulin/publish-please.svg)](https://david-dm.org/inikulin/publish-please)
 
-<p align="center">
-<i>Safe and highly functional replacement for `npm publish`.</i>
-</p>
+Publish-please enables you to :
+- [Validate your package before publishing to the registry](#Validate-your-package-before-publishing-to-the-registry)
+- [Publish to the registry on sucessfull validation](#Publish-to-the-registry-on-sucessfull-validation)
+- [Run any script on successfull publishing](#Run-any-script-on-successfull-publishing)
 
-<p align="center">
-<i>You could also use publish-please only as an ultimate check before publishing: `npx publish-please --dry-run`</i>
-</p>
+Publish-please is versatile enough to be used only as a validation tool before publishing or as an all-in-one tool when you want to manually handle your releases.
 
-<p align="center">
-    <img src="https://raw.githubusercontent.com/inikulin/publish-please/master/media/demo.gif" alt="demo" />
-</p>
+See how the [TestCafe](https://github.com/DevExpress/testcafe) team uses publish-please when [bumping to the next release](https://github.com/DevExpress/testcafe/commit/ab1f5ad430f307c224723a15c6425a41f25087df).
 
-There are numerous ways to "shoot yourself in the foot" using `npm publish`. The purpose of this module is to replace
-`npm publish` for your packages with safe and more functional alternative, which will allow you to:
+Other topics:
+- [Installing publish-please locally](#Installing-publish-please-locally)
+- [Upgrading to latest publish-please version](#Upgrading-to-latest-publish-please-version)
+- [Running in CI mode](#Running-in-CI-mode)
+- [Customize the Validation Workflow](#Customize-the-Validation-Workflow)
+- [Customize the Publishing Workflow](#Customize-the-Publishing-Workflow)
 
- - Run tests or build steps before publishing (because `prepublish` is [broken](https://medium.com/greenkeeper-blog/what-is-npm-s-prepublish-and-why-is-it-so-confusing-a948373e6be1#.a40w9sdy6)).
- - Perform check for the [sensitive and non-essential data](#sensitive-information-audit) in your package to be sure that you didn't leak it by accident (Further reading: [Do not underestimate credentials leaks](https://github.com/ChALkeR/notes/blob/master/Do-not-underestimate-credentials-leaks.md)).
- - Perform check for vulnerable dependencies using `npm audit` data.
- - Check that you are in the correct git branch.
- - Check that git tag matches version specified in the `package.json`.
- - Check that there are no uncommitted changes in the working tree.
- - Check that there are no untracked files in the working tree.
- - Force usage of the [npm publish tag](https://docs.npmjs.com/cli/publish) there necessary, so you'll be sure you're not publishing preview version of your package as a release version.
- - Get release summary and publishing confirmation.
- - Configure publishing using built-in configuration wizard.
+-------------------------------------------------------------
+## Validate your package before publishing to the registry
 
-## Getting started ( [or use npx directly](#running-publish-please-with-npx) )
+There are numerous ways to "shoot yourself in the foot" using `npm publish`. 
 
-Setup process of *publish-please* is quite trivial - just run
-```shell
-npm install --save-dev publish-please
-```
-in your project's directory.
+`publish-please` enables you to check that what will be sent to the registry is valid, free of vulnerabilities and free of useless files.
 
-Once it finish installing, *publish-please* will automatically run it's configuration wizard, which will guide you
-through some simple steps to setup [features](#options) you want to use:
+Before running `npm publish`,  run this command at the root of your project folder:
 
-![config](https://raw.githubusercontent.com/inikulin/publish-please/master/media/config.png)
-
-If you forgot to configure something or just changed your mind and want to change configuration, just run
-```shell
-npm run publish-please config
-```
-to return to wizard.
-
-So, once you've done with wizard from now on `npm publish` for your package is disabled (Muahahaha :smiling_imp:):
-
-![guard](https://raw.githubusercontent.com/inikulin/publish-please/master/media/guard.png)
-
-But don't worry it's done for the good reason to prevent you or your co-workers run unsafe publishing process. Use awesome version
-instead:
-```shell
-npm run publish-please
+```sh
+npx publish-please --dry-run
 ```
 
+The following example shows that you are about to push your test files to the registry:
 
-## Options
+![dry-run-demo-with-errors](media/dry-run-with-errors.gif)
 
- - **prePublishScript** - Specifies command that will be run before publish (e.g. `npm test`). Use it for builds and tests. Default: `npm test`.
- - **postPublishScript** - Specifies command that will be run after successful publishing. Use it for release announcements, creating a GitHub release, uploading binaries, etc. Default: `` (no command).
- - **publishCommand** - Specifies publishing command which will be used to publish the package. Default: `npm publish`.
- - **publishTag** - Specifies tag with which package will be published. See [npm publish docs](https://docs.npmjs.com/cli/publish) for more info. Default: `latest`.
- - **confirm** - Ask for the confirmation before publishing. Default: `true`.
+When all validations pass, publish-please will show you the exact content of the package that will be sent to the registry, so you can check everything is included in the package:
 
-### Validations
- - **uncommittedChanges** - Check that there are no uncommitted changes in the working tree. Default: `true`.
- - **untrackedFiles** - Check that there are no untracked files in the working tree. Default: `true`.
- - **gitTag** - Check that git tag matches version specified in the `package.json`. Default: `true`.
- - **branch** - Check that current branch matches the specified branch. Default: `master`.
-    - You may also set the branch as a regular expression to be able to use publish-please in a multiple branches scenario like `master` and `release`:
-        ```js
-        /(master|release)/
-        ``` 
- - **sensitive and non essential Data** - Perform [audit for the sensitive data](#sensitive-and-non-essential-data-audit). Default: `true` if npm version is 5.9.0 or above, `false` otherwise.
-    - sensitive and non-essential data are by default defined inside this [.sensitivedata](.sensitivedata) file.
-    - you may completely override this file by creating a `.sensitivedata` file in the root of your project so that this validation fits your needs.
-        - if you create your own `.sensitivedata` file, and the `package.json` file has no `files` section, consider adding `.sensitivedata` to the `.npmignore` file.
-    
- - **vulnerableDependencies** - Perform vulnerable dependencies check using `npm audit`. Default: `true` if npm version is 6.1.0 or above, `false` otherwise.
+![dry-run-demo-success](media/dry-run-demo-success.gif)
+
+### **The Validation Workflow performs by default the following actions:**
+
+- **npm test**
+    - Check that all tests pass
+
+- **Checking for the vulnerable dependencies**
+    - Perform vulnerable dependencies check using `npm audit`
+
+- **Checking for the uncommitted changes**
+    - Check that there are no uncommitted changes in the working tree
+
+- **Checking for the untracked files**
+    - Check that there are no untracked files in the working tree
+
+- **Checking for the sensitive and non-essential data in the npm package**
+    - Check that the npm package will not embed sensitive files or useless files (like test files)
+
+- **Validating branch** 
+    - Check that current branch is master
+
+- **Validating git tag**
+    - Check that git tag matches version specified in the `package.json`
+
+-------------------------------------------------------------
+## Customize the Validation Workflow
+
+- **npm test**
+    - you can run any kind of command in place of the `npm test` command. 
+    For this you need a `.publishrc` configuration file at the root of your project. To create or modify the `.publishrc` file, run the command
+
+    ```sh
+    npx publish-please config
+
+    Do you want to run any scripts before publishing (e.g. build steps, tests)? Yes
+    Input pre-publish script: npm run my-own-script
+    ```
+
+    - if you want to disable this validation, run the command:
+
+        ```sh
+        npx publish-please config
+
+        Do you want to run any scripts before publishing (e.g.  build steps, tests)? No
+        ```
+        or directly edit the property `prePublishScript` in the `.publishrc` file:
+
+        ```json
+        {
+            "prePublishScript": false,
+        }
+         ```
+
+
+- **Checking for the vulnerable dependencies**
+    - This validation check uses `npm audit` under the hood. This validation check performs only if npm version is 6.1.0 or above.
+
     - you may prevent specific vulnerabilities to be reported by publish-please by creating a `.auditignore` file in the root of your project with content like the following:
 
         ```yaml
@@ -96,102 +111,342 @@ npm run publish-please
         ```
         The above example will enable to report only vulnerabilities of level `critical` and `high`
 
+    - if you want to disable this validation, run the command:
 
-### Running in dry mode
+        ```sh
+        npx publish-please config
 
-You can execute publish-please in dry mode by using the `--dry-run` option:
+        Would you like to verify that your package doesn`t have vulnerable dependencies before publishing? No
+        ```
 
-```shell
-npm run publish-please --dry-run
-```
+        or directly edit the property `vulnerableDependencies` in the `.publishrc` file:
 
-Instead of publishing, this will show (after all validations) the content of the package that will be sent to npm, so that you can inspect it to be sure everything is there.
+        ```json
+        {
+            "validations": {
+                "vulnerableDependencies": false,
+            }
+        }
+         ```
 
-![dry-run-demo](media/dry-run-demo.gif)
+- **Checking for the uncommitted changes**
+    - This validation checks that there are no uncommitted changes in the working tree.
+    
+    - if you want to disable this validation, run the command:
 
-In this mode, the **postPublishScript** script will not run, since there is no publication to the registry. 
+        ```sh
+        npx publish-please config
 
-It might be a good idea to add these two lines inside your .gitignore file:
-```sh
-package
-*.tgz
-```
+        Would you like to verify that there are no uncommitted changes in your working tree before publishing? No
+        ```
 
-## Running publish-please with npx
+        or directly edit the property `uncommittedChanges` in the `.publishrc` file:
 
-You can execute publish-please directly with npx:  
-* **Publish in a dry-run mode**
-```sh
-npx publish-please --dry-run
-```
+        ```json
+        {
+            "validations": {
+                "uncommittedChanges": false,
+            }
+        }
+         ```
 
-* **Safely publish to the npm registry**
+- **Checking for the untracked files**
+    - This validation checks that there are no untracked files in the working tree.
+
+    - if you want to disable this validation, run the command:
+
+        ```sh
+        npx publish-please config
+
+        Would you like to verify that there are no files that are not tracked by git in your working tree before publishing? No
+        ```
+
+        or directly edit the property `untrackedFiles` in the `.publishrc` file:
+
+        ```json
+        {
+            "validations": {
+                "untrackedFiles": false,
+            }
+        }
+         ```
+
+- **Checking for the sensitive and non-essential data in the npm package**
+    - This validation checks there is no sensitive files and no useless files inside the to-be-published package. This validation check performs only if npm version is 5.9.0 or above.
+
+    - This validation is able to detect the following files:
+        - Benchmark files
+        - Configuration files
+           - CI
+           - eslint
+           - GitHub
+           - JetBrains
+           - Visual Studio Code
+        - Coverage files
+        - Demo files
+        - Dependency directories
+        - Doc files
+        - Example files
+        - Log files
+        - Private SSH key
+        - Script files
+        - Secret files
+        - Source files
+        - Temp files
+        - Test files
+        - Zip files
+           - Output of 'npm pack'
+
+    - sensitive and non-essential files are defined inside this built-in [.sensitivedata](.sensitivedata) file.
+
+    - you may completely override this file by creating a `.sensitivedata` file in the root of your project so that this validation fits your needs.
+        - if you create your own `.sensitivedata` file, and the `package.json` file has no `files` section, consider adding `.sensitivedata` to the `.npmignore` file.
+
+    - if you want to disable this validation, run the command:
+
+        ```sh
+        npx publish-please config
+
+        Would you like to verify that there is no sensitive and non-essential data in the npm package? No
+        ```
+
+        or directly edit the property `sensitiveData` in the `.publishrc` file:
+
+        ```json
+        {
+            "validations": {
+                "sensitiveData": false,
+            }
+        }
+         ```
+
+- **Validating branch**
+    - This validation checks that current branch is `master`.
+    - You can set the branch as a regular expression to be able to use publish-please in a multiple branches scenario like `master` and `release`:
+
+        ```sh
+        npx publish-please config
+
+        Would you like to verify that you are publishing from the correct git branch? Yes
+        Which branch should it be? /(master|release)/
+        ```
+
+        or directly edit the property `branch` in the `.publishrc` file:
+
+        ```json
+        {
+            "validations": {
+                "branch": "/(master|release)/",
+            }
+        }
+         ```
+    
+    - if you want to disable this validation, run the command:
+
+        ```sh
+        npx publish-please config
+
+        Would you like to verify that you are publishing from the correct git branch? No
+        ```
+
+        or directly edit the property `branch` in the `.publishrc` file:
+
+        ```json
+        {
+            "validations": {
+                "branch": false,
+            }
+        }
+         ```
+
+- **Validating git tag**
+    - This validation checks that git tag matches version specified in the `package.json`.
+    - if you want to disable this validation, run the command:
+
+        ```sh
+        npx publish-please config
+
+        Would you like to verify that published commit has git tag that is equal to the version specified in package.json? No
+        ```
+
+        or directly edit the property `gitTag` in the `.publishrc` file:
+
+        ```json
+        {
+            "validations": {
+                "gitTag": false,
+            }
+        }
+         ```
+
+-------------------------------------------------------------
+## Publish to the registry on sucessfull validation
+
+To publish on successfull validation, run the following command:
+
 ```sh
 npx publish-please
 ```
+![publish-demo-success](media/publish-demo-success.gif)
 
-* **Setup a configuration file in order to customise the publishing workflow**
-```sh
-npx publish-please config
-```
+## Customize the Publishing Workflow
 
-## Sensitive and non-essential data audit
-**Important note:** tool provides some very basic sensitive data check. Do not rely on it fully. Always perform manual checks for the
-sensitive data in your packages.
+- **publish command**
 
-Performed for the following items (see [.sensitivedata file](.sensitivedata) for more details):
+    You can customize the command used by publish-please to publish to the registry. By default this command is `npm publish`.
+    In some situation you may need to add specific options on the `npm publish` command (the `--tag` option must not be set here because this option is managed by the **publish Tag** configuration (see below)). 
+    
+    You may also want to run your own publish script instead of the `npm publish`command.
 
- - Benchmark files
- - Configuration files
-    - CI
-    - eslint
-    - GitHub
-    - JetBrains
-    - Visual Studio Code
- - Coverage files
- - Demo files
- - Dependency directories
- - Doc files
- - Example files
- - Log files
- - Private SSH key
- - Script files
- - Secret files
- - Source files
- - Temp files
- - Test files
- - Zip files
-    - Output of 'npm pack'
+    ```sh
+    npx publish-please config
 
+    Specify publishing command which will be used to publish your package: 
+    npm publish --userconfig ~/.npmrc-myuser-config 
+    ```
+    or directly edit the property `publishCommand` in the `.publishrc` file:
+    ```json
+    {
+        "publishCommand": "npm publish --userconfig ~/.npmrc-myuser-config"
+    }
+     ```
+
+- **publish Tag**
+
+    You can set the tag with which the package will be published. See [npm publish docs](https://docs.npmjs.com/cli/publish) for more info.
+    By default publish please will run the `npm publish` command with the option `--tag latest`.
+
+    When you want to manually release an alpha version for version `x.y.z` on npm, you should take the following steps:
+    - in package.json: bump version to `x.y.z-alpha.1`, 
+    - commit and push;
+    - on github: tag this commit with `vx.y.z-alpha.1`
+    - in the `.publishrc` file edit the `publishTag` property:
+
+        ```json
+        {
+            "publishTag": "alpha"
+        }
+        ```
+
+    - run publish-please (publish-please will automatically add on the publish command the option `--tag alpha`):
+
+        ```sh
+        npx publish-please
+        ```
+
+        or
+
+        ```sh
+        npm run publish-please
+        ```
+        if you have installed locally publish-please
+
+- **confirm** 
+
+    - by default a confirmation will be asked before publishing.
+    - if you want to disable this confirmation, run the command:
+
+        ```sh
+        npx publish-please config
+
+        Do you want manually confirm publishing? No
+        ```
+
+        or directly edit the property `confirm` in the `.publishrc` file:
+
+        ```json
+        {
+            "confirm": false
+        }
+        ```
+
+-------------------------------------------------------------
+## Run any script on successfull publishing
+
+- Publish-please enables you to run a command after successful publishing. Use it for release announcements, uploading binaries, etc.
+
+- to configure a post-publish script:
+
+    ```sh
+    npx publish-please config
+
+    Do you want to run any scripts after succesful publishing (e.g. releaseannouncements, binary uploading)? Yes
+    Input post-publish script : npm run my-post-publish-script
+    ```
+    or directly edit the property `postPublishScript` in the `.publishrc` file:
+    ```json
+    {
+        "postPublishScript": "npm run my-post-publish-script"
+    }
+    ```
+
+- to disable a post-publish script:
+    ```sh
+    npx publish-please config
+
+    Do you want to run any scripts after succesful publishing (e.g. releaseannouncements, binary uploading)? No
+    ```
+    or directly edit the property `postPublishScript` in the `.publishrc` file:
+    ```json
+    {
+        "postPublishScript": ""
+    }
+    ```
+
+-------------------------------------------------------------
 ## Upgrading to latest publish-please version
 
 - If you are running node 8 or above, and if you have in the `package.json` file an already existing `prepublish` script, you should rename that script to `prepublishOnly` after you have upgraded publish-please. 
 
 - Run `npm help scripts` to get more details.
 
+-------------------------------------------------------------
 ## Running in CI mode
 
 You can execute publish-please in CI mode by adding the `--ci` option:
 
-```shell
+```sh
 npm run publish-please --ci
 ```
 
 or 
 
-```shell
+```sh
 npx publish-please --ci
 ```
 
-This option will turn off the default elegant-status reporter in favor of the integrated CI reporter.
+This option will turn off the default elegant-status reporter in favor of the built-in CI reporter.
 Use this option to disable emoji and spinner usage.
 When publish-please executes in a CI (Teamcity, Travis, AppVeyor, ...), the CI reporter is automatically activated.
 
+-------------------------------------------------------------
+## Installing publish-please locally
+
+publish-please can be installed locally:
+
+```sh
+npm install --save-dev publish-please
+```
+
+Once installed, the configuration wizard will enable you to configure the validation and publishing workflow.
+
+**From now on you cannot use anymore the `npm publish` command in your project.**
+
+But don't worry it's done for the good reason to prevent you or your co-workers run unsafe publishing process. Use publish-please instead of `npm publish`:
+
+```sh
+npm run publish-please
+```
+
+-------------------------------------------------------------
 ## Check out my other packages used by this tool
 - [cp-sugar](https://github.com/inikulin/cp-sugar) - Some sugar for child_process module.
 - [elegant-status](https://github.com/inikulin/elegant-status) - Create elegant task status for CLI.
-- [pkgd](https://github.com/inikulin/pkgd) - Get package publish info: package.json and file list.
-- [promisify-event](https://github.com/inikulin/promisify-event) - Promisify EventEmitter's event.
 
+-------------------------------------------------------------
 ## Author
 [Ivan Nikulin](https://github.com/inikulin) (ifaaan@gmail.com)
+
+-------------------------------------------------------------
+## Maintainer
+[Henri d'Orgeval](https://github.com/hdorgeval)
