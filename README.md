@@ -445,3 +445,7 @@ npm run publish-please
 -------------------------------------------------------------
 ## Author
 [Ivan Nikulin](https://github.com/inikulin) (ifaaan@gmail.com)
+
+-------------------------------------------------------------
+## Maintainer
+[Henri d'Orgeval](https://github.com/hdorgeval)
