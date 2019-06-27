@@ -376,6 +376,30 @@ describe('Integration tests', () => {
                     )
                 ));
 
+        it('Should expect prefixed git tag to match version', () =>
+            exec('git checkout master')
+                .then(() => exec('git tag foo-v0.0.42'))
+                .then(() =>
+                    publish(
+                        getTestOptions({
+                            set: {
+                                validations: {
+                                    gitTag: 'foo-v',
+                                },
+                            },
+                        })
+                    )
+                )
+                .then(() => {
+                    throw new Error('Promise rejection expected');
+                })
+                .catch((err) =>
+                    assert.strictEqual(
+                        err.message,
+                        "  * Expected git tag to be '1.3.77' or 'foo-v1.3.77', but it was 'foo-v0.0.42'."
+                    )
+                ));
+
         it('Should expect git tag to exist', () =>
             exec('git checkout master')
                 .then(() =>
@@ -409,6 +433,22 @@ describe('Integration tests', () => {
                                 publishCommand: echoPublishCommand,
                                 validations: {
                                     gitTag: true,
+                                },
+                            },
+                        })
+                    )
+                ));
+
+        it('Should pass validation when prefixed', () =>
+            exec('git checkout master')
+                .then(() => exec('git tag foo-v1.3.77'))
+                .then(() =>
+                    publish(
+                        getTestOptions({
+                            set: {
+                                publishCommand: echoPublishCommand,
+                                validations: {
+                                    gitTag: 'foo-v',
                                 },
                             },
                         })
