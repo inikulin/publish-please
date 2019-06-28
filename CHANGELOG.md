@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [5.5.0] - 2019-07-01
 ### Added
-- add the ability to use a tag prefix 
+- add the ability to use a tag prefix (by [Fredrik Wollsén](https://github.com/motin))
 
 ## [5.4.3] - 2018-12-02
 ### Changed
