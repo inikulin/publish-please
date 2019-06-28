@@ -186,14 +186,14 @@ describe('npx integration tests with npm audit', () => {
                     writeFile('package.json', JSON.stringify(pkg, null, 2));
                 })
                 .then(() => {
+                    // will remove low vulnerabilities
                     const auditOptions = `
-                        --debug
-                        --audit-level=moderate  
-                        --json
+                        --audit-level=moderate
                         `;
                     writeFile('audit.opts', auditOptions);
                 })
                 .then(() => {
+                    // will remove moderate vulnerabilities with advisories 566
                     const auditIgnore = ['https://npmjs.com/advisories/566'];
                     writeFile('.auditignore', auditIgnore.join(EOL));
                 })
@@ -223,11 +223,11 @@ describe('npx integration tests with npm audit', () => {
                     /* prettier-ignore */
                     assert(publishLog.includes('ERRORS'));
                     /* prettier-ignore */
-                    assert(!publishLog.includes('publish-please -> ban-sensitive-files -> ggit -> lodash'));
+                    assert(publishLog.includes('publish-please -> ban-sensitive-files -> ggit -> lodash'));
                     /* prettier-ignore */
                     assert(publishLog.includes('publish-please -> nsp -> https-proxy-agent'));
                     /* prettier-ignore */
-                    assert(! publishLog.includes('publish-please -> nsp -> joi -> hoek'));
+                    assert(!publishLog.includes('publish-please -> nsp -> joi -> hoek'));
                     /* prettier-ignore */
                     assert(!publishLog.includes('publish-please -> nsp -> joi -> moment'));
                     /* prettier-ignore */
