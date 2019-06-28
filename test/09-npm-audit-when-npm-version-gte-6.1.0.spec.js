@@ -239,7 +239,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                 {
                                     action: 'install',
                                     module: 'ms',
-                                    target: '2.1.1',
+                                    target: '2.1.2',
                                     isMajor: true,
                                     resolves: [
                                         {
