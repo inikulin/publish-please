@@ -1171,7 +1171,7 @@ describe('Integration tests', () => {
                     return assert(err.message.indexOf(GUARD_ERROR) >= 0);
                 }));
 
-        it.only('Should allow publishing with special flag', () =>
+        it('Should allow publishing with special flag', () =>
             exec('npm publish --with-publish-please')
                 // NOTE: it will reject anyway because this package version already
                 // published or test host don't have permissions to do that
@@ -1179,7 +1179,6 @@ describe('Integration tests', () => {
                     throw new Error('Promise rejection expected');
                 })
                 .catch((err) => {
-                    console.log(err.message);
                     // prettier-ignore
                     assert(
                         err.message.indexOf('You do not have permission to publish') > -1 ||
