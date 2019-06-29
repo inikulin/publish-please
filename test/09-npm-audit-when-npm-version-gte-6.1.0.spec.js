@@ -1016,6 +1016,13 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                     isMajor: false,
                                     resolves: [
                                         {
+                                            id: 782,
+                                            path: 'lodash',
+                                            dev: true,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                        {
                                             id: 577,
                                             path: 'lodash',
                                             dev: true,
@@ -1031,6 +1038,13 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                     target: '4.17.11',
                                     resolves: [
                                         {
+                                            id: 782,
+                                            path: 'nsp>inquirer>lodash',
+                                            dev: true,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                        {
                                             id: 577,
                                             path: 'nsp>inquirer>lodash',
                                             dev: true,
@@ -1043,6 +1057,21 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                     action: 'review',
                                     module: 'lodash',
                                     resolves: [
+                                        {
+                                            id: 782,
+                                            path:
+                                                'ban-sensitive-files>ggit>lodash',
+                                            dev: false,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                        {
+                                            id: 782,
+                                            path: 'nsp>cli-table2>lodash',
+                                            dev: true,
+                                            optional: false,
+                                            bundled: false,
+                                        },
                                         {
                                             id: 577,
                                             path:
@@ -1122,6 +1151,68 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                     },
                                     url: 'https://npmjs.com/advisories/577',
                                 },
+                                '782': {
+                                    findings: [
+                                        {
+                                            version: '4.17.4',
+                                            paths: [
+                                                'ban-sensitive-files>ggit>lodash',
+                                            ],
+                                            dev: false,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                        {
+                                            version: '4.16.4',
+                                            paths: [
+                                                'lodash',
+                                                'nsp>inquirer>lodash',
+                                            ],
+                                            dev: true,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                        {
+                                            version: '3.10.1',
+                                            paths: ['nsp>cli-table2>lodash'],
+                                            dev: true,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                    ],
+                                    id: 782,
+                                    created: '2019-02-13T16:16:53.770Z',
+                                    updated: '2019-06-27T14:01:44.172Z',
+                                    deleted: null,
+                                    title: 'Prototype Pollution',
+                                    found_by: {
+                                        link: '',
+                                        name: 'asgerf',
+                                    },
+                                    reported_by: {
+                                        link: '',
+                                        name: 'asgerf',
+                                    },
+                                    module_name: 'lodash',
+                                    cves: ['CVE-2018-16487'],
+                                    vulnerable_versions: '<4.17.11',
+                                    patched_versions: '>=4.17.11',
+                                    overview:
+                                        "Versions of `lodash` before 4.17.5 are vulnerable to prototype pollution. \n\nThe vulnerable functions are 'defaultsDeep', 'merge', and 'mergeWith' which allow a malicious user to modify the prototype of `Object` via `{constructor: {prototype: {...}}}` causing the addition or modification of an existing property that will exist on all objects.\n\n",
+                                    recommendation:
+                                        'Update to version 4.17.11 or later.',
+                                    references:
+                                        '- [HackerOne Report](https://hackerone.com/reports/380873)',
+                                    access: 'public',
+                                    severity: 'high',
+                                    cwe: 'CWE-471',
+                                    metadata: {
+                                        module_type: '',
+                                        exploitability: 3,
+                                        affected_components: '',
+                                    },
+                                    url: 'https://npmjs.com/advisories/782',
+                                },
                             },
                             muted: [],
                             metadata: {
@@ -1129,7 +1220,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                     info: 0,
                                     low: 4,
                                     moderate: 0,
-                                    high: 0,
+                                    high: 4,
                                     critical: 0,
                                 },
                                 dependencies: 164,
