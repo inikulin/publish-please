@@ -843,7 +843,10 @@ describe('Integration tests', () => {
                         writeFile('package.json', JSON.stringify(pkg));
                         writeFile(
                             '.auditignore',
-                            ['https://npmjs.com/advisories/577'].join(EOL)
+                            [
+                                'https://npmjs.com/advisories/577',
+                                'https://npmjs.com/advisories/782',
+                            ].join(EOL)
                         );
                     })
                     .then(() =>
