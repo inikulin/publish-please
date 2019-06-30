@@ -16,7 +16,7 @@ module.exports = {
         );
     },
     canRun: () => true,
-    run(_, pkg) {
+    run(booleanOrPrefix, pkg) {
         return exec('git describe --exact-match --tags HEAD')
             .catch(() => {
                 throw "Latest commit doesn't have git tag.";
@@ -24,8 +24,13 @@ module.exports = {
             .then((tag) => {
                 const version = pkg.version;
 
-                if (tag !== version && tag !== 'v' + version)
-                    throw `Expected git tag to be '${version}' or 'v${version}', but it was '${tag}'.`;
+                const prefix =
+                    typeof booleanOrPrefix === 'boolean'
+                        ? 'v'
+                        : booleanOrPrefix;
+
+                if (tag !== version && tag !== `${prefix}${version}`)
+                    throw `Expected git tag to be '${version}' or '${prefix}${version}', but it was '${tag}'.`;
             });
     },
 };

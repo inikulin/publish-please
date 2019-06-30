@@ -376,6 +376,30 @@ describe('Integration tests', () => {
                     )
                 ));
 
+        it('Should expect prefixed git tag to match version', () =>
+            exec('git checkout master')
+                .then(() => exec('git tag foo-v0.0.42'))
+                .then(() =>
+                    publish(
+                        getTestOptions({
+                            set: {
+                                validations: {
+                                    gitTag: 'foo-v',
+                                },
+                            },
+                        })
+                    )
+                )
+                .then(() => {
+                    throw new Error('Promise rejection expected');
+                })
+                .catch((err) =>
+                    assert.strictEqual(
+                        err.message,
+                        "  * Expected git tag to be '1.3.77' or 'foo-v1.3.77', but it was 'foo-v0.0.42'."
+                    )
+                ));
+
         it('Should expect git tag to exist', () =>
             exec('git checkout master')
                 .then(() =>
@@ -409,6 +433,22 @@ describe('Integration tests', () => {
                                 publishCommand: echoPublishCommand,
                                 validations: {
                                     gitTag: true,
+                                },
+                            },
+                        })
+                    )
+                ));
+
+        it('Should pass validation when prefixed', () =>
+            exec('git checkout master')
+                .then(() => exec('git tag foo-v1.3.77'))
+                .then(() =>
+                    publish(
+                        getTestOptions({
+                            set: {
+                                publishCommand: echoPublishCommand,
+                                validations: {
+                                    gitTag: 'foo-v',
                                 },
                             },
                         })
@@ -803,7 +843,10 @@ describe('Integration tests', () => {
                         writeFile('package.json', JSON.stringify(pkg));
                         writeFile(
                             '.auditignore',
-                            ['https://npmjs.com/advisories/577'].join(EOL)
+                            [
+                                'https://npmjs.com/advisories/577',
+                                'https://npmjs.com/advisories/782',
+                            ].join(EOL)
                         );
                     })
                     .then(() =>
@@ -819,7 +862,7 @@ describe('Integration tests', () => {
                         )
                     ));
 
-            ['lodash@4.17.5', 'ms@0.7.1'].forEach(function(dependency) {
+            ['lodash@4.17.11', 'ms@0.7.1'].forEach(function(dependency) {
                 const name = dependency.split('@')[0];
                 const version = dependency.split('@')[1];
                 it(`Should not fail on ${dependency} as a direct dependency`, () =>
@@ -1140,7 +1183,8 @@ describe('Integration tests', () => {
                     assert(
                         err.message.indexOf('You do not have permission to publish') > -1 ||
                         err.message.indexOf('auth required for publishing') > -1 ||
-                        err.message.indexOf('operation not permitted') > -1
+                        err.message.indexOf('operation not permitted') > -1 ||
+                        err.message.indexOf('You must be logged in to publish packages') > -1
                     );
                 }));
 

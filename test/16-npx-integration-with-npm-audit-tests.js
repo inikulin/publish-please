@@ -186,14 +186,14 @@ describe('npx integration tests with npm audit', () => {
                     writeFile('package.json', JSON.stringify(pkg, null, 2));
                 })
                 .then(() => {
+                    // will remove low vulnerabilities
                     const auditOptions = `
-                        --debug
-                        --audit-level=moderate  
-                        --json
+                        --audit-level=moderate
                         `;
                     writeFile('audit.opts', auditOptions);
                 })
                 .then(() => {
+                    // will remove moderate vulnerabilities with advisories 566
                     const auditIgnore = ['https://npmjs.com/advisories/566'];
                     writeFile('.auditignore', auditIgnore.join(EOL));
                 })
@@ -223,11 +223,11 @@ describe('npx integration tests with npm audit', () => {
                     /* prettier-ignore */
                     assert(publishLog.includes('ERRORS'));
                     /* prettier-ignore */
-                    assert(!publishLog.includes('publish-please -> ban-sensitive-files -> ggit -> lodash'));
+                    assert(publishLog.includes('publish-please -> ban-sensitive-files -> ggit -> lodash'));
                     /* prettier-ignore */
                     assert(publishLog.includes('publish-please -> nsp -> https-proxy-agent'));
                     /* prettier-ignore */
-                    assert(! publishLog.includes('publish-please -> nsp -> joi -> hoek'));
+                    assert(!publishLog.includes('publish-please -> nsp -> joi -> hoek'));
                     /* prettier-ignore */
                     assert(!publishLog.includes('publish-please -> nsp -> joi -> moment'));
                     /* prettier-ignore */
@@ -271,10 +271,9 @@ describe('npx integration tests with npm audit', () => {
                     writeFile('package.json', JSON.stringify(pkg, null, 2));
                 })
                 .then(() => {
+                    // will remove low+moderate+high vulnerabilities
                     const auditOptions = `
-                        --debug
-                        --audit-level=critical  
-                        --json
+                        --audit-level=critical 
                         `;
                     writeFile('audit.opts', auditOptions);
                 })
@@ -323,6 +322,90 @@ describe('npx integration tests with npm audit', () => {
                     assert(publishLog.includes('Release info'));
                     /* prettier-ignore */
                     assert(publishLog.includes('Command `npm` exited with code'));
+                });
+        });
+
+        it('Should not publish when --audit-level is set to high and vulnerability check is enabled in .publishrc config file', () => {
+            return Promise.resolve()
+                .then(() => {
+                    writeFile(
+                        '.publishrc',
+                        JSON.stringify({
+                            confirm: false,
+                            validations: {
+                                vulnerableDependencies: true,
+                                sensitiveData: false,
+                                uncommittedChanges: false,
+                                untrackedFiles: false,
+                                branch: 'master',
+                                gitTag: false,
+                            },
+                            publishTag: 'latest',
+                            prePublishScript:
+                                'echo "running script defined in .publishrc ..."',
+                            postPublishScript: false,
+                        })
+                    );
+                })
+                .then(() => {
+                    const pkg = JSON.parse(readFile('package.json').toString());
+                    pkg.dependencies = {
+                        'publish-please': '2.4.1',
+                    };
+                    writeFile('package.json', JSON.stringify(pkg, null, 2));
+                })
+                .then(() => {
+                    // will remove low+moderate vulnerabilities
+                    const auditOptions = `
+                        --audit-level=high 
+                        `;
+                    writeFile('audit.opts', auditOptions);
+                })
+                .then(() => console.log(`> npx ${packageName}`))
+                .then(() =>
+                    exec(
+                        /* prettier-ignore */
+                        `npx ../${packageName.replace('@','-')}.tgz > ./publish10.log`
+                    )
+                )
+                .then(() => {
+                    const publishLog = readFile('./publish10.log').toString();
+                    console.log(publishLog);
+                    return publishLog;
+                })
+                .then((publishLog) => {
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running pre-publish script'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('running script defined in .publishrc ...'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Running validations'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Checking for the vulnerable dependencies'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('Validating branch'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('ERRORS'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('publish-please -> ban-sensitive-files -> ggit -> lodash'));
+                    /* prettier-ignore */
+                    assert(publishLog.includes('publish-please -> nsp -> https-proxy-agent'));
+                    /* prettier-ignore */
+                    assert(!publishLog.includes('publish-please -> nsp -> joi -> hoek'));
+                    /* prettier-ignore */
+                    assert(!publishLog.includes('publish-please -> nsp -> joi -> moment'));
+                    /* prettier-ignore */
+                    assert(!publishLog.includes('publish-please -> nsp -> joi -> topo -> hoek'));
+                    /* prettier-ignore */
+                    assert(!publishLog.includes('publish-please -> nsp -> rc -> deep-extend'));
+                    /* prettier-ignore */
+                    assert(!publishLog.includes('publish-please -> nsp -> wreck -> boom -> hoek'));
+                    /* prettier-ignore */
+                    assert(!publishLog.includes('publish-please -> nsp -> wreck -> hoek'));
+                    /* prettier-ignore */
+                    assert(!publishLog.includes('Release info'));
+                    /* prettier-ignore */
+                    assert(!publishLog.includes('Command `npm` exited with code'));
                 });
         });
     }

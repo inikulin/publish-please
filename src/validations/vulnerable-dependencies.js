@@ -35,13 +35,17 @@ module.exports = {
                 audit(projectDir)
                     .then((result) => {
                         if (vulnerabilitiesFoundIn(result)) {
-                            const errs = [];
+                            const errs = new Set();
                             result.actions.forEach((action) => {
                                 action.resolves.forEach((vulnerability) => {
-                                    errs.push(summaryOf(vulnerability));
+                                    errs.add(summaryOf(vulnerability));
                                 });
                             });
-                            reject(errs.sort());
+                            const distinctAndSortedErrors = Array.from(
+                                errs
+                            ).sort();
+
+                            reject(distinctAndSortedErrors);
                             return;
                         }
                         if (auditErrorFoundIn(result)) {
