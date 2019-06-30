@@ -279,7 +279,7 @@ When all validations pass, publish-please will show you the exact content of the
         }
          ```
 
-    - if the git tag contains a prefix to the version like for example `foo-v0.0.42`, the only way for the git tag validation to work is to setup this prefix in the `.publishrc` file:
+    - if the git tag contains a prefix to the version like for example `foo-v0.0.42`, supply the prefix in the `.publishrc` file:
 
         ```json
         {
