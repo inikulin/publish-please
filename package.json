@@ -1,80 +1,80 @@
 {
-  "name": "publish-please",
-  "version": "5.5.0",
-  "description": "Safe and highly functional replacement for `npm publish`.",
-  "main": "./lib/index.js",
-  "bin": {
-    "publish-please": "./bin/publish-please.js"
-  },
-  "scripts": {
-    "prettier-format": "prettier --write \"{bin,src,test}/**/*.js\"",
-    "prettier-check": "prettier --list-different \"{bin,src,test}/**/*.js\"",
-    "eslint-check-config": "eslint --print-config .eslintrc.json | eslint-config-prettier-check",
-    "eslint-init": "eslint --init",
-    "lint": "eslint bin src test",
-    "clean": "rimraf lib",
-    "compile": "babel src -d lib",
-    "build": "npm run clean && npm run compile && prettier --write \"lib/{pre,post}-install.js\" && prettier --write \"lib/reporters/*.js\"",
-    "mocha-with-coverage": "istanbul cover -x test node_modules/mocha/bin/_mocha test",
-    "check-coverage": "istanbul check-coverage --statements 97 --lines 97 --branches 85 --functions 97",
-    "test": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage && npm run check-coverage",
-    "test-with-no-coverage-check": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage",
-    "preinstall": "node lib/pre-install.js",
-    "postinstall": "node lib/post-install.js",
-    "package": "rimraf package && rimraf publish-please*.tgz && npm pack",
-    "publish-please": "node ./bin/publish-please.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/inikulin/publish-please.git"
-  },
-  "keywords": [
-    "gulp",
-    "npm",
-    "publish",
-    "package",
-    "module"
-  ],
-  "author": "Ivan Nikulin <ifaaan@gmail.com>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/inikulin/publish-please/issues"
-  },
-  "homepage": "https://github.com/inikulin/publish-please#readme",
-  "files": [
-    "lib",
-    "bin",
-    ".sensitivedata"
-  ],
-  "dependencies": {
-    "chalk": "2.4.1",
-    "cp-sugar": "1.0.0",
-    "elegant-status": "1.1.0",
-    "inquirer": "6.2.0",
-    "is-ci": "1.2.1",
-    "lodash": "4.17.11",
-    "micromatch": "3.1.10",
-    "node-emoji": "1.8.1",
-    "osenv": "0.1.5",
-    "semver": "5.6.0"
-  },
-  "devDependencies": {
-    "babel-cli": "6.26.0",
-    "babel-plugin-transform-runtime": "6.23.0",
-    "babel-preset-env": "1.7.0",
-    "del": "3.0.0",
-    "eslint": "5.8.0",
-    "eslint-config-prettier": "3.1.0",
-    "import-fresh": "2.0.0",
-    "istanbul": "0.4.5",
-    "mkdirp": "0.5.1",
-    "mocha": "5.2.0",
-    "mock-stdin": "0.3.1",
-    "prettier": "1.14.3",
-    "rimraf": "2.6.2",
-    "should": "13.2.3"
-  },
-  "engines": {
-    "node": ">=6.0.0"
-  }
+    "name": "publish-please",
+    "version": "5.5.0",
+    "description": "Safe and highly functional replacement for `npm publish`.",
+    "main": "./lib/index.js",
+    "bin": {
+        "publish-please": "./bin/publish-please.js"
+    },
+    "scripts": {
+        "prettier-format": "prettier --write \"{bin,src,test}/**/*.js\"",
+        "prettier-check": "prettier --list-different \"{bin,src,test}/**/*.js\"",
+        "eslint-check-config": "eslint --print-config .eslintrc.json | eslint-config-prettier-check",
+        "eslint-init": "eslint --init",
+        "lint": "eslint bin src test",
+        "clean": "rimraf lib",
+        "compile": "babel src -d lib",
+        "build": "npm run clean && npm run compile && prettier --write \"lib/{pre,post}-install.js\" && prettier --write \"lib/reporters/*.js\"",
+        "mocha-with-coverage": "istanbul cover -x test node_modules/mocha/bin/_mocha test",
+        "check-coverage": "istanbul check-coverage --statements 97 --lines 97 --branches 85 --functions 97",
+        "test": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage && npm run check-coverage",
+        "test-with-no-coverage-check": "npm run prettier-format && npm run lint && npm run build && npm run mocha-with-coverage",
+        "preinstall": "node lib/pre-install.js",
+        "postinstall": "node lib/post-install.js",
+        "package": "rimraf package && rimraf publish-please*.tgz && npm pack",
+        "publish-please": "node ./bin/publish-please.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/inikulin/publish-please.git"
+    },
+    "keywords": [
+        "gulp",
+        "npm",
+        "publish",
+        "package",
+        "module"
+    ],
+    "author": "Ivan Nikulin <ifaaan@gmail.com>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/inikulin/publish-please/issues"
+    },
+    "homepage": "https://github.com/inikulin/publish-please#readme",
+    "files": [
+        "lib",
+        "bin",
+        ".sensitivedata"
+    ],
+    "dependencies": {
+        "chalk": "2.4.1",
+        "cp-sugar": "1.0.0",
+        "elegant-status": "1.1.0",
+        "inquirer": "6.2.0",
+        "is-ci": "1.2.1",
+        "lodash": "4.17.12",
+        "micromatch": "3.1.10",
+        "node-emoji": "1.8.1",
+        "osenv": "0.1.5",
+        "semver": "5.6.0"
+    },
+    "devDependencies": {
+        "babel-cli": "6.26.0",
+        "babel-plugin-transform-runtime": "6.23.0",
+        "babel-preset-env": "1.7.0",
+        "del": "3.0.0",
+        "eslint": "5.8.0",
+        "eslint-config-prettier": "3.1.0",
+        "import-fresh": "2.0.0",
+        "istanbul": "0.4.5",
+        "mkdirp": "0.5.1",
+        "mocha": "5.2.0",
+        "mock-stdin": "0.3.1",
+        "prettier": "1.14.3",
+        "rimraf": "2.6.2",
+        "should": "13.2.3"
+    },
+    "engines": {
+        "node": ">=6.0.0"
+    }
 }
