@@ -863,7 +863,7 @@ describe('Integration tests', () => {
                         )
                     ));
 
-            ['lodash@4.17.11', 'ms@0.7.1'].forEach(function(dependency) {
+            ['lodash@4.17.12', 'ms@0.7.1'].forEach(function(dependency) {
                 const name = dependency.split('@')[0];
                 const version = dependency.split('@')[1];
                 it(`Should not fail on ${dependency} as a direct dependency`, () =>
