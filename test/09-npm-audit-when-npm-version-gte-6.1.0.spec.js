@@ -258,9 +258,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                         {
                                             version: '0.7.0',
                                             paths: ['ms'],
-                                            dev: false,
-                                            optional: false,
-                                            bundled: false,
+             
                                         },
                                     ],
                                     id: 46,
