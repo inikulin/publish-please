@@ -336,10 +336,14 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                             actions: [
                                 {
                                     action: 'update',
-                                    module: 'lodash',
-                                    depth: 3,
-                                    target: '4.17.11',
                                     resolves: [
+                                        {
+                                            id: 577,
+                                            path: 'nsp>inquirer>lodash',
+                                            dev: false,
+                                            optional: false,
+                                            bundled: false,
+                                        },
                                         {
                                             id: 782,
                                             path: 'nsp>inquirer>lodash',
@@ -348,18 +352,36 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                             bundled: false,
                                         },
                                         {
-                                            id: 577,
+                                            id: 1065,
                                             path: 'nsp>inquirer>lodash',
                                             dev: false,
                                             optional: false,
                                             bundled: false,
                                         },
                                     ],
+                                    module: 'lodash',
+                                    target: '4.17.15',
+                                    depth: 3,
                                 },
                                 {
                                     action: 'review',
                                     module: 'lodash',
                                     resolves: [
+                                        {
+                                            id: 577,
+                                            path:
+                                                'ban-sensitive-files>ggit>lodash',
+                                            dev: false,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                        {
+                                            id: 577,
+                                            path: 'nsp>cli-table2>lodash',
+                                            dev: false,
+                                            optional: false,
+                                            bundled: false,
+                                        },
                                         {
                                             id: 782,
                                             path:
@@ -376,7 +398,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                             bundled: false,
                                         },
                                         {
-                                            id: 577,
+                                            id: 1065,
                                             path:
                                                 'ban-sensitive-files>ggit>lodash',
                                             dev: false,
@@ -384,7 +406,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                             bundled: false,
                                         },
                                         {
-                                            id: 577,
+                                            id: 1065,
                                             path: 'nsp>cli-table2>lodash',
                                             dev: false,
                                             optional: false,
@@ -402,16 +424,10 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                                 'ban-sensitive-files>ggit>lodash',
                                                 'nsp>inquirer>lodash',
                                             ],
-                                            dev: false,
-                                            optional: false,
-                                            bundled: false,
                                         },
                                         {
                                             version: '3.10.1',
                                             paths: ['nsp>cli-table2>lodash'],
-                                            dev: false,
-                                            optional: false,
-                                            bundled: false,
                                         },
                                     ],
                                     id: 577,
@@ -453,16 +469,10 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                                 'ban-sensitive-files>ggit>lodash',
                                                 'nsp>inquirer>lodash',
                                             ],
-                                            dev: false,
-                                            optional: false,
-                                            bundled: false,
                                         },
                                         {
                                             version: '3.10.1',
                                             paths: ['nsp>cli-table2>lodash'],
-                                            dev: false,
-                                            optional: false,
-                                            bundled: false,
                                         },
                                     ],
                                     id: 782,
@@ -470,14 +480,8 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                     updated: '2019-06-27T14:01:44.172Z',
                                     deleted: null,
                                     title: 'Prototype Pollution',
-                                    found_by: {
-                                        link: '',
-                                        name: 'asgerf',
-                                    },
-                                    reported_by: {
-                                        link: '',
-                                        name: 'asgerf',
-                                    },
+                                    found_by: { link: '', name: 'asgerf' },
+                                    reported_by: { link: '', name: 'asgerf' },
                                     module_name: 'lodash',
                                     cves: ['CVE-2018-16487'],
                                     vulnerable_versions: '<4.17.11',
@@ -498,6 +502,53 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                     },
                                     url: 'https://npmjs.com/advisories/782',
                                 },
+                                '1065': {
+                                    findings: [
+                                        {
+                                            version: '4.17.4',
+                                            paths: [
+                                                'ban-sensitive-files>ggit>lodash',
+                                                'nsp>inquirer>lodash',
+                                            ],
+                                        },
+                                        {
+                                            version: '3.10.1',
+                                            paths: ['nsp>cli-table2>lodash'],
+                                        },
+                                    ],
+                                    id: 1065,
+                                    created: '2019-07-15T17:22:56.990Z',
+                                    updated: '2019-07-15T17:25:05.721Z',
+                                    deleted: null,
+                                    title: 'Prototype Pollution',
+                                    found_by: {
+                                        link: '',
+                                        name: 'Snyk Security Team',
+                                    },
+                                    reported_by: {
+                                        link: '',
+                                        name: 'Snyk Security Team',
+                                    },
+                                    module_name: 'lodash',
+                                    cves: ['CVE-2019-10744'],
+                                    vulnerable_versions: '<4.17.12',
+                                    patched_versions: '>=4.17.12',
+                                    overview:
+                                        'Versions of `lodash` before 4.17.12 are vulnerable to Prototype Pollution.  The function `defaultsDeep` allows a malicious user to modify the prototype of `Object` via `{constructor: {prototype: {...}}}` causing the addition or modification of an existing property that will exist on all objects.\n\n',
+                                    recommendation:
+                                        'Update to version 4.17.12 or later.',
+                                    references:
+                                        '- [Snyk Advisory](https://snyk.io/vuln/SNYK-JS-LODASH-450202)',
+                                    access: 'public',
+                                    severity: 'high',
+                                    cwe: 'CWE-471',
+                                    metadata: {
+                                        module_type: '',
+                                        exploitability: 3,
+                                        affected_components: '',
+                                    },
+                                    url: 'https://npmjs.com/advisories/1065',
+                                },
                             },
                             muted: [],
                             metadata: {
@@ -505,7 +556,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                     info: 0,
                                     low: 3,
                                     moderate: 0,
-                                    high: 3,
+                                    high: 6,
                                     critical: 0,
                                 },
                                 dependencies: 315,
