@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+## [5.5.1] - 2019-07-28
+### Fixed
+- fix vulnerability in lodash (by [Phillip Manwaring](https://github.com/manwaring))
+
 ## [5.5.0] - 2019-07-01
 ### Added
 - add the ability to use a tag prefix (by [Fredrik Wollsén](https://github.com/motin))
