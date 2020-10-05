@@ -849,9 +849,16 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                             optional: false,
                                             bundled: false,
                                         },
+                                        {
+                                            id: 1523,
+                                            path: 'lodash',
+                                            dev: false,
+                                            optional: false,
+                                            bundled: false,
+                                        },
                                     ],
                                     module: 'lodash',
-                                    target: '4.17.15',
+                                    target: '4.17.20',
                                 },
                             ],
                             advisories: {
@@ -967,12 +974,55 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                     },
                                     url: 'https://npmjs.com/advisories/1065',
                                 },
+                                '1523': {
+                                    'findings': [
+                                        {
+                                            version: '4.16.4',
+                                            paths: [
+                                                'lodash',
+                                            ],
+                                        },
+                                    ],
+                                    id: 1523,
+                                    created: '2020-05-20T01:36:49.357Z',
+                                    updated: '2020-07-10T19:23:46.395Z',
+                                    deleted: null,
+                                    title: 'Prototype Pollution',
+                                    found_by: {
+                                        link: '',
+                                        name: 'posix',
+                                        email: '',
+                                    },
+                                    reported_by: {
+                                        link: '',
+                                        name: 'posix',
+                                        email: '',
+                                    },
+                                    module_name: 'lodash',
+                                    cves: [
+                                        'CVE-2019-10744',
+                                    ],
+                                    vulnerable_versions: '<4.17.19',
+                                    patched_versions: '>=4.17.19',
+                                    overview: 'Versions of `lodash` prior to 4.17.19 are vulnerable to Prototype Pollution.  The function `zipObjectDeep` allows a malicious user to modify the prototype of `Object` if the property identifiers are user-supplied. Being affected by this issue requires zipping objects based on user-provided property arrays.  \n\nThis vulnerability causes the addition or modification of an existing property that will exist on all objects and may lead to Denial of Service or Code Execution under specific circumstances.',
+                                    recommendation: 'Upgrade to version 4.17.19 or later.',
+                                    references: '- [HackerOne Report](https://hackerone.com/reports/712065)\n- [GitHub Issue](https://github.com/lodash/lodash/issues/4744)',
+                                    access: 'public',
+                                    severity: 'low',
+                                    cwe: 'CWE-471',
+                                    metadata: {
+                                        module_type: '',
+                                        exploitability: 3,
+                                        affected_components: '',
+                                    },
+                                    url: 'https://npmjs.com/advisories/1523',
+                                },
                             },
                             muted: [],
                             metadata: {
                                 vulnerabilities: {
                                     info: 0,
-                                    low: 1,
+                                    low: 2,
                                     moderate: 0,
                                     high: 2,
                                     critical: 0,
@@ -983,6 +1033,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                 totalDependencies: 1,
                             },
                         };
+
                         result.should.containDeep(expected);
                     })
             );
