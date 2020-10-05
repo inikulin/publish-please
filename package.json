@@ -52,7 +52,7 @@
     "elegant-status": "1.1.0",
     "inquirer": "6.2.0",
     "is-ci": "1.2.1",
-    "lodash": "4.17.12",
+    "lodash": "4.17.20",
     "micromatch": "3.1.10",
     "node-emoji": "1.8.1",
     "osenv": "0.1.5",
