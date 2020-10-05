@@ -847,6 +847,7 @@ describe('Integration tests', () => {
                                 'https://npmjs.com/advisories/577',
                                 'https://npmjs.com/advisories/782',
                                 'https://npmjs.com/advisories/1065',
+                                'https://npmjs.com/advisories/1523',
                             ].join(EOL)
                         );
                     })
