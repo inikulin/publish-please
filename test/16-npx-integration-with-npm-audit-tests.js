@@ -223,8 +223,6 @@ describe('npx integration tests with npm audit', () => {
                     /* prettier-ignore */
                     assert(publishLog.includes('ERRORS'));
                     /* prettier-ignore */
-                    assert(publishLog.includes('publish-please -> ban-sensitive-files -> ggit -> lodash'));
-                    /* prettier-ignore */
                     assert(publishLog.includes('publish-please -> nsp -> https-proxy-agent'));
                     /* prettier-ignore */
                     assert(!publishLog.includes('publish-please -> nsp -> joi -> hoek'));
@@ -386,8 +384,6 @@ describe('npx integration tests with npm audit', () => {
                     assert(publishLog.includes('Validating branch'));
                     /* prettier-ignore */
                     assert(publishLog.includes('ERRORS'));
-                    /* prettier-ignore */
-                    assert(publishLog.includes('publish-please -> ban-sensitive-files -> ggit -> lodash'));
                     /* prettier-ignore */
                     assert(publishLog.includes('publish-please -> nsp -> https-proxy-agent'));
                     /* prettier-ignore */

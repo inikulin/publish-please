@@ -358,9 +358,16 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                             optional: false,
                                             bundled: false,
                                         },
+                                        {
+                                            id: 1523,
+                                            path: 'nsp>inquirer>lodash',
+                                            dev: false,
+                                            optional: false,
+                                            bundled: false,
+                                        },
                                     ],
                                     module: 'lodash',
-                                    target: '4.17.15',
+                                    target: '4.17.20',
                                     depth: 3,
                                 },
                                 {
@@ -408,6 +415,59 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                         {
                                             id: 1065,
                                             path: 'nsp>cli-table2>lodash',
+                                            dev: false,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                        {
+                                            id: 1523,
+                                            path: 'ban-sensitive-files>ggit>lodash',
+                                            dev: false,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                        {
+                                            id: 1523,
+                                            path: 'nsp>cli-table2>lodash',
+                                            dev: false,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                    ],
+                                },
+                                {
+                                    action: 'review',
+                                    module: 'mem',
+                                    resolves: [
+                                        {
+                                            id: 1084,
+                                            path: 'nsp>yargs>os-locale>mem',
+                                            dev: false,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                    ],
+                                },
+                                {
+                                    action: 'review',
+                                    module: 'minimist',
+                                    resolves: [
+                                        {
+                                            id: 1179,
+                                            path: 'ban-sensitive-files>ggit>optimist>minimist',
+                                            dev: false,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                    ],
+                                },
+                                {
+                                    action: 'review',
+                                    module: 'yargs-parser',
+                                    resolves: [
+                                        {
+                                            id: 1500,
+                                            path: 'nsp>yargs>yargs-parser',
                                             dev: false,
                                             optional: false,
                                             bundled: false,
@@ -549,20 +609,193 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                     },
                                     url: 'https://npmjs.com/advisories/1065',
                                 },
+                                '1084': {
+                                    findings: [
+                                        {
+                                            version: '1.1.0',
+                                            paths: [
+                                                'nsp>yargs>os-locale>mem',
+                                            ],
+                                        },
+                                    ],
+                                    id: 1084,
+                                    created: '2019-07-18T21:30:31.935Z',
+                                    updated: '2019-11-19T23:31:37.349Z',
+                                    deleted: null,
+                                    title: 'Denial of Service',
+                                    found_by: {
+                                        link: '',
+                                        name: 'Juan Campa',
+                                        email: '',
+                                    },
+                                    reported_by: {
+                                        link: '',
+                                        name: 'Juan Campa',
+                                        email: '',
+                                    },
+                                    module_name: 'mem',
+                                    cves: [],
+                                    vulnerable_versions: '<4.0.0',
+                                    patched_versions: '>=4.0.0',
+                                    overview: "Versions of `mem` prior to 4.0.0 are vulnerable to Denial of Service (DoS).  The package fails to remove old values from the cache even after a value passes its `maxAge` property. This may allow attackers to exhaust the system's memory if they are able to abuse the application logging.",
+                                    recommendation: 'Upgrade to version 4.0.0 or later.',
+                                    references: '- [Snyk Report](https://snyk.io/vuln/npm:mem:20180117)',
+                                    access: 'public',
+                                    severity: 'low',
+                                    cwe: 'CWE-400',
+                                    metadata: {
+                                        module_type: '',
+                                        exploitability: 2,
+                                        affected_components: '',
+                                    },
+                                    url: 'https://npmjs.com/advisories/1084',
+                                },
+                                '1179': {
+                                    findings: [
+                                        {
+                                            version: '0.0.10',
+                                            paths: [
+                                                'ban-sensitive-files>ggit>optimist>minimist',
+                                            ],
+                                        },
+                                    ],
+                                    id: 1179,
+                                    created: '2019-09-23T15:01:43.049Z',
+                                    updated: '2020-03-18T19:41:45.921Z',
+                                    deleted: null,
+                                    title: 'Prototype Pollution',
+                                    found_by: {
+                                        link: 'https://www.checkmarx.com/resources/blog/',
+                                        name: 'Checkmarx Research Team',
+                                        email: '',
+                                    },
+                                    reported_by: {
+                                        link: 'https://www.checkmarx.com/resources/blog/',
+                                        name: 'Checkmarx Research Team',
+                                        email: '',
+                                    },
+                                    module_name: 'minimist',
+                                    cves: [],
+                                    vulnerable_versions: '<0.2.1 || >=1.0.0 <1.2.3',
+                                    patched_versions: '>=0.2.1 <1.0.0 || >=1.2.3',
+                                    overview: 'Affected versions of `minimist` are vulnerable to prototype pollution. Arguments are not properly sanitized, allowing an attacker to modify the prototype of `Object`, causing the addition or modification of an existing property that will exist on all objects.  \nParsing the argument `--__proto__.y=Polluted` adds a `y` property with value `Polluted` to all objects. The argument `--__proto__=Polluted` raises and uncaught error and crashes the application.  \nThis is exploitable if attackers have control over the arguments being passed to `minimist`.\n',
+                                    recommendation: 'Upgrade to versions 0.2.1, 1.2.3 or later.',
+                                    references: '- [GitHub commit 1](https://github.com/substack/minimist/commit/4cf1354839cb972e38496d35e12f806eea92c11f#diff-a1e0ee62c91705696ddb71aa30ad4f95)\n- [GitHub commit 2](https://github.com/substack/minimist/commit/63e7ed05aa4b1889ec2f3b196426db4500cbda94)',
+                                    access: 'public',
+                                    severity: 'low',
+                                    cwe: 'CWE-471',
+                                    metadata: {
+                                        module_type: '',
+                                        exploitability: 1,
+                                        affected_components: '',
+                                    },
+                                    url: 'https://npmjs.com/advisories/1179',
+                                },
+                                '1500': {
+                                    findings: [
+                                        {
+                                            version: '7.0.0',
+                                            paths: [
+                                                'nsp>yargs>yargs-parser',
+                                            ],
+                                        },
+                                    ],
+                                    id: 1500,
+                                    created: '2020-03-26T19:21:50.174Z',
+                                    updated: '2020-05-01T01:05:15.020Z',
+                                    deleted: null,
+                                    title: 'Prototype Pollution',
+                                    found_by: {
+                                        link: '',
+                                        name: 'Snyk Security Team',
+                                        email: '',
+                                    },
+                                    reported_by: {
+                                        link: '',
+                                        name: 'Snyk Security Team',
+                                        email: '',
+                                    },
+                                    module_name: 'yargs-parser',
+                                    cves: [],
+                                    vulnerable_versions: '<13.1.2 || >=14.0.0 <15.0.1 || >=16.0.0 <18.1.2',
+                                    patched_versions: '>=13.1.2 <14.0.0 || >=15.0.1 <16.0.0 || >=18.1.2',
+                                    overview: "Affected versions of `yargs-parser` are vulnerable to prototype pollution. Arguments are not properly sanitized, allowing an attacker to modify the prototype of `Object`, causing the addition or modification of an existing property that will exist on all objects.  \nParsing the argument `--foo.__proto__.bar baz'` adds a `bar` property with value `baz` to all objects. This is only exploitable if attackers have control over the arguments being passed to `yargs-parser`.\n",
+                                    recommendation: 'Upgrade to versions 13.1.2, 15.0.1, 18.1.1 or later.',
+                                    references: '- [Snyk Report](https://snyk.io/vuln/SNYK-JS-YARGSPARSER-560381)',
+                                    access: 'public',
+                                    severity: 'low',
+                                    cwe: 'CWE-471',
+                                    metadata: {
+                                        module_type: '',
+                                        exploitability: 1,
+                                        affected_components: '',
+                                    },
+                                    url: 'https://npmjs.com/advisories/1500',
+                                },
+                                '1523': {
+                                    findings: [
+                                        {
+                                            version: '4.17.4',
+                                            paths: [
+                                                'ban-sensitive-files>ggit>lodash',
+                                                'nsp>inquirer>lodash',
+                                            ],
+                                        },
+                                        {
+                                            version: '3.10.1',
+                                            paths: [
+                                                'nsp>cli-table2>lodash',
+                                            ],
+                                        },
+                                    ],
+                                    id: 1523,
+                                    created: '2020-05-20T01:36:49.357Z',
+                                    updated: '2020-07-10T19:23:46.395Z',
+                                    deleted: null,
+                                    title: 'Prototype Pollution',
+                                    found_by: {
+                                        link: '',
+                                        name: 'posix',
+                                        email: '',
+                                    },
+                                    reported_by: {
+                                        link: '',
+                                        name: 'posix',
+                                        email: '',
+                                    },
+                                    module_name: 'lodash',
+                                    cves: [
+                                        'CVE-2019-10744',
+                                    ],
+                                    vulnerable_versions: '<4.17.19',
+                                    patched_versions: '>=4.17.19',
+                                    overview: 'Versions of `lodash` prior to 4.17.19 are vulnerable to Prototype Pollution.  The function `zipObjectDeep` allows a malicious user to modify the prototype of `Object` if the property identifiers are user-supplied. Being affected by this issue requires zipping objects based on user-provided property arrays.  \n\nThis vulnerability causes the addition or modification of an existing property that will exist on all objects and may lead to Denial of Service or Code Execution under specific circumstances.',
+                                    recommendation: 'Upgrade to version 4.17.19 or later.',
+                                    references: '- [HackerOne Report](https://hackerone.com/reports/712065)\n- [GitHub Issue](https://github.com/lodash/lodash/issues/4744)',
+                                    access: 'public',
+                                    severity: 'low',
+                                    cwe: 'CWE-471',
+                                    metadata: {
+                                        module_type: '',
+                                        exploitability: 3,
+                                        affected_components: '',
+                                    },
+                                    url: 'https://npmjs.com/advisories/1523',
+                                },
                             },
                             muted: [],
                             metadata: {
                                 vulnerabilities: {
                                     info: 0,
-                                    low: 3,
+                                    low: 9,
                                     moderate: 0,
                                     high: 6,
                                     critical: 0,
                                 },
-                                dependencies: 315,
+                                dependencies: 197,
                                 devDependencies: 0,
                                 optionalDependencies: 0,
-                                totalDependencies: 315,
+                                totalDependencies: 197,
                             },
                         };
                         result.should.containDeep(expected);
@@ -616,9 +849,16 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                             optional: false,
                                             bundled: false,
                                         },
+                                        {
+                                            id: 1523,
+                                            path: 'lodash',
+                                            dev: false,
+                                            optional: false,
+                                            bundled: false,
+                                        },
                                     ],
                                     module: 'lodash',
-                                    target: '4.17.15',
+                                    target: '4.17.20',
                                 },
                             ],
                             advisories: {
@@ -734,12 +974,55 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                     },
                                     url: 'https://npmjs.com/advisories/1065',
                                 },
+                                '1523': {
+                                    'findings': [
+                                        {
+                                            version: '4.16.4',
+                                            paths: [
+                                                'lodash',
+                                            ],
+                                        },
+                                    ],
+                                    id: 1523,
+                                    created: '2020-05-20T01:36:49.357Z',
+                                    updated: '2020-07-10T19:23:46.395Z',
+                                    deleted: null,
+                                    title: 'Prototype Pollution',
+                                    found_by: {
+                                        link: '',
+                                        name: 'posix',
+                                        email: '',
+                                    },
+                                    reported_by: {
+                                        link: '',
+                                        name: 'posix',
+                                        email: '',
+                                    },
+                                    module_name: 'lodash',
+                                    cves: [
+                                        'CVE-2019-10744',
+                                    ],
+                                    vulnerable_versions: '<4.17.19',
+                                    patched_versions: '>=4.17.19',
+                                    overview: 'Versions of `lodash` prior to 4.17.19 are vulnerable to Prototype Pollution.  The function `zipObjectDeep` allows a malicious user to modify the prototype of `Object` if the property identifiers are user-supplied. Being affected by this issue requires zipping objects based on user-provided property arrays.  \n\nThis vulnerability causes the addition or modification of an existing property that will exist on all objects and may lead to Denial of Service or Code Execution under specific circumstances.',
+                                    recommendation: 'Upgrade to version 4.17.19 or later.',
+                                    references: '- [HackerOne Report](https://hackerone.com/reports/712065)\n- [GitHub Issue](https://github.com/lodash/lodash/issues/4744)',
+                                    access: 'public',
+                                    severity: 'low',
+                                    cwe: 'CWE-471',
+                                    metadata: {
+                                        module_type: '',
+                                        exploitability: 3,
+                                        affected_components: '',
+                                    },
+                                    url: 'https://npmjs.com/advisories/1523',
+                                },
                             },
                             muted: [],
                             metadata: {
                                 vulnerabilities: {
                                     info: 0,
-                                    low: 1,
+                                    low: 2,
                                     moderate: 0,
                                     high: 2,
                                     critical: 0,
@@ -750,12 +1033,13 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                 totalDependencies: 1,
                             },
                         };
+
                         result.should.containDeep(expected);
                     })
             );
         });
 
-        it('Should not report vulnerability stored in .auditignore file ', () => {
+        it('Should not report vulnerability stored in .auditignore file', () => {
             // Given
             const pkg = {
                 name: 'testing-repo',
@@ -802,7 +1086,7 @@ if (nodeInfos.npmAuditHasJsonReporter) {
             );
         });
 
-        it('Should report vulnerability that is not stored in .auditignore file ', () => {
+        it('Should report vulnerability that is not stored in .auditignore file', () => {
             // Given
             const pkg = {
                 name: 'testing-repo',
@@ -858,9 +1142,16 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                             optional: false,
                                             bundled: false,
                                         },
+                                        {
+                                            id: 1523,
+                                            path: 'lodash',
+                                            dev: true,
+                                            optional: false,
+                                            bundled: false,
+                                        },
                                     ],
                                     module: 'lodash',
-                                    target: '4.17.15',
+                                    target: '4.17.20',
                                 },
                                 {
                                     action: 'update',
@@ -886,9 +1177,16 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                             optional: false,
                                             bundled: false,
                                         },
+                                        {
+                                            id: 1523,
+                                            path: 'nsp>inquirer>lodash',
+                                            dev: true,
+                                            optional: false,
+                                            bundled: false,
+                                        },
                                     ],
                                     module: 'lodash',
-                                    target: '4.17.15',
+                                    target: '4.17.20',
                                     depth: 3,
                                 },
                                 {
@@ -936,6 +1234,59 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                         {
                                             id: 1065,
                                             path: 'nsp>cli-table2>lodash',
+                                            dev: true,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                        {
+                                            id: 1523,
+                                            path: 'ban-sensitive-files>ggit>lodash',
+                                            dev: false,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                        {
+                                            id: 1523,
+                                            path: 'nsp>cli-table2>lodash',
+                                            dev: true,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                    ],
+                                },
+                                {
+                                    action: 'review',
+                                    module: 'mem',
+                                    resolves: [
+                                        {
+                                            id: 1084,
+                                            path: 'nsp>yargs>os-locale>mem',
+                                            dev: true,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                    ],
+                                },
+                                {
+                                    action: 'review',
+                                    module: 'minimist',
+                                    resolves: [
+                                        {
+                                            id: 1179,
+                                            path: 'ban-sensitive-files>ggit>optimist>minimist',
+                                            dev: false,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                    ],
+                                },
+                                {
+                                    action: 'review',
+                                    module: 'yargs-parser',
+                                    resolves: [
+                                        {
+                                            id: 1500,
+                                            path: 'nsp>yargs>yargs-parser',
                                             dev: true,
                                             optional: false,
                                             bundled: false,
@@ -1095,22 +1446,202 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                     },
                                     url: 'https://npmjs.com/advisories/1065',
                                 },
+                                '1084': {
+                                    findings: [
+                                        {
+                                            version: '1.1.0',
+                                            paths: [
+                                                'nsp>yargs>os-locale>mem',
+                                            ],
+                                        },
+                                    ],
+                                    id: 1084,
+                                    created: '2019-07-18T21:30:31.935Z',
+                                    updated: '2019-11-19T23:31:37.349Z',
+                                    deleted: null,
+                                    title: 'Denial of Service',
+                                    found_by: {
+                                        link: '',
+                                        name: 'Juan Campa',
+                                        email: '',
+                                    },
+                                    reported_by: {
+                                        link: '',
+                                        name: 'Juan Campa',
+                                        email: '',
+                                    },
+                                    module_name: 'mem',
+                                    cves: [],
+                                    vulnerable_versions: '<4.0.0',
+                                    patched_versions: '>=4.0.0',
+                                    overview: "Versions of `mem` prior to 4.0.0 are vulnerable to Denial of Service (DoS).  The package fails to remove old values from the cache even after a value passes its `maxAge` property. This may allow attackers to exhaust the system's memory if they are able to abuse the application logging.",
+                                    recommendation: 'Upgrade to version 4.0.0 or later.',
+                                    references: '- [Snyk Report](https://snyk.io/vuln/npm:mem:20180117)',
+                                    access: 'public',
+                                    severity: 'low',
+                                    cwe: 'CWE-400',
+                                    metadata: {
+                                        module_type: '',
+                                        exploitability: 2,
+                                        affected_components: '',
+                                    },
+                                    url: 'https://npmjs.com/advisories/1084',
+                                },
+                                '1179': {
+                                    findings: [
+                                        {
+                                            version: '0.0.10',
+                                            paths: [
+                                                'ban-sensitive-files>ggit>optimist>minimist',
+                                            ],
+                                        },
+                                    ],
+                                    id: 1179,
+                                    created: '2019-09-23T15:01:43.049Z',
+                                    updated: '2020-03-18T19:41:45.921Z',
+                                    deleted: null,
+                                    title: 'Prototype Pollution',
+                                    found_by: {
+                                        link: 'https://www.checkmarx.com/resources/blog/',
+                                        name: 'Checkmarx Research Team',
+                                        email: '',
+                                    },
+                                    reported_by: {
+                                        link: 'https://www.checkmarx.com/resources/blog/',
+                                        name: 'Checkmarx Research Team',
+                                        email: '',
+                                    },
+                                    module_name: 'minimist',
+                                    cves: [],
+                                    vulnerable_versions: '<0.2.1 || >=1.0.0 <1.2.3',
+                                    patched_versions: '>=0.2.1 <1.0.0 || >=1.2.3',
+                                    overview: 'Affected versions of `minimist` are vulnerable to prototype pollution. Arguments are not properly sanitized, allowing an attacker to modify the prototype of `Object`, causing the addition or modification of an existing property that will exist on all objects.  \nParsing the argument `--__proto__.y=Polluted` adds a `y` property with value `Polluted` to all objects. The argument `--__proto__=Polluted` raises and uncaught error and crashes the application.  \nThis is exploitable if attackers have control over the arguments being passed to `minimist`.\n',
+                                    recommendation: 'Upgrade to versions 0.2.1, 1.2.3 or later.',
+                                    references: '- [GitHub commit 1](https://github.com/substack/minimist/commit/4cf1354839cb972e38496d35e12f806eea92c11f#diff-a1e0ee62c91705696ddb71aa30ad4f95)\n- [GitHub commit 2](https://github.com/substack/minimist/commit/63e7ed05aa4b1889ec2f3b196426db4500cbda94)',
+                                    access: 'public',
+                                    severity: 'low',
+                                    cwe: 'CWE-471',
+                                    metadata: {
+                                        module_type: '',
+                                        exploitability: 1,
+                                        affected_components: '',
+                                    },
+                                    url: 'https://npmjs.com/advisories/1179',
+                                },
+                                '1500': {
+                                    findings: [
+                                        {
+                                            version: '7.0.0',
+                                            paths: [
+                                                'nsp>yargs>yargs-parser',
+                                            ],
+                                        },
+                                    ],
+                                    id: 1500,
+                                    created: '2020-03-26T19:21:50.174Z',
+                                    updated: '2020-05-01T01:05:15.020Z',
+                                    deleted: null,
+                                    title: 'Prototype Pollution',
+                                    found_by: {
+                                        link: '',
+                                        name: 'Snyk Security Team',
+                                        email: '',
+                                    },
+                                    reported_by: {
+                                        link: '',
+                                        name: 'Snyk Security Team',
+                                        email: '',
+                                    },
+                                    module_name: 'yargs-parser',
+                                    cves: [],
+                                    vulnerable_versions: '<13.1.2 || >=14.0.0 <15.0.1 || >=16.0.0 <18.1.2',
+                                    patched_versions: '>=13.1.2 <14.0.0 || >=15.0.1 <16.0.0 || >=18.1.2',
+                                    overview: "Affected versions of `yargs-parser` are vulnerable to prototype pollution. Arguments are not properly sanitized, allowing an attacker to modify the prototype of `Object`, causing the addition or modification of an existing property that will exist on all objects.  \nParsing the argument `--foo.__proto__.bar baz'` adds a `bar` property with value `baz` to all objects. This is only exploitable if attackers have control over the arguments being passed to `yargs-parser`.\n",
+                                    recommendation: 'Upgrade to versions 13.1.2, 15.0.1, 18.1.1 or later.',
+                                    references: '- [Snyk Report](https://snyk.io/vuln/SNYK-JS-YARGSPARSER-560381)',
+                                    access: 'public',
+                                    severity: 'low',
+                                    cwe: 'CWE-471',
+                                    metadata: {
+                                        module_type: '',
+                                        exploitability: 1,
+                                        affected_components: '',
+                                    },
+                                    url: 'https://npmjs.com/advisories/1500',
+                                },
+                                '1523': {
+                                    findings: [
+                                        {
+                                            version: '4.17.4',
+                                            paths: [
+                                                'ban-sensitive-files>ggit>lodash',
+                                            ],
+                                        },
+                                        {
+                                            version: '4.16.4',
+                                            paths: [
+                                                'lodash',
+                                                'nsp>inquirer>lodash',
+                                            ],
+                                        },
+                                        {
+                                            version: '3.10.1',
+                                            paths: [
+                                                'nsp>cli-table2>lodash',
+                                            ],
+                                        },
+                                    ],
+                                    id: 1523,
+                                    created: '2020-05-20T01:36:49.357Z',
+                                    updated: '2020-07-10T19:23:46.395Z',
+                                    deleted: null,
+                                    title: 'Prototype Pollution',
+                                    found_by: {
+                                        link: '',
+                                        name: 'posix',
+                                        email: '',
+                                    },
+                                    reported_by: {
+                                        link: '',
+                                        name: 'posix',
+                                        email: '',
+                                    },
+                                    module_name: 'lodash',
+                                    cves: [
+                                        'CVE-2019-10744',
+                                    ],
+                                    vulnerable_versions: '<4.17.19',
+                                    patched_versions: '>=4.17.19',
+                                    overview: 'Versions of `lodash` prior to 4.17.19 are vulnerable to Prototype Pollution.  The function `zipObjectDeep` allows a malicious user to modify the prototype of `Object` if the property identifiers are user-supplied. Being affected by this issue requires zipping objects based on user-provided property arrays.  \n\nThis vulnerability causes the addition or modification of an existing property that will exist on all objects and may lead to Denial of Service or Code Execution under specific circumstances.',
+                                    recommendation: 'Upgrade to version 4.17.19 or later.',
+                                    references: '- [HackerOne Report](https://hackerone.com/reports/712065)\n- [GitHub Issue](https://github.com/lodash/lodash/issues/4744)',
+                                    access: 'public',
+                                    severity: 'low',
+                                    cwe: 'CWE-471',
+                                    metadata: {
+                                        module_type: '',
+                                        exploitability: 3,
+                                        affected_components: '',
+                                    },
+                                    url: 'https://npmjs.com/advisories/1523',
+                                },
                             },
                             muted: [],
                             metadata: {
                                 vulnerabilities: {
                                     info: 0,
-                                    low: 4,
+                                    low: 11,
                                     moderate: 0,
                                     high: 8,
                                     critical: 0,
                                 },
-                                dependencies: 164,
-                                devDependencies: 153,
+                                dependencies: 119,
+                                devDependencies: 80,
                                 optionalDependencies: 0,
-                                totalDependencies: 317,
+                                totalDependencies: 199,
                             },
                         };
+
                         result.should.containDeep(expected);
                     })
             );
@@ -1175,9 +1706,16 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                             optional: false,
                                             bundled: false,
                                         },
+                                        {
+                                            id: 1523,
+                                            path: 'lodash',
+                                            dev: true,
+                                            optional: false,
+                                            bundled: false,
+                                        },
                                     ],
                                     module: 'lodash',
-                                    target: '4.17.15',
+                                    target: '4.17.20',
                                 },
                                 {
                                     action: 'update',
@@ -1203,9 +1741,16 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                             optional: false,
                                             bundled: false,
                                         },
+                                        {
+                                            id: 1523,
+                                            path: 'nsp>inquirer>lodash',
+                                            dev: true,
+                                            optional: false,
+                                            bundled: false,
+                                        },
                                     ],
                                     module: 'lodash',
-                                    target: '4.17.15',
+                                    target: '4.17.20',
                                     depth: 3,
                                 },
                                 {
@@ -1253,6 +1798,59 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                         {
                                             id: 1065,
                                             path: 'nsp>cli-table2>lodash',
+                                            dev: true,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                        {
+                                            id: 1523,
+                                            path: 'ban-sensitive-files>ggit>lodash',
+                                            dev: false,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                        {
+                                            id: 1523,
+                                            path: 'nsp>cli-table2>lodash',
+                                            dev: true,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                    ],
+                                },
+                                {
+                                    action: 'review',
+                                    module: 'mem',
+                                    resolves: [
+                                        {
+                                            id: 1084,
+                                            path: 'nsp>yargs>os-locale>mem',
+                                            dev: true,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                    ],
+                                },
+                                {
+                                    action: 'review',
+                                    module: 'minimist',
+                                    resolves: [
+                                        {
+                                            id: 1179,
+                                            path: 'ban-sensitive-files>ggit>optimist>minimist',
+                                            dev: false,
+                                            optional: false,
+                                            bundled: false,
+                                        },
+                                    ],
+                                },
+                                {
+                                    action: 'review',
+                                    module: 'yargs-parser',
+                                    resolves: [
+                                        {
+                                            id: 1500,
+                                            path: 'nsp>yargs>yargs-parser',
                                             dev: true,
                                             optional: false,
                                             bundled: false,
@@ -1412,20 +2010,199 @@ if (nodeInfos.npmAuditHasJsonReporter) {
                                     },
                                     url: 'https://npmjs.com/advisories/1065',
                                 },
+                                '1084': {
+                                    findings: [
+                                        {
+                                            version: '1.1.0',
+                                            paths: [
+                                                'nsp>yargs>os-locale>mem',
+                                            ],
+                                        },
+                                    ],
+                                    id: 1084,
+                                    created: '2019-07-18T21:30:31.935Z',
+                                    updated: '2019-11-19T23:31:37.349Z',
+                                    deleted: null,
+                                    title: 'Denial of Service',
+                                    found_by: {
+                                        link: '',
+                                        name: 'Juan Campa',
+                                        email: '',
+                                    },
+                                    reported_by: {
+                                        link: '',
+                                        name: 'Juan Campa',
+                                        email: '',
+                                    },
+                                    module_name: 'mem',
+                                    cves: [],
+                                    vulnerable_versions: '<4.0.0',
+                                    patched_versions: '>=4.0.0',
+                                    overview: "Versions of `mem` prior to 4.0.0 are vulnerable to Denial of Service (DoS).  The package fails to remove old values from the cache even after a value passes its `maxAge` property. This may allow attackers to exhaust the system's memory if they are able to abuse the application logging.",
+                                    recommendation: 'Upgrade to version 4.0.0 or later.',
+                                    references: '- [Snyk Report](https://snyk.io/vuln/npm:mem:20180117)',
+                                    access: 'public',
+                                    severity: 'low',
+                                    cwe: 'CWE-400',
+                                    metadata: {
+                                        module_type: '',
+                                        exploitability: 2,
+                                        affected_components: '',
+                                    },
+                                    url: 'https://npmjs.com/advisories/1084',
+                                },
+                                '1179': {
+                                    findings: [
+                                        {
+                                            version: '0.0.10',
+                                            paths: [
+                                                'ban-sensitive-files>ggit>optimist>minimist',
+                                            ],
+                                        },
+                                    ],
+                                    id: 1179,
+                                    created: '2019-09-23T15:01:43.049Z',
+                                    updated: '2020-03-18T19:41:45.921Z',
+                                    deleted: null,
+                                    title: 'Prototype Pollution',
+                                    found_by: {
+                                        link: 'https://www.checkmarx.com/resources/blog/',
+                                        name: 'Checkmarx Research Team',
+                                        email: '',
+                                    },
+                                    reported_by: {
+                                        link: 'https://www.checkmarx.com/resources/blog/',
+                                        name: 'Checkmarx Research Team',
+                                        email: '',
+                                    },
+                                    module_name: 'minimist',
+                                    cves: [],
+                                    vulnerable_versions: '<0.2.1 || >=1.0.0 <1.2.3',
+                                    patched_versions: '>=0.2.1 <1.0.0 || >=1.2.3',
+                                    overview: 'Affected versions of `minimist` are vulnerable to prototype pollution. Arguments are not properly sanitized, allowing an attacker to modify the prototype of `Object`, causing the addition or modification of an existing property that will exist on all objects.  \nParsing the argument `--__proto__.y=Polluted` adds a `y` property with value `Polluted` to all objects. The argument `--__proto__=Polluted` raises and uncaught error and crashes the application.  \nThis is exploitable if attackers have control over the arguments being passed to `minimist`.\n',
+                                    recommendation: 'Upgrade to versions 0.2.1, 1.2.3 or later.',
+                                    references: '- [GitHub commit 1](https://github.com/substack/minimist/commit/4cf1354839cb972e38496d35e12f806eea92c11f#diff-a1e0ee62c91705696ddb71aa30ad4f95)\n- [GitHub commit 2](https://github.com/substack/minimist/commit/63e7ed05aa4b1889ec2f3b196426db4500cbda94)',
+                                    access: 'public',
+                                    severity: 'low',
+                                    cwe: 'CWE-471',
+                                    metadata: {
+                                        module_type: '',
+                                        exploitability: 1,
+                                        affected_components: '',
+                                    },
+                                    url: 'https://npmjs.com/advisories/1179',
+                                },
+                                '1500': {
+                                    findings: [
+                                        {
+                                            version: '7.0.0',
+                                            paths: [
+                                                'nsp>yargs>yargs-parser',
+                                            ],
+                                        },
+                                    ],
+                                    id: 1500,
+                                    created: '2020-03-26T19:21:50.174Z',
+                                    updated: '2020-05-01T01:05:15.020Z',
+                                    deleted: null,
+                                    title: 'Prototype Pollution',
+                                    found_by: {
+                                        link: '',
+                                        name: 'Snyk Security Team',
+                                        email: '',
+                                    },
+                                    reported_by: {
+                                        link: '',
+                                        name: 'Snyk Security Team',
+                                        email: '',
+                                    },
+                                    module_name: 'yargs-parser',
+                                    cves: [],
+                                    vulnerable_versions: '<13.1.2 || >=14.0.0 <15.0.1 || >=16.0.0 <18.1.2',
+                                    patched_versions: '>=13.1.2 <14.0.0 || >=15.0.1 <16.0.0 || >=18.1.2',
+                                    overview: "Affected versions of `yargs-parser` are vulnerable to prototype pollution. Arguments are not properly sanitized, allowing an attacker to modify the prototype of `Object`, causing the addition or modification of an existing property that will exist on all objects.  \nParsing the argument `--foo.__proto__.bar baz'` adds a `bar` property with value `baz` to all objects. This is only exploitable if attackers have control over the arguments being passed to `yargs-parser`.\n",
+                                    recommendation: 'Upgrade to versions 13.1.2, 15.0.1, 18.1.1 or later.',
+                                    references: '- [Snyk Report](https://snyk.io/vuln/SNYK-JS-YARGSPARSER-560381)',
+                                    access: 'public',
+                                    severity: 'low',
+                                    cwe: 'CWE-471',
+                                    metadata: {
+                                        module_type: '',
+                                        exploitability: 1,
+                                        affected_components: '',
+                                    },
+                                    url: 'https://npmjs.com/advisories/1500',
+                                },
+                                '1523': {
+                                    findings: [
+                                        {
+                                            version: '4.17.4',
+                                            paths: [
+                                                'ban-sensitive-files>ggit>lodash',
+                                            ],
+                                        },
+                                        {
+                                            version: '4.16.4',
+                                            paths: [
+                                                'lodash',
+                                                'nsp>inquirer>lodash',
+                                            ],
+                                        },
+                                        {
+                                            version: '3.10.1',
+                                            paths: [
+                                                'nsp>cli-table2>lodash',
+                                            ],
+                                        },
+                                    ],
+                                    id: 1523,
+                                    created: '2020-05-20T01:36:49.357Z',
+                                    updated: '2020-07-10T19:23:46.395Z',
+                                    deleted: null,
+                                    title: 'Prototype Pollution',
+                                    found_by: {
+                                        link: '',
+                                        name: 'posix',
+                                        email: '',
+                                    },
+                                    reported_by: {
+                                        link: '',
+                                        name: 'posix',
+                                        email: '',
+                                    },
+                                    module_name: 'lodash',
+                                    cves: [
+                                        'CVE-2019-10744',
+                                    ],
+                                    vulnerable_versions: '<4.17.19',
+                                    patched_versions: '>=4.17.19',
+                                    overview: 'Versions of `lodash` prior to 4.17.19 are vulnerable to Prototype Pollution.  The function `zipObjectDeep` allows a malicious user to modify the prototype of `Object` if the property identifiers are user-supplied. Being affected by this issue requires zipping objects based on user-provided property arrays.  \n\nThis vulnerability causes the addition or modification of an existing property that will exist on all objects and may lead to Denial of Service or Code Execution under specific circumstances.',
+                                    recommendation: 'Upgrade to version 4.17.19 or later.',
+                                    references: '- [HackerOne Report](https://hackerone.com/reports/712065)\n- [GitHub Issue](https://github.com/lodash/lodash/issues/4744)',
+                                    access: 'public',
+                                    severity: 'low',
+                                    cwe: 'CWE-471',
+                                    metadata: {
+                                        module_type: '',
+                                        exploitability: 3,
+                                        affected_components: '',
+                                    },
+                                    url: 'https://npmjs.com/advisories/1523',
+                                },
                             },
                             muted: [],
                             metadata: {
                                 vulnerabilities: {
                                     info: 0,
-                                    low: 4,
+                                    low: 11,
                                     moderate: 0,
                                     high: 8,
                                     critical: 0,
                                 },
-                                dependencies: 164,
-                                devDependencies: 153,
+                                dependencies: 119,
+                                devDependencies: 80,
                                 optionalDependencies: 0,
-                                totalDependencies: 317,
+                                totalDependencies: 199,
                             },
                         };
                         result.should.containDeep(expected);

@@ -847,6 +847,7 @@ describe('Integration tests', () => {
                                 'https://npmjs.com/advisories/577',
                                 'https://npmjs.com/advisories/782',
                                 'https://npmjs.com/advisories/1065',
+                                'https://npmjs.com/advisories/1523',
                             ].join(EOL)
                         );
                     })
@@ -863,7 +864,7 @@ describe('Integration tests', () => {
                         )
                     ));
 
-            ['lodash@4.17.12', 'ms@0.7.1'].forEach(function(dependency) {
+            ['lodash@4.17.20', 'ms@0.7.1'].forEach(function(dependency) {
                 const name = dependency.split('@')[0];
                 const version = dependency.split('@')[1];
                 it(`Should not fail on ${dependency} as a direct dependency`, () =>
@@ -1185,7 +1186,9 @@ describe('Integration tests', () => {
                         err.message.indexOf('You do not have permission to publish') > -1 ||
                         err.message.indexOf('auth required for publishing') > -1 ||
                         err.message.indexOf('operation not permitted') > -1 ||
-                        err.message.indexOf('You must be logged in to publish packages') > -1
+                        err.message.indexOf('You must be logged in to publish packages') > -1 ||
+                        //https://github.com/npm/cli/issues/1637
+                        err.message.indexOf('npm ERR! 404 Not Found - PUT https://registry.npmjs.org/testing-repo - Not found') > -1
                     );
                 }));
 
