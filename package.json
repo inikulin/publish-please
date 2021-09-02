@@ -47,16 +47,16 @@
     ".sensitivedata"
   ],
   "dependencies": {
-    "chalk": "2.4.1",
-    "cp-sugar": "1.0.0",
-    "elegant-status": "1.1.0",
-    "inquirer": "6.2.0",
-    "is-ci": "1.2.1",
-    "lodash": "4.17.20",
-    "micromatch": "3.1.10",
-    "node-emoji": "1.8.1",
-    "osenv": "0.1.5",
-    "semver": "5.6.0"
+    "chalk": "^2.4.1",
+    "cp-sugar": "^1.0.0",
+    "elegant-status": "^1.1.0",
+    "inquirer": "^6.2.0",
+    "is-ci": "^1.2.1",
+    "lodash": "^4.17.20",
+    "micromatch": "^3.1.10",
+    "node-emoji": "^1.8.1",
+    "osenv": "^0.1.5",
+    "semver": "^5.6.0"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
